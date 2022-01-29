@@ -15,7 +15,7 @@ class Content(tk.Tk, ttk.LabelFrame, ttk.Entry, ttk.Label, tk.Button, tk.Topleve
         style.map("default.Treeview", background=[("selected", "green")])
 
         # ================================================ Style for Label =============================================
-        style.configure('h1.TLabel', font=("Times New Roman", 20, "bold"), foreground='#585456', background="#FFFFFF")
+        style.configure('h1.TLabel', font=("Times New Roman", 20, "bold"), foreground='#395A68', background="#FFFFFF")
         style.configure('h2.TLabel', font=("Times New Roman", 15), foreground='#585456', background="#FFFFFF")
 
         # ================================================ Style for Frame =============================================
