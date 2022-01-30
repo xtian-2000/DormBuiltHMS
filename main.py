@@ -1,10 +1,15 @@
 import tkinter
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter.messagebox import showinfo
 from style import Content
 from tkinter import PhotoImage
+from database_controller import Database
 import mysql.connector as mysql
+
+host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
+user = "admin"
+password = "44966874"
 
 
 class Window:
@@ -26,9 +31,21 @@ class Window:
         self.settings_b = tkinter.Button
         self.notif_b = tkinter.Button
 
+        # Entry
+        self.admin_username_e = ttk.Entry
+        self.admin_password_e = ttk.Entry
+        self.admin_email_e = ttk.Entry
+
+        # Database
+        self.db1 = None
+        self.mycursor = None
+
         # Initialize method for login interface
         self.login_interface()
         # self.main_interface()
+
+        # Initialize class for Database
+        Database()
 
     def login_interface(self):
         # Root window configuration
@@ -107,18 +124,18 @@ class Window:
 
         ttk.Label(form_f, text='User Name', style="h2.TLabel", justify="left").grid(column=0, row=0)
 
-        username_e = ttk.Entry(form_f)
-        username_e.grid(column=1, row=0)
+        self.admin_username_e = ttk.Entry(form_f)
+        self.admin_username_e.grid(column=1, row=0)
 
         ttk.Label(form_f, text='Password', style="h2.TLabel", justify="left").grid(column=0, row=1)
 
-        password_e = ttk.Entry(form_f, show="*")
-        password_e.grid(column=1, row=1)
+        self.admin_password_e = ttk.Entry(form_f, show="*")
+        self.admin_password_e.grid(column=1, row=1)
 
         ttk.Label(form_f, text='Email', style="h2.TLabel", justify="left").grid(column=0, row=2)
 
-        email_e = ttk.Entry(form_f)
-        email_e.grid(column=1, row=2)
+        self.admin_email_e = ttk.Entry(form_f)
+        self.admin_email_e.grid(column=1, row=2)
 
         buttons_f = ttk.Frame(register_f, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both", ipady=20)
@@ -128,8 +145,32 @@ class Window:
         cancel_b.pack(side="left", padx=10)
 
         register_b = tk.Button(buttons_f, text="Register", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
-                               relief="flat", command=self.button_clicked)
+                               relief="flat", command=self.signup_request)
         register_b.pack(side="right", padx=10)
+
+    def signup_request(self):
+        if not self.admin_username_e.get():
+            self.invalid_input()
+        if not self.admin_password_e.get():
+            self.invalid_input()
+        if not self.admin_email_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO admin (username, password, email) VALUES (%s,%s,%s)",
+                                      (self.admin_username_e.get(), self.admin_password_e.get(),
+                                       self.admin_email_e.get()))
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                # Initialize method to move back to the login interface
+                self.login_interface()
+            except Exception as e:
+                self.invalid_input()
+                print("Failed to connect")
+                print(e)
 
     def main_interface(self):
         # Root window configuration
@@ -235,6 +276,24 @@ class Window:
         self.home_b.configure(fg='#7c8084')
         self.settings_b.configure(fg='#7c8084')
         self.notif_b.configure(fg='#7c8084')
+
+    # ================================================ Database Control ================================================
+    def database_connect(self):
+        try:
+            self.db1 = mysql.connect(host=host,
+                                     user=user,
+                                     password=password,
+                                     database="hmsdatabase")
+            print("Connected to lmsdatabase")
+            self.mycursor = self.db1.cursor()
+        except Exception as e:
+            print("Could not connect to hmsdatabase")
+            print(e)
+
+    # ================================================ Static Methods ==================================================
+    @staticmethod
+    def invalid_input():
+        messagebox.showerror("Error", "Invalid input")
 
     @staticmethod
     def button_clicked():
