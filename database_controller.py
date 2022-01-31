@@ -19,7 +19,7 @@ class Database:
             print("Failed to connect")
             print(e)
 
-        """
+
         # Creating lmsdatabase
         try:
             self.mycursor = self.db.cursor()
@@ -43,16 +43,16 @@ class Database:
         # Creating admin table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`admin` ( `admin_id` INT NOT NULL,`username` VARCHAR(45)"
-                                  " NOT NULL,`password` VARCHAR(45) NOT NULL,`email` VARCHAR(45) NOT NULL,PRIMARY KEY "
-                                  "(`admin_id`), UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC) VISIBLE, UNIQUE INDEX "
-                                  "`username_UNIQUE` (`username` ASC) VISIBLE, UNIQUE INDEX `email_UNIQUE`"
-                                  " (`email` ASC) VISIBLE);")
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`admin` ( `admin_id` INT NOT NULL AUTO_INCREMENT,"
+                                  "`username` VARCHAR(45) NOT NULL,`password` VARCHAR(45) NOT NULL,`email` VARCHAR(45)"
+                                  " NOT NULL,PRIMARY KEY (`admin_id`), UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC)"
+                                  " VISIBLE, UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE, UNIQUE INDEX"
+                                  " `email_UNIQUE` (`email` ASC) VISIBLE);")
             print("'Admin' table is created successfully")
         except Exception as e:
             print("'Admin' table could not be created")
             print(e)
-            """
+
 
 
 
