@@ -7,10 +7,16 @@ from style import Content
 from tkinter import PhotoImage
 # from database_controller import Database
 import mysql.connector as mysql
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from random import randint
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
+
+admin_access = False
 
 
 class Window:
@@ -19,6 +25,10 @@ class Window:
 
         # Window
         self.master = master
+
+        # TopLevel Frame
+        self.reset_password_top = tk.Toplevel
+        self.admin_access_top = tk.Toplevel
 
         # LabelFrame
         self.content_lf = None
@@ -42,6 +52,11 @@ class Window:
 
         self.employee_username_e = ttk.Entry
         self.employee_password_e = ttk.Entry
+
+        self.forgot_password_email_e = ttk.Entry
+
+        self.admin_access_username_e = ttk.Entry
+        self.admin_access_password_e = ttk.Entry
 
         # Integer
         # self.key = int
@@ -85,23 +100,27 @@ class Window:
 
         ttk.Label(logo_f, image=self.db_logo_resized).pack(pady=5)
 
-        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel", justify="center").pack(pady=5)
+        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(pady=5)
 
         form_f = ttk.Frame(login_f, style="Basic.TFrame")
-        form_f.pack(side="top", ipadx=10, ipady=10, fill="both")
+        form_f.pack(side="top", ipadx=10, ipady=5, fill="both")
 
-        ttk.Label(form_f, text='User Name', style="h2.TLabel", justify="left").grid(column=0, row=0)
+        ttk.Label(form_f, text='User Name', style="h2.TLabel").grid(column=0, row=0, sticky="w")
 
         self.signin_username_e = ttk.Entry(form_f)
         self.signin_username_e.grid(column=1, row=0)
 
-        ttk.Label(form_f, text='Password', style="h2.TLabel", justify="left").grid(column=0, row=1)
+        ttk.Label(form_f, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
 
         self.signin_password_e = ttk.Entry(form_f, show="*")
         self.signin_password_e.grid(column=1, row=1)
 
+        forgot_password_l = ttk.Label(form_f, text="Forgot password?", cursor="hand2", style="link.TLabel")
+        forgot_password_l.grid(column=1, row=2, sticky="e")
+        forgot_password_l.bind("<Button-1>", self.forgot_password_interface)
+
         buttons_f = ttk.Frame(login_f, style="Basic.TFrame")
-        buttons_f.pack(side="top", fill="both", ipady=20)
+        buttons_f.pack(side="top", fill="both")
 
         signin_b = tk.Button(buttons_f, text="Sign in", font="OpenSans, 12", fg="#FFFFFF",
                              bg="#4C8404", relief="flat", command=self.signin_validation)
@@ -113,6 +132,8 @@ class Window:
         signup_b = tk.Button(signup_b_lf, text="Sign up", font="OpenSans, 12", fg="#585456",
                              bg="#FFFFFF", relief="flat", command=self.signup_interface)
         signup_b.pack(side="top", fill="x")
+
+        self.signin_username_e.focus()
 
     def signup_interface(self):
         # Clean widgets in the master window
@@ -139,13 +160,13 @@ class Window:
 
         ttk.Label(form_f, text='Password', style="h2.TLabel", justify="left").grid(column=0, row=1, sticky="w")
 
-        self.signup_username_e = ttk.Entry(form_f, show="*")
-        self.signup_username_e.grid(column=1, row=1)
+        self.signup_password_e = ttk.Entry(form_f, show="*")
+        self.signup_password_e.grid(column=1, row=1)
 
         ttk.Label(form_f, text='Email', style="h2.TLabel", justify="left").grid(column=0, row=2, sticky="w")
 
-        self.signup_username_e = ttk.Entry(form_f)
-        self.signup_username_e.grid(column=1, row=2)
+        self.signup_email_e = ttk.Entry(form_f)
+        self.signup_email_e.grid(column=1, row=2)
 
         buttons_f = ttk.Frame(register_f, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both", ipady=20)
@@ -160,6 +181,8 @@ class Window:
         signup_b = tk.Button(buttons_f, text="Continue", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
                              relief="flat", command=self.signup_request)
         signup_b.pack(side="right", padx=10)
+
+        self.signup_username_e.focus()
 
     def main_interface(self):
         # Root window configuration
@@ -247,15 +270,19 @@ class Window:
         Content.destroy_content(self.content_lf)
 
         # ================================================ Settings content ============================================
-        create_account_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        create_account_lf.pack(side="top", fill="x")
+        admin_panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        admin_panel_lf.pack(side="top", fill="x")
 
-        create_account_form_lf2 = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
-        create_account_form_lf2.pack(side="top", fill="x")
+        # ================================================ Create employee account interface ===========================
+        create_account_lf = tk.LabelFrame(admin_panel_lf, bg="#FFFFFF")
+        create_account_lf.pack(side="left", padx=10, pady=10)
 
-        ttk.Label(create_account_form_lf2, text='Create employee account',
+        create_account_label_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
+        create_account_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(create_account_label_lf, text='Create employee account',
                   style="h1.TLabel").pack(side="left", anchor="nw")
-        ttk.Label(create_account_form_lf2, text='admin',
+        ttk.Label(create_account_label_lf, text='admin',
                   style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
         create_account_form_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
@@ -283,6 +310,26 @@ class Window:
         ttk.Label(create_account_buttons_lf, text='Click here to create an\n employee account!',
                   style="small_info.TLabel").pack(side="left")
 
+        # ================================================ Account Settings ============================================
+        account_settings_lf = tk.LabelFrame(admin_panel_lf, bg="#FFFFFF")
+        account_settings_lf.pack(side="left", padx=10, pady=10)
+
+        account_settings_label_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+        account_settings_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(account_settings_label_lf, text='Account settings',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(account_settings_label_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        create_account_links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+        create_account_links_lf.pack(side="top", anchor="nw", pady=10)
+
+        change_username_password_l = ttk.Label(create_account_links_lf, text='Change username and password',
+                                               style="link.TLabel", justify="left")
+        change_username_password_l.pack()
+        change_username_password_l.bind("<Button-1>", self.admin_access_validation_interface)
+
     def notif_content_interface(self):
         self.change_button_color()
         self.notif_b.configure(fg='#395A68')
@@ -298,6 +345,87 @@ class Window:
         self.home_b.configure(fg='#7c8084')
         self.settings_b.configure(fg='#7c8084')
         self.notif_b.configure(fg='#7c8084')
+
+    # ================================================ Dialog Boxes Interface ==========================================
+    def admin_access_validation_interface(self, event):
+        print(admin_access)
+        self.admin_access_top = tk.Toplevel(self.master)
+        self.admin_access_top.title("Administrator access validation")
+        self.admin_access_top.configure(bg="#FFFFFF")
+        self.admin_access_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==============================
+        admin_access_lf = tk.LabelFrame(self.admin_access_top, bg="#FFFFFF")
+        admin_access_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        forms_lf = tk.LabelFrame(admin_access_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='User Name', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+
+        self.admin_access_username_e = ttk.Entry(forms_lf, width=60)
+        self.admin_access_username_e.grid(column=1, row=0, sticky="w", padx=10)
+        self.admin_access_username_e.focus()
+
+        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+
+        self.admin_access_password_e = ttk.Entry(forms_lf, width=60)
+        self.admin_access_password_e.grid(column=1, row=1, sticky="w", padx=10)
+
+        buttons_lf = tk.LabelFrame(admin_access_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        admin_access_validate_b = tk.Button(buttons_lf, text="Validate", font="OpenSans, 10", fg="#FFFFFF",
+                                            bg="#4C8404", relief="flat", command=self.forgot_password_request)
+        admin_access_validate_b.pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to validate your\n administrative account!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.admin_access_top.grab_set()
+
+        self.admin_access_top.mainloop()
+
+    def forgot_password_interface(self, event):
+        self.reset_password_top = tk.Toplevel(self.master)
+        self.reset_password_top.title("Forgot Password")
+        self.reset_password_top.configure(bg="#FFFFFF")
+        self.reset_password_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==============================
+        reset_password_lf = tk.LabelFrame(self.reset_password_top, bg="#FFFFFF")
+        reset_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        forms_lf = tk.LabelFrame(reset_password_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Email', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+
+        self.forgot_password_email_e = ttk.Entry(forms_lf, width=60)
+        self.forgot_password_email_e.grid(column=1, row=0, sticky="w", padx=10)
+        self.forgot_password_email_e.focus()
+
+        buttons_lf = tk.LabelFrame(reset_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        reset_password_b = tk.Button(buttons_lf, text="Reset password", font="OpenSans, 10", fg="#FFFFFF",
+                                     bg="#4C8404", relief="flat", command=self.forgot_password_request)
+        reset_password_b.pack(side="left")
+
+        ttk.Label(buttons_lf, text="A new password will be generated and sent to\n"
+                                   " the email that are linked to your account.",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.reset_password_top.grab_set()
+
+        self.reset_password_top.mainloop()
+
+        print(event)
+
+    def change_username_password(self, event):
+        pass
 
     # ================================================ Database Control ================================================
     def database_connect(self):
@@ -364,10 +492,51 @@ class Window:
                 print("Failed to connect")
                 print(e)
 
+    def forgot_password_request(self):
+        if not self.forgot_password_email_e.get():
+            self.invalid_input()
+        else:
+            otp = randint(10000, 99999)
+
+            self.database_connect()
+            self.mycursor.execute("UPDATE admin SET password='" + str(otp) + "' WHERE email='"
+                                  + self.forgot_password_email_e.get() + "';")
+            print(str(otp), self.forgot_password_email_e.get())
+
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            email = 'pongodev0914@gmail.com'
+            email_password = 'Bin@1110010010'
+            send_to_email = self.forgot_password_email_e.get()
+            subject = 'Password reset for Administrative account in Hotel Management System of DormBuilt Inc.'
+            message = ("Your new password is\n\n" + str(otp))
+
+            msg = MIMEMultipart()
+            msg['From'] = email
+            msg['To'] = send_to_email
+            msg['Subject'] = subject
+
+            # Attach the message to the MIMEMultipart object
+            msg.attach(MIMEText(message, 'plain'))
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email, email_password)
+            text = msg.as_string()
+            server.sendmail(email, send_to_email, text)
+            server.quit()
+
+            tk.messagebox.showinfo("Forgot password", "Please check your email at " +
+                                   self.forgot_password_email_e.get() + ".")
+
+            self.reset_password_top.destroy()
+
     # ================================================ Static Methods ==================================================
     @staticmethod
     def invalid_input():
-        messagebox.showerror("Error", "Invalid input")
+        messagebox.showerror("Error", "Invalid or no input.")
 
     @staticmethod
     def button_clicked():
