@@ -11,12 +11,11 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from random import randint
+from tkinter import Menu
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
-
-admin_access = False
 
 
 class Window:
@@ -29,6 +28,8 @@ class Window:
         # TopLevel Frame
         self.reset_password_top = tk.Toplevel
         self.admin_access_top = tk.Toplevel
+        self.bug_report_top = tk.Toplevel
+        self.change_username_password_top = tk.Toplevel
 
         # LabelFrame
         self.content_lf = None
@@ -58,11 +59,17 @@ class Window:
         self.admin_access_username_e = ttk.Entry
         self.admin_access_password_e = ttk.Entry
 
-        # Integer
-        # self.key = int
+        self.change_username_e = ttk.Entry
+        self.change_password_e = ttk.Entry
+
+        # Text
+        self.bug_description_e = ttk.Entry
 
         # String
         self.admin_id_str = str
+
+        # Boolean
+        self.admin_access = False
 
         # Database
         self.db1 = None
@@ -179,7 +186,7 @@ class Window:
         cancel_b.pack()
 
         signup_b = tk.Button(buttons_f, text="Continue", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
-                             relief="flat", command=self.signup_request)
+                             relief="flat", command=self.admin_signup_request)
         signup_b.pack(side="right", padx=10)
 
         self.signup_username_e.focus()
@@ -195,6 +202,21 @@ class Window:
         Content.destroy_content(self.master)
 
         # ================================================ Main interface contents =====================================
+        # ================================================ Menu Bar Interface ==========================================
+        menu_bar = Menu(self.master)
+        self.master.config(menu=menu_bar)
+
+        # Creating file menu
+        file_menu = Menu(menu_bar, tearoff=0)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.switch_exit)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+
+        # Creating help menu
+        help_menu = Menu(menu_bar, tearoff=0)
+        help_menu.add_command(label="Bug report", command=self.bug_report_interface)
+        help_menu.add_separator()
+        menu_bar.add_cascade(label="Help", menu=help_menu)
 
         # ================================================ Top-Nav Interface ===========================================
         top_nav_lf = tk.LabelFrame(self.master, bg="#FFFFFF", relief="flat")
@@ -304,7 +326,7 @@ class Window:
         create_account_buttons_lf.pack(side="top", anchor="nw")
 
         create_account_b = tk.Button(create_account_buttons_lf, text="Create account", font="OpenSans, 12",
-                                     fg="#FFFFFF", bg="#4C8404", relief="flat", command=self.signup_request)
+                                     fg="#FFFFFF", bg="#4C8404", relief="flat", command=self.admin_signup_request)
         create_account_b.pack(side="left", padx=10)
 
         ttk.Label(create_account_buttons_lf, text='Click here to create an\n employee account!',
@@ -328,7 +350,7 @@ class Window:
         change_username_password_l = ttk.Label(create_account_links_lf, text='Change username and password',
                                                style="link.TLabel", justify="left")
         change_username_password_l.pack()
-        change_username_password_l.bind("<Button-1>", self.admin_access_validation_interface)
+        change_username_password_l.bind("<Button-1>", self.change_username_password_interface)
 
     def notif_content_interface(self):
         self.change_button_color()
@@ -347,8 +369,7 @@ class Window:
         self.notif_b.configure(fg='#7c8084')
 
     # ================================================ Dialog Boxes Interface ==========================================
-    def admin_access_validation_interface(self, event):
-        print(admin_access)
+    def admin_access_validation_interface(self):
         self.admin_access_top = tk.Toplevel(self.master)
         self.admin_access_top.title("Administrator access validation")
         self.admin_access_top.configure(bg="#FFFFFF")
@@ -424,8 +445,91 @@ class Window:
 
         print(event)
 
-    def change_username_password(self, event):
-        pass
+    def bug_report_interface(self):
+        self.bug_report_top = tk.Toplevel(self.master)
+        self.bug_report_top.title("Bug report")
+        self.bug_report_top.configure(bg="#FFFFFF")
+        self.bug_report_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==============================
+        bug_report_lf = tk.LabelFrame(self.bug_report_top, bg="#FFFFFF")
+        bug_report_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        forms_lf = tk.LabelFrame(bug_report_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Bug description', style="h2.TLabel").pack(side="top", anchor="nw")
+
+        self.bug_description_e = ttk.Entry(forms_lf, width=60)
+        self.bug_description_e.pack()
+        self.bug_description_e.focus()
+
+        buttons_lf = tk.LabelFrame(bug_report_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        report_bug_b = tk.Button(buttons_lf, text="Report", font="OpenSans, 10", fg="#FFFFFF",
+                                 bg="#4C8404", relief="flat", command=self.bug_report)
+        report_bug_b.pack(side="left")
+
+        ttk.Label(buttons_lf, text="Your bug report will be sent to our developers.",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.bug_report_top.grab_set()
+
+        self.bug_report_top.mainloop()
+
+    def change_username_password_interface(self, event):
+        if self.admin_access:
+            self.change_username_password_top = tk.Toplevel(self.master)
+            self.change_username_password_top.title("Change username and password")
+            self.change_username_password_top.configure(bg="#FFFFFF")
+            self.change_username_password_top.resizable(False, False)
+
+            # ================================================ Widgets for changing username and password ==============
+            change_username_password_lf = tk.LabelFrame(self.change_username_password_top, bg="#FFFFFF")
+            change_username_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+            forms_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
+            forms_lf.pack(side="top", fill="both", expand=True)
+
+            ttk.Label(forms_lf, text='Username', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+
+            self.change_username_e = ttk.Entry(forms_lf, width=60)
+            self.change_username_e.grid(column=1, row=0, sticky="w", padx=10)
+            self.change_username_e.focus()
+
+            ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+
+            self.change_password_e = ttk.Entry(forms_lf, width=60)
+            self.change_password_e.grid(column=1, row=1, sticky="w", padx=10)
+            self.change_password_e.focus()
+
+            buttons_lf = tk.LabelFrame(change_username_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+            buttons_lf.pack(side="top", fill="both", expand=True)
+
+            continue_password_b = tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF",
+                                            bg="#4C8404", relief="flat", command=self.change_username_password_request)
+            continue_password_b.pack(side="left")
+
+            ttk.Label(buttons_lf, text="The new username and password will\n be saved on your account",
+                      style="small_info.TLabel").pack(side="left", padx=10)
+
+            # Disables underlying window
+            self.change_username_password_top.grab_set()
+
+            self.change_username_password_top.mainloop()
+        else:
+            self.admin_access_validation_interface()
+
+        print(event)
+
+    def switch_exit(self):
+        exit_yes_no = messagebox.askyesno(title="Exit", message="Are you sure you want to exit?")
+        if exit_yes_no:
+            self.master.destroy()
+        else:
+            pass
 
     # ================================================ Database Control ================================================
     def database_connect(self):
@@ -462,13 +566,15 @@ class Window:
                 self.admin_id_str = str(admin_id)
                 # print(self.admin_id_str)
 
+                self.admin_access = True
+
                 # Instantiate create_widgets method
                 self.main_interface()
 
             self.db1.close()
             self.mycursor.close()
 
-    def signup_request(self):
+    def admin_signup_request(self):
         if not self.signup_username_e.get():
             self.invalid_input()
         if not self.signup_password_e.get():
@@ -491,6 +597,46 @@ class Window:
                 self.invalid_input()
                 print("Failed to connect")
                 print(e)
+
+    def bug_report(self):
+        if not self.bug_description_e.get():
+            self.invalid_input()
+        else:
+            self.database_connect()
+            self.mycursor.execute(
+                "SELECT DISTINCT email FROM admin where admin_id ='" + str(self.admin_id_str) + "';")
+            myresult = self.mycursor.fetchone()
+
+            # Convert tuple into string
+            admin_email = ''.join(myresult)
+
+            self.db1.close()
+            self.mycursor.close()
+
+            email = 'pongodev0914@gmail.com'
+            email_password = 'Bin@1110010010'
+            send_to_email = 'pongodev0914@gmail.com'
+            subject = ('Bug report from ' + admin_email)
+            message = self.bug_description_e.get()
+
+            msg = MIMEMultipart()
+            msg['From'] = email
+            msg['To'] = send_to_email
+            msg['Subject'] = subject
+
+            # Attach the message to the MIMEMultipart object
+            msg.attach(MIMEText(message, 'plain'))
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email, email_password)
+            text = msg.as_string()
+            server.sendmail(email, send_to_email, text)
+            server.quit()
+
+            tk.messagebox.showinfo("Bug report", "Your bug report has been sent to the developers.")
+
+            self.bug_report_top.destroy()
 
     def forgot_password_request(self):
         if not self.forgot_password_email_e.get():
@@ -532,6 +678,46 @@ class Window:
                                    self.forgot_password_email_e.get() + ".")
 
             self.reset_password_top.destroy()
+
+    def change_username_password_request(self):
+        if not self.change_username_e.get():
+            self.invalid_input()
+        if not self.change_password_e.get():
+            self.invalid_input()
+        else:
+            self.database_connect()
+            self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
+                                  + self.change_password_e.get() + "' WHERE admin_id='"
+                                  + str(self.admin_id_str) + "';")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+            """
+            email = 'pongodev0914@gmail.com'
+            email_password = 'Bin@1110010010'
+            send_to_email = self.forgot_password_email_e.get()
+            subject = 'Change username and password Administrative account in Hotel Management System of DormBuilt Inc.'
+            message = ("Your new password is\n\n" + self.change_password_e.get())
+
+            msg = MIMEMultipart()
+            msg['From'] = email
+            msg['To'] = send_to_email
+            msg['Subject'] = subject
+
+            # Attach the message to the MIMEMultipart object
+            msg.attach(MIMEText(message, 'plain'))
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email, email_password)
+            text = msg.as_string()
+            server.sendmail(email, send_to_email, text)
+            server.quit()
+
+            tk.messagebox.showinfo("Forgot password", "Please check your email at " +
+                                   self.forgot_password_email_e.get() + ".")"""
+
+            self.change_username_password_top.destroy()
 
     # ================================================ Static Methods ==================================================
     @staticmethod

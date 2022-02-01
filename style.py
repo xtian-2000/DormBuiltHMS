@@ -27,6 +27,9 @@ class Content(tk.Tk, ttk.LabelFrame, ttk.Entry, ttk.Label, tk.Button, tk.Topleve
         # ================================================ Style for LabelFrame ========================================
         style.configure('Basic.TLabelframe', background="#FFFFFF")
 
+        # ================================================ Style for Entry ========================================
+        style.configure('Basic.TEntry', background="#FFFFFF", borderwidth=3)
+
     def destroy_content(self):
         for child in self.winfo_children():
             child.destroy()
