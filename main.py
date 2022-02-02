@@ -30,6 +30,7 @@ class Window:
         self.admin_access_top = tk.Toplevel
         self.bug_report_top = tk.Toplevel
         self.change_username_password_top = tk.Toplevel
+        self.create_employee_top = tk.Toplevel
 
         # LabelFrame
         self.content_lf = None
@@ -133,9 +134,16 @@ class Window:
         buttons_f = ttk.Frame(login_f, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both")
 
-        signin_b = tk.Button(buttons_f, text="Sign in", font="OpenSans, 12", fg="#FFFFFF",
-                             bg="#4C8404", relief="flat", command=self.signin_validation)
-        signin_b.pack(side="top", pady=5, padx=10, fill="x")
+        signin_admin_b = tk.Button(buttons_f, text="Sign in as Administrator", font="OpenSans, 12", fg="#FFFFFF",
+                             bg="#4C8404", relief="flat", command=self.admin_signin_request)
+        signin_admin_b.pack(side="top", pady=5, padx=10, fill="x")
+
+        signin_basic_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
+        signin_basic_b_lf.pack(side="top", pady=5, padx=10, fill="x")
+
+        signin_basic_b = tk.Button(signin_basic_b_lf, text="Sign in as Basic user", font="OpenSans, 12", fg="#4C8404",
+                                   bg="#FFFFFF", relief="flat", command=self.admin_signin_request)
+        signin_basic_b.pack(side="top", fill="x")
 
         signup_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
         signup_b_lf.pack(side="top", pady=5, padx=10, fill="x")
@@ -301,43 +309,6 @@ class Window:
         admin_panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
         admin_panel_lf.pack(side="top", fill="x")
 
-        # ================================================ Create employee account interface ===========================
-        create_account_lf = tk.LabelFrame(admin_panel_lf, bg="#FFFFFF")
-        create_account_lf.pack(side="left", padx=10, pady=10)
-
-        create_account_label_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
-        create_account_label_lf.pack(side="top", fill="x")
-
-        ttk.Label(create_account_label_lf, text='Create employee account',
-                  style="h1.TLabel").pack(side="left", anchor="nw")
-        ttk.Label(create_account_label_lf, text='admin',
-                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
-
-        create_account_form_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
-        create_account_form_lf.pack(side="top", anchor="nw", pady=10)
-
-        ttk.Label(create_account_form_lf, text='Employee Name', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
-
-        self.employee_username_e = ttk.Entry(create_account_form_lf)
-        self.employee_username_e.grid(column=1, row=0)
-
-        ttk.Label(create_account_form_lf, text='Employee Password', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
-
-        self.employee_password_e = ttk.Entry(create_account_form_lf)
-        self.employee_password_e.grid(column=1, row=1)
-
-        create_account_buttons_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
-        create_account_buttons_lf.pack(side="top", anchor="nw")
-
-        create_account_b = tk.Button(create_account_buttons_lf, text="Create account", font="OpenSans, 12",
-                                     fg="#FFFFFF", bg="#4C8404", relief="flat", command=self.admin_signup_request)
-        create_account_b.pack(side="left", padx=10)
-
-        ttk.Label(create_account_buttons_lf, text='Click here to create an\n employee account!',
-                  style="small_info.TLabel").pack(side="left")
-
         # ================================================ Account Settings ============================================
         account_settings_lf = tk.LabelFrame(admin_panel_lf, bg="#FFFFFF")
         account_settings_lf.pack(side="left", padx=10, pady=10)
@@ -359,13 +330,33 @@ class Window:
         self.admin_access_status_l = ttk.Label(description_lf, text=self.admin_access_status)
         self.admin_access_status_l.grid(column=1, row=0)
 
-        links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
-        links_lf.pack(side="top", anchor="nw", pady=10)
+        account_settings_links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+        account_settings_links_lf.pack(side="top", anchor="nw", pady=10)
 
-        change_username_password_l = ttk.Label(links_lf, text='Change username and password',
+        change_username_password_l = ttk.Label(account_settings_links_lf, text='Change username and password',
                                                style="link.TLabel")
         change_username_password_l.pack(side="top", anchor="w")
         change_username_password_l.bind("<Button-1>", self.change_username_password_dialog)
+
+        # ================================================ Create employee account interface ===========================
+        create_account_lf = tk.LabelFrame(admin_panel_lf, bg="#FFFFFF")
+        create_account_lf.pack(side="left", padx=10, pady=10, fill="y")
+
+        create_account_label_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
+        create_account_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(create_account_label_lf, text='Create employee account',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(create_account_label_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        account_settings_links_lf = tk.LabelFrame(create_account_lf, bg="#FFFFFF", relief="flat")
+        account_settings_links_lf.pack(side="top", anchor="nw", pady=10)
+
+        create_employee_l = ttk.Label(account_settings_links_lf, text='Create employee account',
+                                      style="link.TLabel")
+        create_employee_l.pack(side="top", anchor="w")
+        create_employee_l.bind("<Button-1>", self.create_employee_dialog)
 
         # Initialize method for changing content according to admin access
         self.admin_status()
@@ -405,6 +396,12 @@ class Window:
         admin_access_lf = tk.LabelFrame(self.admin_access_top, bg="#FFFFFF")
         admin_access_lf.pack(padx=15, pady=15, fill="both", expand=True)
 
+        account_settings_label_lf = tk.LabelFrame(admin_access_lf, bg="#FFFFFF", relief="flat")
+        account_settings_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(account_settings_label_lf, text='Admin access validation',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
         forms_lf = tk.LabelFrame(admin_access_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
@@ -423,7 +420,7 @@ class Window:
         buttons_lf.pack(side="top", fill="both", expand=True)
 
         admin_access_validate_b = tk.Button(buttons_lf, text="Validate", font="OpenSans, 10", fg="#FFFFFF",
-                                            bg="#4C8404", relief="flat", command=self.forgot_password_request)
+                                            bg="#4C8404", relief="flat", command=self.admin_access_request)
         admin_access_validate_b.pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to validate your\n administrative account!",
@@ -434,6 +431,57 @@ class Window:
 
         self.admin_access_top.mainloop()
 
+    def create_employee_dialog(self, event):
+        self.create_employee_top = tk.Toplevel(self.master)
+        self.create_employee_top.title("Create employee account")
+        self.create_employee_top.configure(bg="#FFFFFF")
+        self.create_employee_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==============================
+        create_employee_lf = tk.LabelFrame(self.create_employee_top, bg="#FFFFFF")
+        create_employee_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        account_settings_label_lf = tk.LabelFrame(create_employee_lf, bg="#FFFFFF", relief="flat")
+        account_settings_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(account_settings_label_lf, text='Create employee account',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(account_settings_label_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(create_employee_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Employee Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, sticky="w")
+
+        self.employee_username_e = ttk.Entry(forms_lf)
+        self.employee_username_e.grid(column=1, row=0)
+        self.employee_username_e.focus()
+
+        ttk.Label(forms_lf, text='Employee Password', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, sticky="w")
+
+        self.employee_password_e = ttk.Entry(forms_lf)
+        self.employee_password_e.grid(column=1, row=1)
+
+        buttons_lf = tk.LabelFrame(create_employee_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        create_account_b = tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF",
+                                     bg="#4C8404", relief="flat", command=self.forgot_password_request)
+        create_account_b.pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create an\n employee account!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.create_employee_top.grab_set()
+
+        self.create_employee_top.mainloop()
+
+        print(event)
+
     def forgot_password_dialog(self, event):
         self.reset_password_top = tk.Toplevel(self.master)
         self.reset_password_top.title("Forgot Password")
@@ -443,6 +491,12 @@ class Window:
         # ================================================ Widgets for resetting password ==============================
         reset_password_lf = tk.LabelFrame(self.reset_password_top, bg="#FFFFFF")
         reset_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        account_settings_label_lf = tk.LabelFrame(reset_password_lf, bg="#FFFFFF", relief="flat")
+        account_settings_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(account_settings_label_lf, text='Forgot password',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
 
         forms_lf = tk.LabelFrame(reset_password_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
@@ -506,6 +560,7 @@ class Window:
         self.bug_report_top.mainloop()
 
     def change_username_password_dialog(self, event):
+        print(self.admin_access)
         if self.admin_access:
             self.change_username_password_top = tk.Toplevel(self.master)
             self.change_username_password_top.title("Change username and password")
@@ -515,6 +570,14 @@ class Window:
             # ================================================ Widgets for changing username and password ==============
             change_username_password_lf = tk.LabelFrame(self.change_username_password_top, bg="#FFFFFF")
             change_username_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+            account_settings_label_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
+            account_settings_label_lf.pack(side="top", fill="x")
+
+            ttk.Label(account_settings_label_lf, text='Change username and password',
+                      style="h1.TLabel").pack(side="left", anchor="nw")
+            ttk.Label(account_settings_label_lf, text='admin',
+                      style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
             forms_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
             forms_lf.pack(side="top", fill="both", expand=True)
@@ -570,7 +633,7 @@ class Window:
             print("Could not connect to hmsdatabase")
             print(e)
 
-    def signin_validation(self):
+    def admin_signin_request(self):
         if not self.signin_username_e.get():
             self.invalid_input()
         if not self.signin_password_e.get():
@@ -623,6 +686,27 @@ class Window:
                 self.invalid_input()
                 print("Failed to connect")
                 print(e)
+
+    def admin_access_request(self):
+        if not self.admin_access_username_e.get():
+            self.invalid_input()
+        if not self.admin_access_password_e.get():
+            self.invalid_input()
+        else:
+            self.database_connect()
+            self.mycursor.execute(
+                "SELECT * FROM admin where username = '" + self.admin_access_username_e.get() + "' and password = '" +
+                self.admin_access_password_e.get() + "' and admin_id = '" + str(1) + "';")
+            myresult = self.mycursor.fetchone()
+            if myresult is None:
+                messagebox.showerror("Error", "Invalid User Name And Password")
+            else:
+                print("else")
+                # Instantiate create_widgets method
+                # self.main_interface()
+
+            self.db1.close()
+            self.mycursor.close()
 
     def bug_report(self):
         if not self.bug_description_e.get():
