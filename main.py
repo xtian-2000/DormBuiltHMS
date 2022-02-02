@@ -34,6 +34,9 @@ class Window:
         # LabelFrame
         self.content_lf = None
 
+        # Label
+        self.admin_access_status_l = ttk.Label
+
         # PhotoImage
         self.db_logo_resized = tkinter.PhotoImage
         self.db_logo_resized_2 = tkinter.PhotoImage
@@ -67,6 +70,7 @@ class Window:
 
         # String
         self.admin_id_str = str
+        self.admin_access_status = None
 
         # Boolean
         self.admin_access = False
@@ -124,7 +128,7 @@ class Window:
 
         forgot_password_l = ttk.Label(form_f, text="Forgot password?", cursor="hand2", style="link.TLabel")
         forgot_password_l.grid(column=1, row=2, sticky="e")
-        forgot_password_l.bind("<Button-1>", self.forgot_password_interface)
+        forgot_password_l.bind("<Button-1>", self.forgot_password_dialog)
 
         buttons_f = ttk.Frame(login_f, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both")
@@ -214,7 +218,7 @@ class Window:
 
         # Creating help menu
         help_menu = Menu(menu_bar, tearoff=0)
-        help_menu.add_command(label="Bug report", command=self.bug_report_interface)
+        help_menu.add_command(label="Bug report", command=self.bug_report_dialog)
         help_menu.add_separator()
         menu_bar.add_cascade(label="Help", menu=help_menu)
 
@@ -291,6 +295,8 @@ class Window:
         # Clean widgets in the master window
         Content.destroy_content(self.content_lf)
 
+        self.admin_access_status = "Off"
+
         # ================================================ Settings content ============================================
         admin_panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
         admin_panel_lf.pack(side="top", fill="x")
@@ -344,13 +350,25 @@ class Window:
         ttk.Label(account_settings_label_lf, text='admin',
                   style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        create_account_links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
-        create_account_links_lf.pack(side="top", anchor="nw", pady=10)
+        description_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+        description_lf.pack(side="top", anchor="nw", pady=10)
 
-        change_username_password_l = ttk.Label(create_account_links_lf, text='Change username and password',
-                                               style="link.TLabel", justify="left")
-        change_username_password_l.pack()
-        change_username_password_l.bind("<Button-1>", self.change_username_password_interface)
+        ttk.Label(description_lf, text='Administrative access: ',
+                  style="small_info.TLabel").grid(column=0, row=0)
+
+        self.admin_access_status_l = ttk.Label(description_lf, text=self.admin_access_status)
+        self.admin_access_status_l.grid(column=1, row=0)
+
+        links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+        links_lf.pack(side="top", anchor="nw", pady=10)
+
+        change_username_password_l = ttk.Label(links_lf, text='Change username and password',
+                                               style="link.TLabel")
+        change_username_password_l.pack(side="top", anchor="w")
+        change_username_password_l.bind("<Button-1>", self.change_username_password_dialog)
+
+        # Initialize method for changing content according to admin access
+        self.admin_status()
 
     def notif_content_interface(self):
         self.change_button_color()
@@ -363,13 +381,21 @@ class Window:
 
         ttk.Label(self.content_lf, text='Notification', style="h2.TLabel", justify="left").pack(side="top", anchor="nw")
 
+    # ================================================ Content control =================================================
     def change_button_color(self):
         self.home_b.configure(fg='#7c8084')
         self.settings_b.configure(fg='#7c8084')
         self.notif_b.configure(fg='#7c8084')
 
+    def admin_status(self):
+        if self.admin_access:
+            self.admin_access_status = "On"
+            self.admin_access_status_l.config(text=self.admin_access_status, style="on.TLabel")
+        else:
+            self.admin_access_status_l.configure(style='off.TLabel')
+
     # ================================================ Dialog Boxes Interface ==========================================
-    def admin_access_validation_interface(self):
+    def admin_access_validation_dialog(self):
         self.admin_access_top = tk.Toplevel(self.master)
         self.admin_access_top.title("Administrator access validation")
         self.admin_access_top.configure(bg="#FFFFFF")
@@ -408,7 +434,7 @@ class Window:
 
         self.admin_access_top.mainloop()
 
-    def forgot_password_interface(self, event):
+    def forgot_password_dialog(self, event):
         self.reset_password_top = tk.Toplevel(self.master)
         self.reset_password_top.title("Forgot Password")
         self.reset_password_top.configure(bg="#FFFFFF")
@@ -445,7 +471,7 @@ class Window:
 
         print(event)
 
-    def bug_report_interface(self):
+    def bug_report_dialog(self):
         self.bug_report_top = tk.Toplevel(self.master)
         self.bug_report_top.title("Bug report")
         self.bug_report_top.configure(bg="#FFFFFF")
@@ -479,7 +505,7 @@ class Window:
 
         self.bug_report_top.mainloop()
 
-    def change_username_password_interface(self, event):
+    def change_username_password_dialog(self, event):
         if self.admin_access:
             self.change_username_password_top = tk.Toplevel(self.master)
             self.change_username_password_top.title("Change username and password")
@@ -520,7 +546,7 @@ class Window:
 
             self.change_username_password_top.mainloop()
         else:
-            self.admin_access_validation_interface()
+            self.admin_access_validation_dialog()
 
         print(event)
 
