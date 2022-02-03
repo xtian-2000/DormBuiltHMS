@@ -12,10 +12,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from random import randint
 from tkinter import Menu
+from datetime import datetime
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
+
+date_time = datetime.now()
+date_time_str = date_time.strftime("%d/%m/%Y %H:%M:%S")
 
 
 class Window:
@@ -34,7 +38,7 @@ class Window:
 
         # LabelFrame
         self.content_lf = None
-
+        self.login_register_lf = None
         # Label
         self.admin_access_status_l = ttk.Label
 
@@ -57,6 +61,7 @@ class Window:
 
         self.employee_username_e = ttk.Entry
         self.employee_password_e = ttk.Entry
+        self.employee_role_e = ttk.Entry
 
         self.forgot_password_email_e = ttk.Entry
 
@@ -75,37 +80,40 @@ class Window:
 
         # Boolean
         self.admin_access = False
+        self.basic_user_access = True
 
         # Database
         self.db1 = None
         self.mycursor = None
 
         # Initialize method for login interface
-        # self.signin_interface()
-        self.main_interface()
+        self.signin_interface()
+        # self.main_interface()
 
         # Initialize class for database
         # Database()
 
         # Root window configuration
         self.master.title('DormBuilt HMS')
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+        self.master.geometry("%dx%d" % (width, height))
         self.master.resizable(True, True)
 
         # Initialize class for default styles
         Content.widget_styles(self.master)
 
     def signin_interface(self):
-        self.master.geometry("%dx%d" % (350, 450))
-
         # Clean widgets in the master window
         Content.destroy_content(self.master)
 
-        # ================================================ Login UI ====================================================
-        login_f = tk.LabelFrame(self.master, bg="#FFFFFF")
-        login_f.pack(anchor="center")
+        # ================================================ Sign In Interface ===========================================
+        top_f = ttk.Frame(self.master, style="Basic.TFrame")
+        top_f.pack(side="top", fill="x")
 
-        logo_f = ttk.Frame(login_f, style="Basic.TFrame")
-        logo_f.pack(side="top", ipady=20, fill="both")
+        # ================================================ Logo Interface ==============================================
+        logo_f = ttk.Frame(top_f, style="Basic.TFrame")
+        logo_f.pack(side="left", padx=20)
 
         db_logo = PhotoImage(file=r"Dormbuilt_logo.png")
         self.db_logo_resized = db_logo.subsample(2, 2)
@@ -114,7 +122,19 @@ class Window:
 
         ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(pady=5)
 
-        form_f = ttk.Frame(login_f, style="Basic.TFrame")
+        ttk.Label(top_f, text='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at velit eu leo \n'
+                              'consectetur aliquam. Donec lacus orci, bibendum in sodales et, sollicitudin vel \n '
+                              'magna. Nullam elit elit, consectetur commodo erat vitae, auctor porttitor nibh. \n'
+                              'In diam nisi, tristique ut mi ac, efficitur auctor rna.',
+                  style="h1_body.TLabel").pack(side="left")
+
+        # ================================================ Sign In Form Interface ======================================
+        self.login_register_lf = tk.LabelFrame(top_f, bg="#FFFFFF")
+        self.login_register_lf.pack(side="right", padx=20, pady=20)
+
+        ttk.Label(self.login_register_lf, text='Sign In', style="h1.TLabel").pack(side="top", pady=10, anchor="nw")
+
+        form_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         form_f.pack(side="top", ipadx=10, ipady=5, fill="both")
 
         ttk.Label(form_f, text='User Name', style="h2.TLabel").grid(column=0, row=0, sticky="w")
@@ -131,18 +151,18 @@ class Window:
         forgot_password_l.grid(column=1, row=2, sticky="e")
         forgot_password_l.bind("<Button-1>", self.forgot_password_dialog)
 
-        buttons_f = ttk.Frame(login_f, style="Basic.TFrame")
+        buttons_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both")
 
         signin_admin_b = tk.Button(buttons_f, text="Sign in as Administrator", font="OpenSans, 12", fg="#FFFFFF",
-                             bg="#4C8404", relief="flat", command=self.admin_signin_request)
+                                   bg="#4C8404", relief="flat", command=self.admin_signin_request)
         signin_admin_b.pack(side="top", pady=5, padx=10, fill="x")
 
         signin_basic_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
         signin_basic_b_lf.pack(side="top", pady=5, padx=10, fill="x")
 
         signin_basic_b = tk.Button(signin_basic_b_lf, text="Sign in as Basic user", font="OpenSans, 12", fg="#4C8404",
-                                   bg="#FFFFFF", relief="flat", command=self.admin_signin_request)
+                                   bg="#FFFFFF", relief="flat", command=self.basic_user_signin_request)
         signin_basic_b.pack(side="top", fill="x")
 
         signup_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
@@ -156,26 +176,19 @@ class Window:
 
     def signup_interface(self):
         # Clean widgets in the master window
-        Content.destroy_content(self.master)
+        Content.destroy_content(self.login_register_lf)
 
         # ================================================ Login UI ====================================================
-        register_f = tk.LabelFrame(self.master, bg="#FFFFFF")
-        register_f.pack(anchor="center")
+        ttk.Label(self.login_register_lf, text='Sign Up', style="h1.TLabel").pack(side="top", pady=10, anchor="nw")
 
-        logo_f = ttk.Frame(register_f, style="Basic.TFrame")
-        logo_f.pack(side="top", ipady=20, fill="both")
-
-        ttk.Label(logo_f, image=self.db_logo_resized).pack(pady=5)
-
-        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel", justify="center").pack(pady=5)
-
-        form_f = ttk.Frame(register_f, style="Basic.TFrame")
+        form_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         form_f.pack(side="top", ipadx=10, ipady=10, fill="both")
 
         ttk.Label(form_f, text='User Name', style="h2.TLabel", justify="left").grid(column=0, row=0, sticky="w")
 
         self.signup_username_e = ttk.Entry(form_f)
         self.signup_username_e.grid(column=1, row=0)
+        self.signup_username_e.focus()
 
         ttk.Label(form_f, text='Password', style="h2.TLabel", justify="left").grid(column=0, row=1, sticky="w")
 
@@ -187,29 +200,21 @@ class Window:
         self.signup_email_e = ttk.Entry(form_f)
         self.signup_email_e.grid(column=1, row=2)
 
-        buttons_f = ttk.Frame(register_f, style="Basic.TFrame")
+        buttons_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both", ipady=20)
 
+        signup_b = tk.Button(buttons_f, text="Sign up as Administrator", font="OpenSans, 12", fg="#FFFFFF",
+                             bg="#4C8404", relief="flat", command=self.admin_signup_request)
+        signup_b.pack(side="top", pady=5, padx=10, fill="x")
+
         cancel_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
-        cancel_b_lf.pack(side="left", padx=10)
+        cancel_b_lf.pack(side="top", pady=5, padx=10, fill="x")
 
-        cancel_b = tk.Button(cancel_b_lf, text="Cancel", font="OpenSans, 12", fg="#585456",
+        cancel_b = tk.Button(cancel_b_lf, text="Go back", font="OpenSans, 12", fg="#585456",
                              bg="#FFFFFF", relief="flat", command=self.signin_interface)
-        cancel_b.pack()
-
-        signup_b = tk.Button(buttons_f, text="Continue", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
-                             relief="flat", command=self.admin_signup_request)
-        signup_b.pack(side="right", padx=10)
-
-        self.signup_username_e.focus()
+        cancel_b.pack(fill="x")
 
     def main_interface(self):
-        # Root window configuration
-        width = self.master.winfo_screenwidth()
-        height = self.master.winfo_screenheight()
-        self.master.resizable(True, True)
-        self.master.geometry("%dx%d" % (width, height))
-
         # Clean widgets in the master window
         Content.destroy_content(self.master)
 
@@ -358,6 +363,15 @@ class Window:
         create_employee_l.pack(side="top", anchor="w")
         create_employee_l.bind("<Button-1>", self.create_employee_dialog)
 
+        # ================================================ Employee info ============================================
+        employee_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        employee_info_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(employee_info_lf, text='Employee Information',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(employee_info_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
         # Initialize method for changing content according to admin access
         self.admin_status()
 
@@ -371,19 +385,6 @@ class Window:
         # ================================================ Notif content ===============================================
 
         ttk.Label(self.content_lf, text='Notification', style="h2.TLabel", justify="left").pack(side="top", anchor="nw")
-
-    # ================================================ Content control =================================================
-    def change_button_color(self):
-        self.home_b.configure(fg='#7c8084')
-        self.settings_b.configure(fg='#7c8084')
-        self.notif_b.configure(fg='#7c8084')
-
-    def admin_status(self):
-        if self.admin_access:
-            self.admin_access_status = "On"
-            self.admin_access_status_l.config(text=self.admin_access_status, style="on.TLabel")
-        else:
-            self.admin_access_status_l.configure(style='off.TLabel')
 
     # ================================================ Dialog Boxes Interface ==========================================
     def admin_access_validation_dialog(self):
@@ -420,7 +421,8 @@ class Window:
         buttons_lf.pack(side="top", fill="both", expand=True)
 
         admin_access_validate_b = tk.Button(buttons_lf, text="Validate", font="OpenSans, 10", fg="#FFFFFF",
-                                            bg="#4C8404", relief="flat", command=self.admin_access_request)
+                                            bg="#4C8404", relief="flat",
+                                            command=self.admin_access_request)
         admin_access_validate_b.pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to validate your\n administrative account!",
@@ -437,7 +439,7 @@ class Window:
         self.create_employee_top.configure(bg="#FFFFFF")
         self.create_employee_top.resizable(False, False)
 
-        # ================================================ Widgets for resetting password ==============================
+        # ================================================ Widgets for resetting password ==========================
         create_employee_lf = tk.LabelFrame(self.create_employee_top, bg="#FFFFFF")
         create_employee_lf.pack(padx=15, pady=15, fill="both", expand=True)
 
@@ -455,21 +457,30 @@ class Window:
         ttk.Label(forms_lf, text='Employee Name', style="h2.TLabel",
                   justify="left").grid(column=0, row=0, sticky="w")
 
-        self.employee_username_e = ttk.Entry(forms_lf)
+        self.employee_username_e = ttk.Entry(forms_lf, width=60)
         self.employee_username_e.grid(column=1, row=0)
         self.employee_username_e.focus()
 
         ttk.Label(forms_lf, text='Employee Password', style="h2.TLabel",
                   justify="left").grid(column=0, row=1, sticky="w")
 
-        self.employee_password_e = ttk.Entry(forms_lf)
+        self.employee_password_e = ttk.Entry(forms_lf, width=60)
         self.employee_password_e.grid(column=1, row=1)
+
+        ttk.Label(forms_lf, text='Role', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, sticky="w")
+
+        self.employee_role_e = ttk.Entry(forms_lf, width=60)
+        self.employee_role_e.grid(column=1, row=2)
+
+        ttk.Label(forms_lf, text='ex. Manager, Operator', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=3, sticky="w")
 
         buttons_lf = tk.LabelFrame(create_employee_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
         create_account_b = tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF",
-                                     bg="#4C8404", relief="flat", command=self.forgot_password_request)
+                                     bg="#4C8404", relief="flat", command=self.create_employee_request)
         create_account_b.pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create an\n employee account!",
@@ -479,6 +490,56 @@ class Window:
         self.create_employee_top.grab_set()
 
         self.create_employee_top.mainloop()
+
+        print(event)
+
+    def change_username_password_dialog(self, event):
+        self.change_username_password_top = tk.Toplevel(self.master)
+        self.change_username_password_top.title("Change username and password")
+        self.change_username_password_top.configure(bg="#FFFFFF")
+        self.change_username_password_top.resizable(False, False)
+
+        # ================================================ Widgets for changing username and password ==============
+        change_username_password_lf = tk.LabelFrame(self.change_username_password_top, bg="#FFFFFF")
+        change_username_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        account_settings_label_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
+        account_settings_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(account_settings_label_lf, text='Change username and password',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(account_settings_label_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Username', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+
+        self.change_username_e = ttk.Entry(forms_lf, width=60)
+        self.change_username_e.grid(column=1, row=0, sticky="w", padx=10)
+        self.change_username_e.focus()
+
+        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+
+        self.change_password_e = ttk.Entry(forms_lf, width=60)
+        self.change_password_e.grid(column=1, row=1, sticky="w", padx=10)
+        self.change_password_e.focus()
+
+        buttons_lf = tk.LabelFrame(change_username_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        continue_password_b = tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF",
+                                        bg="#4C8404", relief="flat", command=self.change_username_password_request)
+        continue_password_b.pack(side="left")
+
+        ttk.Label(buttons_lf, text="The new username and password will\n be saved on your account",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.change_username_password_top.grab_set()
+
+        self.change_username_password_top.mainloop()
 
         print(event)
 
@@ -559,60 +620,6 @@ class Window:
 
         self.bug_report_top.mainloop()
 
-    def change_username_password_dialog(self, event):
-        print(self.admin_access)
-        if self.admin_access:
-            self.change_username_password_top = tk.Toplevel(self.master)
-            self.change_username_password_top.title("Change username and password")
-            self.change_username_password_top.configure(bg="#FFFFFF")
-            self.change_username_password_top.resizable(False, False)
-
-            # ================================================ Widgets for changing username and password ==============
-            change_username_password_lf = tk.LabelFrame(self.change_username_password_top, bg="#FFFFFF")
-            change_username_password_lf.pack(padx=15, pady=15, fill="both", expand=True)
-
-            account_settings_label_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
-            account_settings_label_lf.pack(side="top", fill="x")
-
-            ttk.Label(account_settings_label_lf, text='Change username and password',
-                      style="h1.TLabel").pack(side="left", anchor="nw")
-            ttk.Label(account_settings_label_lf, text='admin',
-                      style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
-
-            forms_lf = tk.LabelFrame(change_username_password_lf, bg="#FFFFFF", relief="flat")
-            forms_lf.pack(side="top", fill="both", expand=True)
-
-            ttk.Label(forms_lf, text='Username', style="h2.TLabel").grid(column=0, row=0, sticky="w")
-
-            self.change_username_e = ttk.Entry(forms_lf, width=60)
-            self.change_username_e.grid(column=1, row=0, sticky="w", padx=10)
-            self.change_username_e.focus()
-
-            ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
-
-            self.change_password_e = ttk.Entry(forms_lf, width=60)
-            self.change_password_e.grid(column=1, row=1, sticky="w", padx=10)
-            self.change_password_e.focus()
-
-            buttons_lf = tk.LabelFrame(change_username_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
-            buttons_lf.pack(side="top", fill="both", expand=True)
-
-            continue_password_b = tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF",
-                                            bg="#4C8404", relief="flat", command=self.change_username_password_request)
-            continue_password_b.pack(side="left")
-
-            ttk.Label(buttons_lf, text="The new username and password will\n be saved on your account",
-                      style="small_info.TLabel").pack(side="left", padx=10)
-
-            # Disables underlying window
-            self.change_username_password_top.grab_set()
-
-            self.change_username_password_top.mainloop()
-        else:
-            self.admin_access_validation_dialog()
-
-        print(event)
-
     def switch_exit(self):
         exit_yes_no = messagebox.askyesno(title="Exit", message="Are you sure you want to exit?")
         if exit_yes_no:
@@ -673,9 +680,11 @@ class Window:
         else:
             try:
                 self.database_connect()
-                self.mycursor.execute("INSERT INTO admin (username, password, email) VALUES (%s,%s,%s)",
-                                      (self.signup_username_e.get(), self.signup_password_e.get(),
-                                       self.signup_email_e.get()))
+                self.mycursor.execute("INSERT INTO admin (username, password, email, date_created)"
+                                      "VALUES (%s,%s,%s,%s)", (self.signup_username_e.get(),
+                                                               self.signup_password_e.get(),
+                                                               self.signup_email_e.get(), date_time_str))
+
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -701,9 +710,39 @@ class Window:
             if myresult is None:
                 messagebox.showerror("Error", "Invalid User Name And Password")
             else:
-                print("else")
+                self.admin_access = True
+                self.admin_access_top.destroy()
+
+            self.db1.close()
+            self.mycursor.close()
+
+    def basic_user_signin_request(self):
+        if not self.signin_username_e.get():
+            self.invalid_input()
+        if not self.signin_password_e.get():
+            self.invalid_input()
+        else:
+            self.database_connect()
+            self.mycursor.execute(
+                "SELECT * FROM basic_user where username = '" + self.signin_username_e.get() + "' and password = '" +
+                self.signin_password_e.get() + "';")
+            myresult = self.mycursor.fetchone()
+            if myresult is None:
+                messagebox.showerror("Error", "Invalid User Name And Password")
+            else:
+                self.mycursor.execute(
+                    "SELECT DISTINCT admin_id FROM basic_user where username = '" + self.signin_username_e.get() + "';")
+
+                # Converts the tuple into integer
+                admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                self.admin_id_str = str(admin_id)
+                # print(self.admin_id_str)
+
+                self.admin_access = False
+                self.basic_user_access = True
+
                 # Instantiate create_widgets method
-                # self.main_interface()
+                self.main_interface()
 
             self.db1.close()
             self.mycursor.close()
@@ -794,6 +833,8 @@ class Window:
             self.invalid_input()
         if not self.change_password_e.get():
             self.invalid_input()
+        if not self.admin_access:
+            self.admin_access_validation_dialog()
         else:
             self.database_connect()
             self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
@@ -802,32 +843,59 @@ class Window:
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
-            """
-            email = 'pongodev0914@gmail.com'
-            email_password = 'Bin@1110010010'
-            send_to_email = self.forgot_password_email_e.get()
-            subject = 'Change username and password Administrative account in Hotel Management System of DormBuilt Inc.'
-            message = ("Your new password is\n\n" + self.change_password_e.get())
-
-            msg = MIMEMultipart()
-            msg['From'] = email
-            msg['To'] = send_to_email
-            msg['Subject'] = subject
-
-            # Attach the message to the MIMEMultipart object
-            msg.attach(MIMEText(message, 'plain'))
-
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(email, email_password)
-            text = msg.as_string()
-            server.sendmail(email, send_to_email, text)
-            server.quit()
-
-            tk.messagebox.showinfo("Forgot password", "Please check your email at " +
-                                   self.forgot_password_email_e.get() + ".")"""
 
             self.change_username_password_top.destroy()
+
+            self.basic_user_status()
+
+    def create_employee_request(self):
+        if not self.employee_username_e.get():
+            self.invalid_input()
+        if not self.employee_password_e.get():
+            self.invalid_input()
+        if not self.employee_role_e.get():
+            self.invalid_input()
+        if not self.admin_access:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO basic_user (admin_id, username, password, role, date_created)"
+                                      "VALUES (%s,%s,%s,%s,%s)", (self.admin_id_str, self.employee_username_e.get(),
+                                                                  self.employee_password_e.get(),
+                                                                  self.employee_role_e.get(), date_time_str))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Employee Account is  created")
+
+                self.create_employee_top.destroy()
+
+                self.basic_user_status()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
+    # ================================================ Content control =================================================
+    def change_button_color(self):
+        self.home_b.configure(fg='#7c8084')
+        self.settings_b.configure(fg='#7c8084')
+        self.notif_b.configure(fg='#7c8084')
+
+    def admin_status(self):
+        if self.admin_access:
+            self.admin_access_status = "On"
+            self.admin_access_status_l.config(text=self.admin_access_status, style="on.TLabel")
+        else:
+            self.admin_access_status_l.configure(style='off.TLabel')
+
+    def basic_user_status(self):
+        if self.basic_user_access:
+            self.admin_access = False
+        else:
+            pass
 
     # ================================================ Static Methods ==================================================
     @staticmethod

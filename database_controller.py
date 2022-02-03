@@ -42,11 +42,12 @@ class Database:
         # Creating admin table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`admin` ( `admin_id` INT NOT NULL AUTO_INCREMENT,"
-                                  "`username` VARCHAR(45) NOT NULL,`password` VARCHAR(45) NOT NULL,`email` VARCHAR(45)"
-                                  " NOT NULL,PRIMARY KEY (`admin_id`), UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC)"
-                                  " VISIBLE, UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE, UNIQUE INDEX"
-                                  " `email_UNIQUE` (`email` ASC) VISIBLE);")
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`admin` (`admin_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`username` VARCHAR(45) NOT NULL, `password` VARCHAR(45) NOT NULL, `email` "
+                                  "VARCHAR(45) NOT NULL, `date_created` VARCHAR(45) NOT NULL, PRIMARY KEY (`admin_id`),"
+                                  "UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC) VISIBLE, UNIQUE INDEX "
+                                  "`username_UNIQUE` (`username` ASC) VISIBLE, UNIQUE INDEX `email_UNIQUE` "
+                                  "(`email` ASC) VISIBLE);")
             print("'Admin' table is created successfully")
         except Exception as e:
             print("'Admin' table could not be created")
@@ -56,10 +57,11 @@ class Database:
         try:
             self.mycursor = self.db1.cursor()
             self.mycursor.execute("CREATE TABLE `hmsdatabase`.`basic_user` (`basic_user_id` INT NOT NULL "
-                                  "AUTO_INCREMENT, `admin_id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, "
-                                  "`password` VARCHAR(45) NOT NULL, `role` VARCHAR(45) NOT NULL, PRIMARY KEY "
-                                  "(`basic_user_id`, `admin_id`, `name`, `password`, `role`), UNIQUE INDEX "
-                                  "`basic_user_id_UNIQUE` (`basic_user_id` ASC) VISIBLE);")
+                                  "AUTO_INCREMENT, `admin_id` INT NOT NULL, `username` VARCHAR(45) NOT NULL, "
+                                  "`password` VARCHAR(45) NOT NULL, `role` VARCHAR(45) NOT NULL, `date_created` "
+                                  "VARCHAR(45) NOT NULL, PRIMARY KEY (`basic_user_id`), UNIQUE INDEX "
+                                  "`basic_user_id_UNIQUE` (`basic_user_id` ASC) VISIBLE, UNIQUE INDEX `username_UNIQUE`"
+                                  "(`username` ASC) VISIBLE);")
             print("'basic_user' table is created successfully")
         except Exception as e:
             print("'basic_user' table could not be created")
@@ -68,10 +70,10 @@ class Database:
         # Creating foreign key for admin_id
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`basic_user` ADD INDEX `admin_id_idx`"
-                                  " (`admin_id` ASC) VISIBLE;; ALTER TABLE `hmsdatabase`.`basic_user` "
-                                  "ADD CONSTRAINT `admin_id` FOREIGN KEY (`admin_id`) REFERENCES `hmsdatabase`.`admin`"
-                                  " (`admin_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;")
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`basic_user` ADD INDEX `admin_id_idx` (`admin_id` ASC) "
+                                  "VISIBLE; ; ALTER TABLE `hmsdatabase`.`basic_user` ADD CONSTRAINT `admin_id` "
+                                  "FOREIGN KEY (`admin_id`) REFERENCES `hmsdatabase`.`admin` (`admin_id`) ON DELETE NO "
+                                  "ACTION ON UPDATE NO ACTION;")
             print("Foreign key is created")
         except Exception as e:
             print("Foreign key could not be created")

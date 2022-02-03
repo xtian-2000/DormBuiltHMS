@@ -17,12 +17,12 @@ class Content(tk.Tk, ttk.LabelFrame, ttk.Entry, ttk.Label, tk.Button, tk.Topleve
         # ================================================ Style for Label =============================================
         style.configure('h1.TLabel', font=("Times New Roman", 20, "bold"), foreground='#395A68', background="#FFFFFF")
         style.configure('h2.TLabel', font=("Times New Roman", 15), foreground='#585456', background="#FFFFFF")
+        style.configure('h1_body.TLabel', font=("Times New Roman", 15), foreground='#585456', background="#FFFFFF")
         style.configure('small.TLabel', font=("Times New Roman", 10), foreground='#FFFFFF', background="#4C8404")
         style.configure('small_info.TLabel', font=("Times New Roman", 10), foreground='#585456', background="#FFFFFF")
         style.configure('link.TLabel', font=("Times New Roman", 10), foreground='Blue', background="#FFFFFF")
         style.configure('on.TLabel', font=("Times New Roman", 10), foreground='#4C8404', background="#FFFFFF")
         style.configure('off.TLabel', font=("Times New Roman", 10), foreground='#BD1E51', background="#FFFFFF")
-
 
         # ================================================ Style for Frame =============================================
         style.configure('Basic.TFrame', background="#FFFFFF")
