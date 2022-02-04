@@ -53,7 +53,7 @@ class Database:
             print("'Admin' table could not be created")
             print(e)
 
-        # Creating basic user table in database
+        # Creating basic_user table in database
         try:
             self.mycursor = self.db1.cursor()
             self.mycursor.execute("CREATE TABLE `hmsdatabase`.`basic_user` (`basic_user_id` INT NOT NULL "
@@ -74,6 +74,32 @@ class Database:
                                   "VISIBLE; ; ALTER TABLE `hmsdatabase`.`basic_user` ADD CONSTRAINT `admin_id` "
                                   "FOREIGN KEY (`admin_id`) REFERENCES `hmsdatabase`.`admin` (`admin_id`) ON DELETE NO "
                                   "ACTION ON UPDATE NO ACTION;")
+            print("Foreign key is created")
+        except Exception as e:
+            print("Foreign key could not be created")
+            print(e)
+
+        # Creating room table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`room` (`room_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`room_number` INT NOT NULL, `room_description` VARCHAR(45) NULL, `room_type` "
+                                  "VARCHAR(45) NULL, `room_availability` VARCHAR(45) NOT NULL, `room_capacity` INT "
+                                  "NOT NULL, `admin_id` INT NOT NULL, PRIMARY KEY (`room_id`), UNIQUE INDEX "
+                                  "`room_id_UNIQUE` (`room_id` ASC) VISIBLE, UNIQUE INDEX `room_number_UNIQUE` "
+                                  "(`room_number` ASC) VISIBLE);")
+            print("'room' table is created successfully")
+        except Exception as e:
+            print("'room' table could not be created")
+            print(e)
+
+        # Creating foreign key for admin_id in room
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` ADD INDEX `admin_id_idx` (`admin_id` ASC) "
+                                  "VISIBLE;; ALTER TABLE `hmsdatabase`.`room` ADD CONSTRAINT `admin_id` FOREIGN KEY "
+                                  "(`admin_id`) REFERENCES `hmsdatabase`.`admin` (`admin_id`) ON DELETE NO ACTION "
+                                  "ON UPDATE NO ACTION;")
             print("Foreign key is created")
         except Exception as e:
             print("Foreign key could not be created")
