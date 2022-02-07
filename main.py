@@ -14,6 +14,7 @@ from email.mime.multipart import MIMEMultipart
 from random import randint
 from tkinter import Menu
 from datetime import datetime
+import time
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
@@ -40,9 +41,13 @@ class Window:
 
         # LabelFrame
         self.content_lf = None
+
         self.login_register_lf = None
+
         self.employee_info_tree_lf = None
         self.employee_info_buttons_lf = None
+
+        self.room_info_content_lf = None
         self.room_info_tree_lf = None
         self.room_info_buttons_lf = None
 
@@ -236,6 +241,9 @@ class Window:
         cancel_b.pack(fill="x")
 
     def main_interface(self):
+        # =================== Execution time
+        start_time = time.time()
+
         # Clean widgets in the master window
         Content_control.destroy_content(self.master)
 
@@ -280,8 +288,8 @@ class Window:
                                 bg="#FFFFFF", relief="flat", command=self.home_content_interface)
         self.home_b.pack(side="top", anchor="w")
 
-        self.settings_b = tk.Button(left_nav_lf, text="Settings", font=("Times New Roman", 15), fg='#7c8084',
-                                    bg="#FFFFFF", relief="flat", command=self.settings_content_interface)
+        self.settings_b = tk.Button(left_nav_lf, text="Accounts", font=("Times New Roman", 15), fg='#7c8084',
+                                    bg="#FFFFFF", relief="flat", command=self.account_settings_content_interface)
         self.settings_b.pack(side="top", anchor="w")
 
         self.notif_b = tk.Button(left_nav_lf, text="Notifications", font=("Times New Roman", 15), fg='#7c8084',
@@ -294,6 +302,8 @@ class Window:
 
         # Initialize home_content_interface method
         self.home_content_interface()
+
+        print("--- %s seconds ---" % (time.time() - start_time))
 
     def home_content_interface(self):
         self.change_button_color()
@@ -340,53 +350,13 @@ class Window:
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
         # ================================================ Room info content ===========================================
-        room_info_content_lf = tk.LabelFrame(room_info_lf, bg="#FFFFFF", relief="flat")
-        room_info_content_lf.pack(side="top", fill="x")
+        self.room_info_content_lf = tk.LabelFrame(room_info_lf, bg="#FFFFFF", relief="flat")
+        self.room_info_content_lf.pack(side="top", fill="x")
 
-        self.room_info_tree_lf = tk.LabelFrame(room_info_content_lf, bg="#FFFFFF", relief="flat")
-        self.room_info_tree_lf.pack(side="left", fill="both", expand=True)
+        tk.Button(self.room_info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat", command=self.show_room_information_module).pack(side="top", fill="x")
 
-        room_info_tree_scr = tk.Scrollbar(self.room_info_tree_lf)
-        room_info_tree_scr.pack(side="right", fill="y")
-
-        # Create treeview
-        self.room_info_tree = ttk.Treeview(self.room_info_tree_lf, style="default.Treeview",
-                                           yscrollcommand=room_info_tree_scr.set)
-        self.room_info_tree["columns"] = ("Room ID", "Room Number", "Description", "Type", "Availability", "Capacity")
-
-        # Create columns
-        self.room_info_tree.column("#0", width=0, stretch=False)
-        self.room_info_tree.column("Room ID", anchor="center", width=80)
-        self.room_info_tree.column("Room Number", anchor="center", width=80)
-        self.room_info_tree.column("Description", anchor="w", width=120)
-        self.room_info_tree.column("Type", anchor="w", width=120)
-        self.room_info_tree.column("Availability", anchor="w", width=120)
-        self.room_info_tree.column("Capacity", anchor="w", width=120)
-
-        # Create headings
-        self.room_info_tree.heading("#0", text="", anchor="w")
-        self.room_info_tree.heading("Room ID", text="Room ID", anchor="center")
-        self.room_info_tree.heading("Room Number", text="Room Number", anchor="center")
-        self.room_info_tree.heading("Description", text="Description", anchor="w")
-        self.room_info_tree.heading("Type", text="Type", anchor="w")
-        self.room_info_tree.heading("Availability", text="Availability", anchor="w")
-        self.room_info_tree.heading("Capacity", text="Capacity", anchor="w")
-
-        self.room_info_tree.pack(side="top", fill="x")
-
-        # Initialize method for inserting items in a list
-        self.room_info_treeview_request()
-
-        self.room_info_buttons_lf = tk.LabelFrame(room_info_content_lf, bg="#FFFFFF", relief="flat")
-        self.room_info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
-
-        ttk.Label(self.room_info_buttons_lf, text="! Click on a room to open this section",
-                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
-
-        # Bind the treeview to database_view_info method
-        self.room_info_tree.bind("<ButtonRelease-1>", self.room_info_section)
-
-    def settings_content_interface(self):
+    def account_settings_content_interface(self):
         self.change_button_color()
         self.settings_b.configure(fg='#395A68')
 
@@ -469,9 +439,88 @@ class Window:
         self.employee_info_tree_lf = tk.LabelFrame(employee_info_lf, bg="#FFFFFF", relief="flat")
         self.employee_info_tree_lf.pack(side="top", fill="both")
 
+        tk.Button(self.employee_info_tree_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#4C8404", relief="flat", command=self.show_employee_information_module).pack(side="top", fill="x")
+
+        # Initialize method for changing content according to admin access
+        self.admin_status()
+
+    def notif_content_interface(self):
+        self.change_button_color()
+        self.notif_b.configure(fg='#395A68')
+
+        # Clean widgets in the master window
+        Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Notif content ===============================================
+        notif_panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        notif_panel_lf.pack(side="top", fill="x")
+
+        # ================================================ Room info ===============================================
+        notif_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        notif_info_lf.pack(side="top", pady=20, fill="x")
+
+        notif_info_title_lf = tk.LabelFrame(notif_info_lf, bg="#FFFFFF", relief="flat")
+        notif_info_title_lf.pack(side="top", fill="x")
+
+        ttk.Label(notif_info_title_lf, text='Notifications', style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(notif_info_title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+    # ================================================ Modularized Interface ===========================================
+    def show_room_information_module(self):
+        Content_control.destroy_content(self.room_info_content_lf)
+
+        self.room_info_tree_lf = tk.LabelFrame(self.room_info_content_lf, bg="#FFFFFF", relief="flat")
+        self.room_info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        room_info_tree_scr = tk.Scrollbar(self.room_info_tree_lf)
+        room_info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.room_info_tree = ttk.Treeview(self.room_info_tree_lf, style="default.Treeview",
+                                           yscrollcommand=room_info_tree_scr.set)
+        self.room_info_tree["columns"] = ("Room ID", "Room Number", "Description", "Type", "Availability", "Capacity")
+
+        # Create columns
+        self.room_info_tree.column("#0", width=0, stretch=False)
+        self.room_info_tree.column("Room ID", anchor="center", width=80)
+        self.room_info_tree.column("Room Number", anchor="center", width=80)
+        self.room_info_tree.column("Description", anchor="w", width=120)
+        self.room_info_tree.column("Type", anchor="w", width=120)
+        self.room_info_tree.column("Availability", anchor="w", width=120)
+        self.room_info_tree.column("Capacity", anchor="w", width=120)
+
+        # Create headings
+        self.room_info_tree.heading("#0", text="", anchor="w")
+        self.room_info_tree.heading("Room ID", text="Room ID", anchor="center")
+        self.room_info_tree.heading("Room Number", text="Room Number", anchor="center")
+        self.room_info_tree.heading("Description", text="Description", anchor="w")
+        self.room_info_tree.heading("Type", text="Type", anchor="w")
+        self.room_info_tree.heading("Availability", text="Availability", anchor="w")
+        self.room_info_tree.heading("Capacity", text="Capacity", anchor="w")
+
+        self.room_info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.room_info_treeview_request()
+
+        self.room_info_buttons_lf = tk.LabelFrame(self.room_info_content_lf, bg="#FFFFFF", relief="flat")
+        self.room_info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        ttk.Label(self.room_info_buttons_lf, text="! Click on a room to open this section",
+                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+
+        # Bind the treeview to database_view_info method
+        self.room_info_tree.bind("<ButtonRelease-1>", self.room_info_section)
+
+    def show_employee_information_module(self):
+        Content_control.destroy_content(self.employee_info_tree_lf)
+
         employee_info_tree_scr = tk.Scrollbar(self.employee_info_tree_lf)
         employee_info_tree_scr.pack(side="right", fill="y")
-
+        print("here")
         # Create treeview
         self.employee_info_tree = ttk.Treeview(self.employee_info_tree_lf, style="default.Treeview",
                                                yscrollcommand=employee_info_tree_scr.set)
@@ -503,21 +552,8 @@ class Window:
         # Bind the treeview to database_view_info method
         self.employee_info_tree.bind("<ButtonRelease-1>", self.employee_info_section)
 
-        # Initialize method for changing content according to admin access
-        self.admin_status()
-
-    def notif_content_interface(self):
-        self.change_button_color()
-        self.notif_b.configure(fg='#395A68')
-
-        # Clean widgets in the master window
-        Content_control.destroy_content(self.content_lf)
-
-        # ================================================ Notif content ===============================================
-
-        ttk.Label(self.content_lf, text='Notification', style="h2.TLabel", justify="left").pack(side="top", anchor="nw")
-
     # ================================================ Dialog Boxes Interface ==========================================
+
     # System
     def admin_access_validation_dialog(self):
         self.admin_access_top = tk.Toplevel(self.master)
@@ -552,10 +588,8 @@ class Window:
         buttons_lf = tk.LabelFrame(admin_access_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        admin_access_validate_b = tk.Button(buttons_lf, text="Validate", font="OpenSans, 10", fg="#FFFFFF",
-                                            bg="#4C8404", relief="flat",
-                                            command=self.admin_access_request)
-        admin_access_validate_b.pack(side="left")
+        tk.Button(buttons_lf, text="Validate", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.admin_access_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to validate your\n administrative account!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -633,9 +667,8 @@ class Window:
         buttons_lf = tk.LabelFrame(create_room_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        create_room_b = tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF",
-                                  bg="#4C8404", relief="flat", command=self.create_room_request)
-        create_room_b.pack(side="left")
+        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.create_room_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create room!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -693,9 +726,8 @@ class Window:
         buttons_lf = tk.LabelFrame(create_employee_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        create_account_b = tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF",
-                                     bg="#4C8404", relief="flat", command=self.create_employee_request)
-        create_account_b.pack(side="left")
+        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.create_employee_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create an\n employee account!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -743,9 +775,8 @@ class Window:
         buttons_lf = tk.LabelFrame(change_username_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        continue_password_b = tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF",
-                                        bg="#4C8404", relief="flat", command=self.change_username_password_request)
-        continue_password_b.pack(side="left")
+        tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.change_username_password_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="The new username and password will\n be saved on your account",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -785,9 +816,8 @@ class Window:
         buttons_lf = tk.LabelFrame(reset_password_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        reset_password_b = tk.Button(buttons_lf, text="Reset password", font="OpenSans, 10", fg="#FFFFFF",
-                                     bg="#4C8404", relief="flat", command=self.forgot_password_request)
-        reset_password_b.pack(side="left")
+        tk.Button(buttons_lf, text="Reset password", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.forgot_password_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="A new password will be generated and sent to\n"
                                    " the email that are linked to your account.",
@@ -824,9 +854,8 @@ class Window:
         buttons_lf = tk.LabelFrame(bug_report_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        report_bug_b = tk.Button(buttons_lf, text="Report", font="OpenSans, 10", fg="#FFFFFF",
-                                 bg="#4C8404", relief="flat", command=self.bug_report)
-        report_bug_b.pack(side="left")
+        tk.Button(buttons_lf, text="Report", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.bug_report).pack(side="left")
 
         ttk.Label(buttons_lf, text="Your bug report will be sent to our developers.",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -846,6 +875,7 @@ class Window:
             print("Connected to lmsdatabase")
             self.mycursor = self.db1.cursor()
         except Exception as e:
+            messagebox.showerror("Error", "Could not connect to database. \n Please check your internet connection")
             print("Could not connect to hmsdatabase")
             print(e)
 
@@ -956,46 +986,6 @@ class Window:
 
             self.db1.close()
             self.mycursor.close()
-
-    def bug_report(self):
-        if not self.bug_description_e.get():
-            self.invalid_input()
-        else:
-            self.database_connect()
-            self.mycursor.execute(
-                "SELECT DISTINCT email FROM admin where admin_id ='" + str(self.admin_id_str) + "';")
-            myresult = self.mycursor.fetchone()
-
-            # Convert tuple into string
-            admin_email = ''.join(myresult)
-
-            self.db1.close()
-            self.mycursor.close()
-
-            email = 'pongodev0914@gmail.com'
-            email_password = 'Bin@1110010010'
-            send_to_email = 'pongodev0914@gmail.com'
-            subject = ('Bug report from ' + admin_email)
-            message = self.bug_description_e.get()
-
-            msg = MIMEMultipart()
-            msg['From'] = email
-            msg['To'] = send_to_email
-            msg['Subject'] = subject
-
-            # Attach the message to the MIMEMultipart object
-            msg.attach(MIMEText(message, 'plain'))
-
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(email, email_password)
-            text = msg.as_string()
-            server.sendmail(email, send_to_email, text)
-            server.quit()
-
-            tk.messagebox.showinfo("Bug report", "Your bug report has been sent to the developers.")
-
-            self.bug_report_top.destroy()
 
     def forgot_password_request(self):
         if not self.forgot_password_email_e.get():
@@ -1216,7 +1206,7 @@ class Window:
 
             tk.messagebox.showinfo("Removed account successfully")
 
-            self.settings_content_interface()
+            self.account_settings_content_interface()
         except Exception as e:
             self.invalid_input()
             print(e)
@@ -1244,6 +1234,47 @@ class Window:
         except Exception as e:
             self.invalid_input()
             print(e)
+
+    # Menu
+    def bug_report(self):
+        if not self.bug_description_e.get():
+            self.invalid_input()
+        else:
+            self.database_connect()
+            self.mycursor.execute(
+                "SELECT DISTINCT email FROM admin where admin_id ='" + str(self.admin_id_str) + "';")
+            myresult = self.mycursor.fetchone()
+
+            # Convert tuple into string
+            admin_email = ''.join(myresult)
+
+            self.db1.close()
+            self.mycursor.close()
+
+            email = 'pongodev0914@gmail.com'
+            email_password = 'Bin@1110010010'
+            send_to_email = 'pongodev0914@gmail.com'
+            subject = ('Bug report from ' + admin_email)
+            message = self.bug_description_e.get()
+
+            msg = MIMEMultipart()
+            msg['From'] = email
+            msg['To'] = send_to_email
+            msg['Subject'] = subject
+
+            # Attach the message to the MIMEMultipart object
+            msg.attach(MIMEText(message, 'plain'))
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email, email_password)
+            text = msg.as_string()
+            server.sendmail(email, send_to_email, text)
+            server.quit()
+
+            tk.messagebox.showinfo("Bug report", "Your bug report has been sent to the developers.")
+
+            self.bug_report_top.destroy()
 
     # ================================================ Content control =================================================
     def change_button_color(self):
