@@ -104,3 +104,37 @@ class Database:
         except Exception as e:
             print("Foreign key could not be created")
             print(e)
+
+        # Add room price column to the room table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` ADD COLUMN `room_price` INT NULL AFTER `admin_id`;")
+            print("Price column is added to the room table successfully")
+        except Exception as e:
+            print("Price column could not be created successfully")
+            print(e)
+
+        # Creating tenant's table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`tenant` (`tenant_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`tenant_name` VARCHAR(45) NOT NULL, `tenant_balance` VARCHAR(45) NULL, "
+                                  "`date_created` VARCHAR(45) NOT NULL, `admin_id` VARCHAR(45) NOT NULL, PRIMARY KEY "
+                                  "(`tenant_id`), UNIQUE INDEX `tenant_id_UNIQUE` (`tenant_id` ASC) VISIBLE, "
+                                  "UNIQUE INDEX `tenant_name_UNIQUE` (`tenant_name` ASC) VISIBLE);")
+            print("'tenant' table is created successfully")
+        except Exception as e:
+            print("'tenant' table could not be created")
+            print(e)
+
+        # Alter tenant table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` CHANGE COLUMN `date_created` `date_created` "
+                                  "VARCHAR(45) NOT NULL AFTER `tenant_name`, CHANGE COLUMN `tenant_balance` "
+                                  "`tenant_balance` INT NULL DEFAULT NULL , CHANGE COLUMN `admin_id` `admin_id` INT "
+                                  "NOT NULL ;")
+            print("Alteration is added successfully")
+        except Exception as e:
+            print("Alteration is not added successfully")
+            print(e)
