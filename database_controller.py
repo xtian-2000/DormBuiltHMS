@@ -148,3 +148,30 @@ class Database:
         except Exception as e:
             print("Alteration is not added successfully")
             print(e)
+
+        # Creating payment table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`payment` (`payment_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`payment_amount` INT NOT NULL, `room_id` INT NOT NULL, `tenant_id` INT NOT NULL, "
+                                  "`admin_id` INT NOT NULL, `basic_user_id` INT NULL, `date_created` VARCHAR(45) NOT "
+                                  "NULL, PRIMARY KEY (`payment_id`), UNIQUE INDEX `payment_id_UNIQUE` (`payment_id` "
+                                  "ASC) VISIBLE);")
+            print("'payment' table is created successfully")
+        except Exception as e:
+            print("'payment' table could not be created")
+            print(e)
+
+        # Creating discount table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`discount` ( `discount_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`discount_code` VARCHAR(45) NOT NULL, `discount_amount` INT NOT NULL, `admin_id` "
+                                  "INT NOT NULL, `basic_user_id` INT NULL, `date_created` VARCHAR(45) NOT NULL, "
+                                  "PRIMARY KEY (`discount_id`), UNIQUE INDEX `discount_code_UNIQUE` "
+                                  "(`discount_code` ASC) VISIBLE, UNIQUE INDEX `discount_id_UNIQUE` "
+                                  "(`discount_id` ASC) VISIBLE);")
+            print("'discount' table is created successfully")
+        except Exception as e:
+            print("'discount' table could not be created")
+            print(e)

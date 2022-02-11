@@ -23,6 +23,8 @@ password = "44966874"
 date_time = datetime.now()
 date_time_str = date_time.strftime("%d/%m/%Y %H:%M:%S")
 
+hms_version = "DORv1.14"
+
 
 class Window:
     def __init__(self, master):
@@ -51,6 +53,8 @@ class Window:
         # Buttons
         self.home_b = tk.Button
         self.tenants_b = tk.Button
+        self.payments_b = tk.Button
+        self.discounts_b = tk.Button
         self.settings_b = tk.Button
         self.notif_b = tk.Button
 
@@ -81,10 +85,14 @@ class Window:
 
         self.bug_description_e = ttk.Entry
 
+        self.discount_code_e = ttk.Entry
+
         # Spinbox
         self.room_number_sp = ttk.Spinbox
         self.room_capacity_sp = ttk.Spinbox
         self.room_price_sp = ttk.Spinbox
+
+        self.discount_amount_sp = ttk.Spinbox
 
         # ComboBox
         self.room_availability_cb = ttk.Combobox
@@ -96,6 +104,7 @@ class Window:
 
         # String
         self.admin_id_str = str
+        self.basic_user_id_str = str
         self.current_user = None
         self.admin_access_status = None
 
@@ -285,6 +294,14 @@ class Window:
                                    bg="#FFFFFF", relief="flat", command=self.tenant_content_interface)
         self.tenants_b.pack(side="top", anchor="w")
 
+        self.payments_b = tk.Button(left_nav_lf, text="Payments", font=("Times New Roman", 15), fg='#7c8084',
+                                    bg="#FFFFFF", relief="flat", command=self.payment_content_interface)
+        self.payments_b.pack(side="top", anchor="w")
+
+        self.discounts_b = tk.Button(left_nav_lf, text="Discounts", font=("Times New Roman", 15), fg='#7c8084',
+                                     bg="#FFFFFF", relief="flat", command=self.discount_content_interface)
+        self.discounts_b.pack(side="top", anchor="w")
+
         self.settings_b = tk.Button(left_nav_lf, text="Accounts", font=("Times New Roman", 15), fg='#7c8084',
                                     bg="#FFFFFF", relief="flat", command=self.account_settings_content_interface)
         self.settings_b.pack(side="top", anchor="w")
@@ -292,6 +309,8 @@ class Window:
         self.notif_b = tk.Button(left_nav_lf, text="Notifications", font=("Times New Roman", 15), fg='#7c8084',
                                  bg="#FFFFFF", relief="flat", command=self.notif_content_interface)
         self.notif_b.pack(side="top", anchor="w")
+
+        ttk.Label(left_nav_lf, text=hms_version, style="small_info.TLabel").pack(side="bottom", pady=20)
 
         # ================================================ Left-Nav widgets ============================================
         self.content_lf = tk.LabelFrame(self.master, bg="#FFFFFF")
@@ -418,6 +437,113 @@ class Window:
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#89CFF0", relief="flat", command=self.show_tenant_information_module).pack(side="top", fill="x")
+
+    def payment_content_interface(self):
+        self.change_button_color()
+        self.payments_b.configure(fg='#395A68')
+
+        # Clean widgets in the master window
+        Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Home content ============================================
+        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        panel_lf.pack(side="top", fill="x")
+
+        # ================================================ Room Settings ============================================
+        payment_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
+        payment_dashboard_lf.pack(side="left", padx=10, pady=10)
+
+        payment_dashboard_label_lf = tk.LabelFrame(payment_dashboard_lf, bg="#FFFFFF", relief="flat")
+        payment_dashboard_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(payment_dashboard_label_lf, text='Payments Settings',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(payment_dashboard_label_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        # ================================================ Tenant info ===============================================
+        payment_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        payment_info_lf.pack(side="top", pady=20, fill="x")
+
+        payment_info_title_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        payment_info_title_lf.pack(side="top", fill="x")
+
+        ttk.Label(payment_info_title_lf, text='Payment Information',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(payment_info_title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        refresh_b_lf = tk.LabelFrame(payment_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat").pack(fill="x")
+
+        # ================================================ Room info content ===========================================
+        self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="x")
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat", command=self.show_tenant_information_module).pack(side="top", fill="x")
+
+    def discount_content_interface(self):
+        self.change_button_color()
+        self.discounts_b.configure(fg='#395A68')
+
+        # Clean widgets in the master window
+        Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Home content ============================================
+        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        panel_lf.pack(side="top", fill="x")
+
+        # ================================================ Discount Dashboard ==========================================
+        discount_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
+        discount_dashboard_lf.pack(side="left", padx=10, pady=10)
+
+        discount_dashboard_label_lf = tk.LabelFrame(discount_dashboard_lf, bg="#FFFFFF", relief="flat")
+        discount_dashboard_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(discount_dashboard_label_lf, text='Discount Dashboard',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(discount_dashboard_label_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        discount_dashboard_links_lf = tk.LabelFrame(discount_dashboard_lf, bg="#FFFFFF", relief="flat")
+        discount_dashboard_links_lf.pack(side="top", anchor="nw", pady=10)
+
+        create_discount_l = ttk.Label(discount_dashboard_links_lf, text='Create discount code', style="link.TLabel")
+        create_discount_l.pack(side="top", anchor="w")
+        create_discount_l.bind("<Button-1>", self.create_discount_dialog)
+
+        # ================================================ Tenant info ===============================================
+        discount_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        discount_info_lf.pack(side="top", pady=20, fill="x")
+
+        discount_info_title_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
+        discount_info_title_lf.pack(side="top", fill="x")
+
+        ttk.Label(discount_info_title_lf, text='Discount Information',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(discount_info_title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        refresh_b_lf = tk.LabelFrame(discount_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat").pack(fill="x")
+
+        # ================================================ Room info content ===========================================
+        self.info_content_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="x")
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat").pack(side="top", fill="x")
 
     def account_settings_content_interface(self):
         self.change_button_color()
@@ -1153,6 +1279,62 @@ class Window:
 
         self.dialog_box_top.mainloop()
 
+    # Discount
+    def create_discount_dialog(self, event):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create discount")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Main interface ==============================================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Create discount',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Discount Code', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, sticky="w")
+
+        self.discount_code_e = ttk.Entry(forms_lf, width=30)
+        self.discount_code_e.grid(column=1, row=0)
+        self.discount_code_e.focus()
+
+        ttk.Label(forms_lf, text="Ex: BASIC10, SUITE 10",
+                  style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(forms_lf, text='Discount Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, sticky="w")
+
+        self.discount_amount_sp = ttk.Spinbox(forms_lf, from_=0, to=100, wrap=True)
+        self.discount_amount_sp.grid(column=1, row=2, sticky="w")
+
+        ttk.Label(forms_lf, text="in percentage",
+                  style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.create_tenant_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create discount!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+        print(event)
+
     # Accounts
     def change_username_password_dialog(self, event):
         self.dialog_box_top = tk.Toplevel(self.master)
@@ -1422,23 +1604,41 @@ class Window:
                 # Converts the tuple into integer
                 admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                 self.admin_id_str = str(admin_id)
-                # print(self.admin_id_str)
 
                 self.admin_access = False
                 self.basic_user_access = True
 
                 # Instantiate create_widgets method
+                self.basic_user_get_id_request()
                 self.basic_user_get_current_user()
                 self.main_interface()
 
             self.db1.close()
             self.mycursor.close()
 
-    def basic_user_get_current_user(self):
+    def basic_user_get_id_request(self):
         self.database_connect()
 
         self.mycursor.execute(
+            "SELECT DISTINCT basic_user_id FROM basic_user where username = '" + self.signin_username_e.get() + "';")
+
+        # Converts the tuple into integer
+        basic_user_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+        self.basic_user_id_str = str(basic_user_id)
+
+        print(self.basic_user_id_str)
+
+        self.db1.close()
+        self.mycursor.close()
+
+    def basic_user_get_current_user(self):
+        self.database_connect()
+        """
+        self.mycursor.execute(
             "SELECT DISTINCT username FROM basic_user where admin_id = '" + str(self.admin_id_str) + "';")
+            """
+        self.mycursor.execute(
+            "SELECT DISTINCT username FROM basic_user where basic_user_id = '" + str(self.basic_user_id_str) + "';")
 
         # Converts the tuple into integer
         self.current_user = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
@@ -1759,6 +1959,34 @@ class Window:
         self.mycursor.close()
         self.db1.close()
 
+    # Discount
+    def create_discount_request(self):
+        if not self.discount_code_e.get():
+            self.invalid_input()
+        if not self.discount_amount_sp.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO discount (discount_code, discount_amount, admin_id,"
+                                      " basic_user_id, date_created) VALUES (%s,%s,%s,%s,%s)",
+                                      (self.discount_code_e.get(), self.discount_amount_sp.get(),
+                                       self.admin_id_str,
+                                       self.room_availability_cb.get(), date_time_str))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Room is  created")
+
+                self.dialog_box_top.destroy()
+                self.show_room_information_module()
+
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
     # Accounts
 
     def change_username_password_request(self):
@@ -1941,6 +2169,8 @@ class Window:
     def change_button_color(self):
         self.home_b.configure(fg='#7c8084')
         self.tenants_b.configure(fg='#7c8084')
+        self.payments_b.configure(fg='#7c8084')
+        self.discounts_b.configure(fg='#7c8084')
         self.settings_b.configure(fg='#7c8084')
         self.notif_b.configure(fg='#7c8084')
 
