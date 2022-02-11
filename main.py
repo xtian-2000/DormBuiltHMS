@@ -99,6 +99,8 @@ class Window:
 
         self.tenant_status_cb = ttk.Combobox
 
+        self.discount_status_cb = ttk.Combobox
+
         # Treeview
         self.info_tree = ttk.Treeview
 
@@ -110,7 +112,10 @@ class Window:
 
         # Int
         self.room_id = int
+
         self.tenant_id = int
+
+        self.discount_id = int
 
         # Boolean
         self.admin_access = False
@@ -536,14 +541,14 @@ class Window:
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
-                  bg="#FFFFFF", relief="flat").pack(fill="x")
+                  bg="#FFFFFF", relief="flat", command=self.show_discount_information_module).pack(fill="x")
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat").pack(side="top", fill="x")
+                  bg="#89CFF0", relief="flat", command=self.show_discount_information_module).pack(side="top", fill="x")
 
     def account_settings_content_interface(self):
         self.change_button_color()
@@ -674,7 +679,7 @@ class Window:
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
                                       yscrollcommand=info_tree_scr.set)
         self.info_tree["columns"] = ("Room ID", "Room Number", "Description", "Type", "Availability", "Capacity",
-                                     "Price")
+                                     "Price", "Current Occupants")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
@@ -685,6 +690,7 @@ class Window:
         self.info_tree.column("Availability", anchor="w", width=120)
         self.info_tree.column("Capacity", anchor="w", width=120)
         self.info_tree.column("Price", anchor="center", width=80)
+        self.info_tree.column("Current Occupants", anchor="center", width=80)
 
         # Create headings
         self.info_tree.heading("#0", text="", anchor="w")
@@ -695,6 +701,7 @@ class Window:
         self.info_tree.heading("Availability", text="Availability", anchor="w")
         self.info_tree.heading("Capacity", text="Capacity", anchor="w")
         self.info_tree.heading("Price", text="Price", anchor="center")
+        self.info_tree.heading("Current Occupants", text="Current Occupants", anchor="center")
 
         self.info_tree.pack(side="top", fill="x")
 
@@ -753,6 +760,52 @@ class Window:
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.tenant_info_section)
+
+    # Discount
+    def show_discount_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
+                                      yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = ("Discount ID", "Discount Code", "Discount Amount", "Discount Status",
+                                     "Date created")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Discount ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Discount Code", anchor="w", width=80)
+        self.info_tree.column("Discount Amount", anchor="center", width=80)
+        self.info_tree.column("Discount Status", anchor="center", width=80)
+        self.info_tree.column("Date created", width=0, stretch=False)
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Discount ID", text="Discount ID", anchor="center")
+        self.info_tree.heading("Discount Code", text="Discount Code", anchor="w")
+        self.info_tree.heading("Discount Amount", text="Discount Amount (%)", anchor="center")
+        self.info_tree.heading("Discount Status", text="Discount Status", anchor="center")
+        self.info_tree.heading("Date created", text="Date created", anchor="w")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.discount_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        ttk.Label(self.info_buttons_lf, text="! Click on a discount code to open this section",
+                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.discount_info_section)
 
     # Accounts
     def show_employee_information_module(self):
@@ -1308,7 +1361,7 @@ class Window:
         self.discount_code_e.grid(column=1, row=0)
         self.discount_code_e.focus()
 
-        ttk.Label(forms_lf, text="Ex: BASIC10, SUITE 10",
+        ttk.Label(forms_lf, text="Ex: BASIC10, SUITE10",
                   style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
         ttk.Label(forms_lf, text='Discount Amount', style="h2.TLabel",
@@ -1320,11 +1373,19 @@ class Window:
         ttk.Label(forms_lf, text="in percentage",
                   style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
+        ttk.Label(forms_lf, text='Discount Status', style="h2.TLabel",
+                  justify="left").grid(column=0, row=4, sticky="w")
+
+        self.discount_status_cb = ttk.Combobox(forms_lf)
+        self.discount_status_cb['values'] = ('Active', 'Inactive')
+        self.discount_status_cb.current(0)
+        self.discount_status_cb.grid(column=1, row=4, sticky="w")
+
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
         tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
-                  command=self.create_tenant_request).pack(side="left")
+                  command=self.create_discount_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create discount!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -1334,6 +1395,79 @@ class Window:
 
         self.dialog_box_top.mainloop()
         print(event)
+
+    def modify_discount_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Modify discount")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Main interface ==============================================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Modify discount',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Discount Code', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, sticky="w")
+
+        self.discount_code_e = ttk.Entry(forms_lf, width=30)
+        self.discount_code_e.grid(column=1, row=0)
+        self.discount_code_e.focus()
+
+        ttk.Label(forms_lf, text="Ex: BASIC10, SUITE10",
+                  style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(forms_lf, text='Discount Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, sticky="w")
+
+        self.discount_amount_sp = ttk.Spinbox(forms_lf, from_=0, to=100, wrap=True)
+        self.discount_amount_sp.grid(column=1, row=2, sticky="w")
+
+        ttk.Label(forms_lf, text="in percentage",
+                  style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(forms_lf, text='Discount Status', style="h2.TLabel",
+                  justify="left").grid(column=0, row=4, sticky="w")
+
+        self.discount_status_cb = ttk.Combobox(forms_lf)
+        self.discount_status_cb['values'] = ('Active', 'Inactive')
+        self.discount_status_cb.grid(column=1, row=4, sticky="w")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        # Insert values to entry widgets
+        self.discount_code_e.insert(0, values[1])
+        self.discount_amount_sp.insert(0, values[2])
+        self.discount_status_cb.insert(0, values[3])
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text="Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.modify_discount_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to modify discount!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
 
     # Accounts
     def change_username_password_dialog(self, event):
@@ -1782,7 +1916,7 @@ class Window:
     def room_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT room.room_id, room.room_number, room.room_description, room.room_type, "
-                              "room.room_availability, room.room_capacity, room.room_price "
+                              "room.room_availability, room.room_capacity, room.room_price, room.current_ "
                               "FROM room where admin_id = ' "
                               + str(self.admin_id_str) + "';")
 
@@ -1965,27 +2099,111 @@ class Window:
             self.invalid_input()
         if not self.discount_amount_sp.get():
             self.invalid_input()
+        if not self.discount_status_cb.get():
+            self.invalid_input()
         else:
             try:
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO discount (discount_code, discount_amount, admin_id,"
-                                      " basic_user_id, date_created) VALUES (%s,%s,%s,%s,%s)",
+                                      " basic_user_id, date_created, discount_status) VALUES (%s,%s,%s,%s,%s,%s)",
                                       (self.discount_code_e.get(), self.discount_amount_sp.get(),
-                                       self.admin_id_str,
-                                       self.room_availability_cb.get(), date_time_str))
+                                       str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                       self.discount_status_cb.get()))
 
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
 
-                messagebox.showinfo("Success", "Room is  created")
+                messagebox.showinfo("Success", "Discount code is  created")
 
                 self.dialog_box_top.destroy()
-                self.show_room_information_module()
+                self.show_discount_information_module()
 
             except Exception as e:
-                self.invalid_input()
+                self.invalid_request()
                 print(e)
+
+    def modify_discount_request(self):
+        if not self.discount_code_e.get():
+            self.invalid_input()
+        if not self.discount_amount_sp.get():
+            self.invalid_input()
+        if not self.discount_status_cb.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+
+                self.mycursor.execute("UPDATE discount SET discount_code = '"
+                                      + self.discount_code_e.get() + "', discount_amount = '"
+                                      + self.discount_amount_sp.get() + "', discount_status = '"
+                                      + self.discount_status_cb.get() + "'  WHERE discount_id = '"
+                                      + self.discount_id + "';")
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Discount information is modified successfully")
+
+                self.dialog_box_top.destroy()
+                self.show_discount_information_module()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+
+    def discount_info_treeview_request(self):
+        self.database_connect()
+        self.mycursor.execute("SELECT discount.discount_id, discount.discount_code, discount.discount_amount, "
+                              "discount.discount_status, discount.date_created FROM discount where admin_id = ' "
+                              + str(self.admin_id_str) + "';")
+
+        discount = self.mycursor.fetchall()
+
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+        count = 0
+        for record in discount:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      tags=("evenrow",))
+            count += 1
+
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
+
+    def remove_discount_request(self):
+        try:
+            self.database_connect()
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+
+            self.mycursor.execute("DELETE FROM discount WHERE discount_id = '" + values[0] + "';")
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            messagebox.showinfo("Success", "Removed discount successfully")
+
+            self.discount_content_interface()
+        except Exception as e:
+            self.invalid_input()
+            print(e)
 
     # Accounts
 
@@ -2355,10 +2573,68 @@ class Window:
 
         print(event)
 
+    def discount_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Discount Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        self.discount_id = values[0]
+
+        ttk.Label(info_lf, text='Discount ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Discount Code: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Discount Amount: ',
+                  style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Discount Status: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
+        modify_b_lf.pack(side="top", pady=5, fill="x")
+
+        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 10", fg="#4C8404",
+                  bg="#FFFFFF", relief="flat", command=self.modify_discount_dialog).pack(side="top", fill="x")
+
+        tk.Button(buttons_lf, text="Remove", font="OpenSans, 10", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
     # ================================================ Static Methods ==================================================
     @staticmethod
     def invalid_input():
         messagebox.showerror("Error", "Invalid or no input.")
+
+    @staticmethod
+    def invalid_request():
+        messagebox.showerror("Error", "Database request unsuccessful! \n Please your internet connection.")
 
     @staticmethod
     def button_clicked():
