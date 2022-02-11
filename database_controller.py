@@ -114,7 +114,7 @@ class Database:
             print("Price column could not be created successfully")
             print(e)
 
-        # Add current_occupants column to the discount table
+        # Add current_occupants column to the room table
         try:
             self.mycursor = self.db1.cursor()
             self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` ADD COLUMN `current_occupants` INT NOT NULL "
@@ -122,6 +122,16 @@ class Database:
             print("current_occupants column is added to the room table successfully")
         except Exception as e:
             print("current_occupants column could not be created successfully")
+            print(e)
+
+        # Add current_occupants column to the room table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` CHANGE COLUMN `room_price` `room_price` INT "
+                                  "NULL DEFAULT 0 ;")
+            print("alter room_price column is added to the room table successfully")
+        except Exception as e:
+            print("alteration could not be created successfully")
             print(e)
 
         # Creating tenant's table in database
@@ -170,6 +180,16 @@ class Database:
             print("'payment' table is created successfully")
         except Exception as e:
             print("'payment' table could not be created")
+            print(e)
+
+        # Add discount_code column to the payment table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`payment` ADD COLUMN `discount_code` VARCHAR(45) NULL "
+                                  "AFTER `date_created`;")
+            print("discount_code column is added to the payment table successfully")
+        except Exception as e:
+            print("discount_code column could not be created successfully")
             print(e)
 
         # Creating discount table in database

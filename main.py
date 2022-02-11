@@ -46,6 +46,8 @@ class Window:
         # Label
         self.admin_access_status_l = ttk.Label
 
+        self.room_cost_l = ttk.Label
+
         # PhotoImage
         self.db_logo_resized = tkinter.PhotoImage
         self.db_logo_resized_2 = tkinter.PhotoImage
@@ -91,6 +93,8 @@ class Window:
         self.room_number_sp = ttk.Spinbox
         self.room_capacity_sp = ttk.Spinbox
         self.room_price_sp = ttk.Spinbox
+        self.tenant_id_sp = ttk.Spinbox
+        self.payment_amount_sp = ttk.Spinbox
 
         self.discount_amount_sp = ttk.Spinbox
 
@@ -1220,6 +1224,85 @@ class Window:
 
         print(event)
 
+    def create_transaction_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create transaction")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Create transaction',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        ttk.Label(forms1_lf, text='Payment Information',
+                  style="on.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(forms1_lf, text='Room cost', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=1, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=1, sticky="w")
+
+        ttk.Label(forms1_lf, text='Discount Code', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, sticky="w")
+
+        self.discount_code_e = ttk.Entry(forms1_lf, width=30)
+        self.discount_code_e.grid(column=1, row=2)
+
+        apply_b_lf = tk.LabelFrame(forms1_lf, bd=1, bg="#585456", relief="flat")
+        apply_b_lf.grid(column=2, row=2, padx=10)
+
+        tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#4C8404", bg="#FFFFFF",
+                  relief="flat", command=self.apply_discount_request).pack(fill="x")
+
+        forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms2_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, sticky="w")
+
+        self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.tenant_id_sp.grid(column=1, row=0, sticky="w")
+        self.tenant_id_sp.focus()
+
+        ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, sticky="w")
+
+        self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  command=self.create_transaction_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create transaction!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
     # Tenant
     def create_tenant_account_dialog(self, event):
         self.dialog_box_top = tk.Toplevel(self.master)
@@ -1916,7 +1999,7 @@ class Window:
     def room_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT room.room_id, room.room_number, room.room_description, room.room_type, "
-                              "room.room_availability, room.room_capacity, room.room_price, room.current_ "
+                              "room.room_availability, room.room_capacity, room.room_price, room.current_occupants "
                               "FROM room where admin_id = ' "
                               + str(self.admin_id_str) + "';")
 
@@ -1931,12 +2014,12 @@ class Window:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]),
+                                              record[6], record[7]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]),
+                                              record[6], record[7]),
                                       tags=("evenrow",))
             count += 1
 
@@ -1964,6 +2047,89 @@ class Window:
             except Exception as e:
                 self.invalid_input()
                 print(e)
+
+    def apply_discount_request(self):
+        if not self.discount_code_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+
+                self.mycursor.execute(
+                    "SELECT * FROM discount where discount_code = '" + self.discount_code_e.get() +
+                    "' and admin_id = '" + str(self.admin_id_str) + "';")
+                myresult = self.mycursor.fetchone()
+                if myresult is None:
+                    tk.messagebox.showerror("Error", "Invalid Discount Code")
+                else:
+                    self.mycursor.execute(
+                        "SELECT DISTINCT discount_amount FROM discount where discount_code = '"
+                        + self.discount_code_e.get() + "' and admin_id = '" + str(self.admin_id_str) + "';")
+
+                    # Converts the tuple into integer
+                    discount_amount = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                    discounted_price = (int(self.room_cost_l.cget("text")) - (int(self.room_cost_l.cget("text")) *
+                                                                              discount_amount / 100))
+                    print(discounted_price)
+                    self.room_cost_l.config(text=discounted_price)
+
+                self.db1.close()
+                self.mycursor.close()
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+
+    def create_transaction_request(self):
+        if not self.tenant_id_sp.get():
+            self.invalid_input()
+        if not self.payment_amount_sp.get():
+            self.invalid_input()
+        else:
+            try:
+                # remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
+
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, discount_code) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), str(self.room_id),
+                                       self.tenant_id_sp.get(),
+                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       self.discount_code_e.get()))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                self.room_add_occupant()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+
+                self.dialog_box_top.destroy()
+                self.show_room_information_module()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+
+    def room_add_occupant(self):
+        remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
+
+        self.database_connect()
+
+        self.mycursor.execute(
+            "SELECT DISTINCT current_occupants FROM room where room_id = '"
+            + self.room_id + "';")
+
+        # Converts the tuple into integer
+        current_occupants_int = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+        current_occupants = current_occupants_int + 1
+
+        self.mycursor.execute("UPDATE room SET current_occupants = '" + current_occupants + "';")
+
+        self.db1.commit()
+        self.db1.close()
+        self.mycursor.close()
+        print(remaining_balance)
 
     def remove_room_account_request(self):
         try:
@@ -2485,23 +2651,28 @@ class Window:
 
         ttk.Label(room_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
-        ttk.Label(room_info_label_lf, text='Room Availability: ',
+        ttk.Label(room_info_label_lf, text='Current Occupants: ',
                   style="small_info.TLabel").grid(column=0, row=5, sticky="w")
 
-        ttk.Label(room_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+        ttk.Label(room_info_label_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
 
-        ttk.Label(room_info_label_lf, text='Room Description: ',
+        ttk.Label(room_info_label_lf, text='Room Availability: ',
                   style="small_info.TLabel").grid(column=0, row=6, sticky="w")
 
+        ttk.Label(room_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
+
+        ttk.Label(room_info_label_lf, text='Room Description: ',
+                  style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+
         ttk.Label(room_info_label_lf, text=values[2],
-                  style="small_info.TLabel").grid(column=1, row=6, columnspan=2, sticky="w")
+                  style="small_info.TLabel").grid(column=1, row=7, columnspan=2, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
-        tk.Button(buttons_lf, text="+ Create transaction", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat").pack(side="top", pady=5, fill="x")
+        tk.Button(buttons_lf, text="+ Create transaction", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0",
+                  relief="flat", command=self.create_transaction_dialog).pack(side="top", pady=5, fill="x")
 
         copy_create_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         copy_create_b_lf.pack(side="top", pady=5, fill="x")
