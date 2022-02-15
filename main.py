@@ -13,7 +13,7 @@ from email.mime.multipart import MIMEMultipart
 from random import randint
 from tkinter import Menu
 from datetime import datetime
-import time
+# import time
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
@@ -53,6 +53,18 @@ class Window:
 
         logout_im = PhotoImage(file=r"exit_b.png")
         self.logout_im_resized = logout_im.subsample(1, 1)
+
+        remove_im = PhotoImage(file=r"remove_b.png")
+        self.remove_im_resized = remove_im.subsample(1, 1)
+
+        copy_im = PhotoImage(file=r"copy_b.png")
+        self.copy_im_resized = copy_im.subsample(1, 1)
+
+        edit_im = PhotoImage(file=r"modify_b.png")
+        self.edit_im_resized = edit_im.subsample(1, 1)
+
+        create_im = PhotoImage(file=r"create_b.png")
+        self.create_im_resized = create_im.subsample(1, 1)
 
         home_active_im = PhotoImage(file=r"home_active_b.png")
         self.home_active_im_resized = home_active_im.subsample(1, 1)
@@ -765,7 +777,7 @@ class Window:
         self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
         ttk.Label(self.info_buttons_lf, text="! Click on a room to open this section",
-                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+                  style="small_info_colored.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.room_info_section)
@@ -2620,47 +2632,6 @@ class Window:
         else:
             pass
 
-    def employee_info_section(self, event):
-        # =================== Execution time
-        start_time = time.time()
-
-        Content_control.destroy_content(self.info_buttons_lf)
-
-        ttk.Label(self.info_buttons_lf, text='Employee Information',
-                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
-
-        employee_info_label_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
-        employee_info_label_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
-
-        # Grab record number
-        selected = self.info_tree.focus()
-
-        # Grab record values
-        values = self.info_tree.item(selected, "values")
-
-        ttk.Label(employee_info_label_lf, text='ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
-
-        ttk.Label(employee_info_label_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
-
-        ttk.Label(employee_info_label_lf, text='Name: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
-
-        ttk.Label(employee_info_label_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
-
-        ttk.Label(employee_info_label_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
-
-        ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
-
-        # Buttons
-        tk.Button(self.info_buttons_lf, text="Modify", font="OpenSans, 10",
-                  fg="#FFFFFF", bg="#4C8404").pack(side="left", pady=5, padx=10, anchor="w")
-
-        tk.Button(self.info_buttons_lf, text="Remove", font="OpenSans, 10", fg="#FFFFFF", bg="#BD1E51",
-                  command=self.remove_employee_account_request).pack(side="left", pady=5, padx=10, anchor="w")
-
-        print(event)
-
-        print("--- %s seconds ---" % (time.time() - start_time))
-
     def room_info_section(self, event):
         Content_control.destroy_content(self.info_buttons_lf)
 
@@ -2720,23 +2691,64 @@ class Window:
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
-        tk.Button(buttons_lf, text="+ Create transaction", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0",
-                  relief="flat", command=self.create_transaction_dialog).pack(side="top", pady=5, fill="x")
+        tk.Button(buttons_lf, text=" Create transaction", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+                  relief="flat", image=self.create_im_resized, compound="left", justify="left",
+                  command=self.create_transaction_dialog).pack(side="top", pady=5, fill="x")
 
         copy_create_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         copy_create_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(copy_create_b_lf, text="Copy info and create new", font="OpenSans, 10", fg="#4C8404",
-                  bg="#FFFFFF", relief="flat", command=self.copy_and_create_room_dialog).pack(side="top", fill="x")
+        tk.Button(copy_create_b_lf, text=" Copy and create new", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.copy_im_resized, compound="left", justify="left",
+                  command=self.copy_and_create_room_dialog).pack(side="top", fill="x")
 
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 10", fg="#4C8404",
-                  bg="#FFFFFF", relief="flat", command=self.modify_room_dialog).pack(side="top", fill="x")
+        tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left", justify="left",
+                  command=self.modify_room_dialog).pack(side="top", fill="x")
 
-        tk.Button(buttons_lf, text="Remove", font="OpenSans, 10", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+                  image=self.remove_im_resized, compound="left", justify="left",
                   command=self.remove_room_account_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def employee_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Employee Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        employee_info_label_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        employee_info_label_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        ttk.Label(employee_info_label_lf, text='ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text='Name: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        # Buttons
+        tk.Button(self.info_buttons_lf, text="Modify", font="OpenSans, 15",
+                  fg="#FFFFFF", bg="#4C8404").pack(side="left", pady=5, padx=10, anchor="w")
+
+        tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+                  image=self.remove_im_resized, compound="left",
+                  command=self.remove_employee_account_request).pack(side="left", pady=5, padx=10, anchor="w")
 
         print(event)
 
@@ -2785,10 +2797,11 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 10", fg="#4C8404",
+        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 15", fg="#4C8404",
                   bg="#FFFFFF", relief="flat", command=self.modify_tenant_account_dialog).pack(side="top", fill="x")
 
-        tk.Button(buttons_lf, text="Remove", font="OpenSans, 10", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+                  image=self.remove_im_resized, compound="left",
                   command=self.remove_tenant_account_request).pack(side="top", pady=5, fill="x")
 
         print(event)
@@ -2839,11 +2852,12 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 10", fg="#4C8404",
+        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 15", fg="#4C8404",
                   bg="#FFFFFF", relief="flat", command=self.modify_discount_dialog).pack(side="top", fill="x")
 
-        tk.Button(buttons_lf, text="Remove", font="OpenSans, 10", fg="#FFFFFF", bg="#BD1E51",
-                  relief="flat", command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
