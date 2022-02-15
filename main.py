@@ -1,5 +1,4 @@
 import functools
-import tkinter
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter.messagebox import showinfo
@@ -49,15 +48,54 @@ class Window:
         self.room_cost_l = ttk.Label
 
         # PhotoImage
-        self.db_logo_resized = tkinter.PhotoImage
-        self.db_logo_resized_2 = tkinter.PhotoImage
+        self.db_logo_resized = tk.PhotoImage
+        self.db_logo_resized_2 = tk.PhotoImage
+
+        logout_im = PhotoImage(file=r"exit_b.png")
+        self.logout_im_resized = logout_im.subsample(1, 1)
+
+        home_active_im = PhotoImage(file=r"home_active_b.png")
+        self.home_active_im_resized = home_active_im.subsample(1, 1)
+
+        home_inactive_im = PhotoImage(file=r"home_inactive_b.png")
+        self.home_inactive_im_resized = home_inactive_im.subsample(1, 1)
+
+        tenant_active_im = PhotoImage(file=r"tenant_active_b.png")
+        self.tenant_active_im_resized = tenant_active_im.subsample(1, 1)
+
+        tenant_inactive_im = PhotoImage(file=r"tenant_inactive_b.png")
+        self.tenant_inactive_im_resized = tenant_inactive_im.subsample(1, 1)
+
+        payment_active_im = PhotoImage(file=r"payment_active_b.png")
+        self.payment_active_im_resized = payment_active_im.subsample(1, 1)
+
+        payment_inactive_im = PhotoImage(file=r"payment_inactive_b.png")
+        self.payment_inactive_im_resized = payment_inactive_im.subsample(1, 1)
+
+        discount_active_im = PhotoImage(file=r"discount_active_b.png")
+        self.discount_active_im_resized = discount_active_im.subsample(1, 1)
+
+        discount_inactive_im = PhotoImage(file=r"discount_inactive_b.png")
+        self.discount_inactive_im_resized = discount_inactive_im.subsample(1, 1)
+
+        account_active_im = PhotoImage(file=r"account_active_b.png")
+        self.account_active_im_resized = account_active_im.subsample(1, 1)
+
+        account_inactive_im = PhotoImage(file=r"account_inactive_b.png")
+        self.account_inactive_im_resized = account_inactive_im.subsample(1, 1)
+
+        notif_active_im = PhotoImage(file=r"notif_active_b.png")
+        self.notif_active_im_resized = notif_active_im.subsample(1, 1)
+
+        notif_inactive_im = PhotoImage(file=r"notif_inactive_b.png")
+        self.notif_inactive_im_resized = notif_inactive_im.subsample(1, 1)
 
         # Buttons
         self.home_b = tk.Button
         self.tenants_b = tk.Button
         self.payments_b = tk.Button
         self.discounts_b = tk.Button
-        self.settings_b = tk.Button
+        self.accounts_b = tk.Button
         self.notif_b = tk.Button
 
         # Entry
@@ -211,6 +249,10 @@ class Window:
         self.signin_username_e.focus()
 
         # ================================================ Footer Interface ===========================================
+        middle_f = ttk.Frame(self.master, style="Basic.TFrame")
+        middle_f.pack(side="top", fill="both", expand=True)
+
+        # ================================================ Footer Interface ===========================================
         footer_f = ttk.Frame(self.master, style="Basic.TFrame")
         footer_f.pack(side="bottom", fill="x")
 
@@ -289,34 +331,41 @@ class Window:
                   style="h2.TLabel", justify="left").pack(side="left")
 
         tk.Button(top_nav_lf, text="Logout", font=("Times New Roman", 15), fg='#FFFFFF', bg="#BD1E51", relief="flat",
-                  command=self.signin_interface).pack(side="right", padx=10)
+                  image=self.logout_im_resized, compound="left",
+                  command=self.signin_interface).pack(side="right", padx=20)
 
         # ================================================ Left-Nav widgets ============================================
         left_nav_lf = tk.LabelFrame(self.master, bg="#FFFFFF", relief="flat")
         left_nav_lf.pack(side="left", fill="both")
 
-        self.home_b = tk.Button(left_nav_lf, text="Home", font=("Times New Roman", 15), fg='#395A68',
-                                bg="#FFFFFF", relief="flat", command=self.home_content_interface)
+        self.home_b = tk.Button(left_nav_lf, text=" Home", font=("OpenSans", 15), fg='#395A68',
+                                bg="#FFFFFF", relief="flat", image=self.home_active_im_resized, compound="left",
+                                command=self.home_content_interface)
         self.home_b.pack(side="top", anchor="w")
 
-        self.tenants_b = tk.Button(left_nav_lf, text="Tenants", font=("Times New Roman", 15), fg='#7c8084',
-                                   bg="#FFFFFF", relief="flat", command=self.tenant_content_interface)
+        self.tenants_b = tk.Button(left_nav_lf, text=" Tenants", font=("OpenSans", 15), fg='#7c8084',
+                                   bg="#FFFFFF", relief="flat", image=self.tenant_inactive_im_resized, compound="left",
+                                   command=self.tenant_content_interface)
         self.tenants_b.pack(side="top", anchor="w")
 
-        self.payments_b = tk.Button(left_nav_lf, text="Payments", font=("Times New Roman", 15), fg='#7c8084',
-                                    bg="#FFFFFF", relief="flat", command=self.payment_content_interface)
+        self.payments_b = tk.Button(left_nav_lf, text=" Payments", font=("OpenSans", 15), fg='#7c8084',
+                                    bg="#FFFFFF", relief="flat", image=self.payment_inactive_im_resized,
+                                    compound="left", command=self.payment_content_interface)
         self.payments_b.pack(side="top", anchor="w")
 
-        self.discounts_b = tk.Button(left_nav_lf, text="Discounts", font=("Times New Roman", 15), fg='#7c8084',
-                                     bg="#FFFFFF", relief="flat", command=self.discount_content_interface)
+        self.discounts_b = tk.Button(left_nav_lf, text=" Discounts", font=("OpenSans", 15), fg='#7c8084',
+                                     bg="#FFFFFF", relief="flat", image=self.discount_inactive_im_resized,
+                                     compound="left", command=self.discount_content_interface)
         self.discounts_b.pack(side="top", anchor="w")
 
-        self.settings_b = tk.Button(left_nav_lf, text="Accounts", font=("Times New Roman", 15), fg='#7c8084',
-                                    bg="#FFFFFF", relief="flat", command=self.account_settings_content_interface)
-        self.settings_b.pack(side="top", anchor="w")
+        self.accounts_b = tk.Button(left_nav_lf, text=" Accounts", font=("OpenSans", 15), fg='#7c8084',
+                                    bg="#FFFFFF", relief="flat", image=self.account_inactive_im_resized,
+                                    compound="left", command=self.account_settings_content_interface)
+        self.accounts_b.pack(side="top", anchor="w")
 
-        self.notif_b = tk.Button(left_nav_lf, text="Notifications", font=("Times New Roman", 15), fg='#7c8084',
-                                 bg="#FFFFFF", relief="flat", command=self.notif_content_interface)
+        self.notif_b = tk.Button(left_nav_lf, text=" Notifications", font=("OpenSans", 15), fg='#7c8084',
+                                 bg="#FFFFFF", relief="flat", image=self.notif_inactive_im_resized,
+                                 compound="left", command=self.notif_content_interface)
         self.notif_b.pack(side="top", anchor="w")
 
         ttk.Label(left_nav_lf, text=hms_version, style="small_info.TLabel").pack(side="bottom", pady=20)
@@ -330,7 +379,7 @@ class Window:
 
     def home_content_interface(self):
         self.change_button_color()
-        self.home_b.configure(fg='#395A68')
+        self.home_b.configure(fg='#395A68', image=self.home_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -392,7 +441,7 @@ class Window:
 
     def tenant_content_interface(self):
         self.change_button_color()
-        self.tenants_b.configure(fg='#395A68')
+        self.tenants_b.configure(fg='#395A68', image=self.tenant_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -449,7 +498,7 @@ class Window:
 
     def payment_content_interface(self):
         self.change_button_color()
-        self.payments_b.configure(fg='#395A68')
+        self.payments_b.configure(fg='#395A68', image=self.payment_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -499,7 +548,7 @@ class Window:
 
     def discount_content_interface(self):
         self.change_button_color()
-        self.discounts_b.configure(fg='#395A68')
+        self.discounts_b.configure(fg='#395A68', image=self.discount_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -556,7 +605,7 @@ class Window:
 
     def account_settings_content_interface(self):
         self.change_button_color()
-        self.settings_b.configure(fg='#395A68')
+        self.accounts_b.configure(fg='#395A68', image=self.account_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -645,7 +694,7 @@ class Window:
 
     def notif_content_interface(self):
         self.change_button_color()
-        self.notif_b.configure(fg='#395A68')
+        self.notif_b.configure(fg='#395A68', image=self.notif_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
@@ -2100,7 +2149,7 @@ class Window:
                 self.db1.close()
                 self.mycursor.close()
 
-                self.room_add_occupant()
+                # self.room_add_occupant()
 
                 messagebox.showinfo("Success", "Transaction is  created")
 
@@ -2551,12 +2600,12 @@ class Window:
 
     # ================================================ Content control =================================================
     def change_button_color(self):
-        self.home_b.configure(fg='#7c8084')
-        self.tenants_b.configure(fg='#7c8084')
-        self.payments_b.configure(fg='#7c8084')
-        self.discounts_b.configure(fg='#7c8084')
-        self.settings_b.configure(fg='#7c8084')
-        self.notif_b.configure(fg='#7c8084')
+        self.home_b.configure(fg='#7c8084', image=self.home_inactive_im_resized)
+        self.tenants_b.configure(fg='#7c8084', image=self.tenant_inactive_im_resized)
+        self.payments_b.configure(fg='#7c8084', image=self.payment_inactive_im_resized)
+        self.discounts_b.configure(fg='#7c8084', image=self.discount_inactive_im_resized)
+        self.accounts_b.configure(fg='#7c8084', image=self.account_inactive_im_resized)
+        self.notif_b.configure(fg='#7c8084', image=self.notif_inactive_im_resized)
 
     def admin_status(self):
         if self.admin_access:
