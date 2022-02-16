@@ -49,9 +49,12 @@ class Window:
         self.room_cost_l = ttk.Label
 
         # PhotoImage
-        db_logo = PhotoImage(file=r"Dormbuilt_logo.png")
-        self.db_logo_resized = db_logo.subsample(2, 2)
-        self.db_logo_resized_2 = db_logo.subsample(6, 6)
+        db_logo_im = PhotoImage(file=r"Dormbuilt_logo.png")
+        self.db_logo_resized = db_logo_im.subsample(2, 2)
+        self.db_logo_resized_2 = db_logo_im.subsample(6, 6)
+
+        hms_logo_im = PhotoImage(file=r"pongodev_hms_small_logo.png")
+        self.hms_logo_im_resized = hms_logo_im.subsample(8, 8)
 
         signin_im = PhotoImage(file=r"signin_l.png")
         self.signin_im_resized = signin_im.subsample(1, 1)
@@ -216,21 +219,28 @@ class Window:
 
         # ================================================ Logo Interface ==============================================
         logo_f = ttk.Frame(top_f, style="Basic.TFrame")
-        logo_f.pack(side="left", padx=20)
+        logo_f.pack(side="left", padx=20, fill="both", expand=True)
 
-        ttk.Label(logo_f, image=self.db_logo_resized).pack(pady=5)
+        tk.Label(logo_f, image=self.db_logo_resized, bg="#FFFFFF").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(pady=5)
+        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(top_f, text='Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec at velit eu leo \n'
-                              'consectetur aliquam. Donec lacus orci, bibendum in sodales et, sollicitudin vel \n '
-                              'magna. Nullam elit elit, consectetur commodo erat vitae, auctor porttitor nibh. \n'
-                              'In diam nisi, tristique ut mi ac, efficitur auctor rna.',
-                  style="h1_body.TLabel").pack(side="left")
+        ttk.Label(logo_f, text='Dormbuilt is a company that recognizes housing needs of the community within\n '
+                               '    the institution and dedicates its expertise to better serve them.',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        tk.Label(logo_f, bg="#FFFFFF").pack(side="top", pady=20, anchor="center")
+
+        tk.Label(logo_f, image=self.hms_logo_im_resized,
+                 bg="#FFFFFF").pack(side="top", padx=10, pady=5, anchor="center")
+
+        ttk.Label(logo_f, text='Dormbuilt is a company that recognizes housing needs of the community within\n '
+                               '    the institution and dedicates its expertise to better serve them.',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
         # ================================================ Sign In Form Interface ======================================
         self.login_register_lf = tk.LabelFrame(top_f, bg="#FFFFFF")
-        self.login_register_lf.pack(side="right", padx=20, pady=20)
+        self.login_register_lf.pack(side="right", padx=40, pady=20, anchor="n")
 
         tk.Label(self.login_register_lf, image=self.signin_im_resized, bg="#FFFFFF").pack(side="top", anchor="center")
 
@@ -270,7 +280,7 @@ class Window:
 
         self.signin_username_e.focus()
 
-        # ================================================ Footer Interface ===========================================
+        # ================================================ Filler Interface ===========================================
         middle_f = ttk.Frame(self.master, style="Basic.TFrame")
         middle_f.pack(side="top", fill="both", expand=True)
 
@@ -1001,20 +1011,20 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Room number', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.room_number_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_number_sp.grid(column=1, row=0, sticky="w")
         self.room_number_sp.focus()
 
         ttk.Label(forms_lf, text='Room description', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, padx=2.5, pady=2.5, row=2, sticky="w")
 
         self.room_type_e = ttk.Entry(forms_lf, width=60)
         self.room_type_e.grid(column=1, row=2)
@@ -1023,23 +1033,23 @@ class Window:
                   justify="left").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
-                  justify="left").grid(column=0, row=4, sticky="w")
+                  justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
         self.room_availability_cb['values'] = ('Available', 'Fully Occupied', 'Maintenance')
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
-                  justify="left").grid(column=0, row=5, sticky="w")
+                  justify="left").grid(column=0, row=5, padx=2.5, pady=2.5, sticky="w")
 
         self.room_capacity_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_capacity_sp.grid(column=1, row=5, sticky="w")
 
         ttk.Label(forms_lf, text='Room price', style="h2.TLabel",
-                  justify="left").grid(column=0, row=6, sticky="w")
+                  justify="left").grid(column=0, row=6, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
-        self.room_price_sp.grid(column=1, row=6, sticky="w")
+        self.room_price_sp.grid(column=1, row=6, padx=2.5, pady=2.5, sticky="w")
 
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=1, row=7, sticky="w")
@@ -1082,20 +1092,20 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Room number', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.room_number_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_number_sp.grid(column=1, row=0, sticky="w")
         self.room_number_sp.focus()
 
         ttk.Label(forms_lf, text='Room description', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.room_type_e = ttk.Entry(forms_lf, width=60)
         self.room_type_e.grid(column=1, row=2)
@@ -1104,20 +1114,20 @@ class Window:
                   justify="left").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
-                  justify="left").grid(column=0, row=4, sticky="w")
+                  justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
         self.room_availability_cb['values'] = ('Available', 'Fully Occupied', 'Maintenance')
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
-                  justify="left").grid(column=0, row=5, sticky="w")
+                  justify="left").grid(column=0, row=5, padx=2.5, pady=2.5, sticky="w")
 
         self.room_capacity_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_capacity_sp.grid(column=1, row=5, sticky="w")
 
         ttk.Label(forms_lf, text='Room price', style="h2.TLabel",
-                  justify="left").grid(column=0, row=6, sticky="w")
+                  justify="left").grid(column=0, row=6, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
         self.room_price_sp.grid(column=1, row=6, sticky="w")
@@ -1176,20 +1186,20 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Room number', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.room_number_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_number_sp.grid(column=1, row=0, sticky="w")
         self.room_number_sp.focus()
 
         ttk.Label(forms_lf, text='Room description', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.room_type_e = ttk.Entry(forms_lf, width=60)
         self.room_type_e.grid(column=1, row=2)
@@ -1198,20 +1208,20 @@ class Window:
                   justify="left").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
-                  justify="left").grid(column=0, row=4, sticky="w")
+                  justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
         self.room_availability_cb['values'] = ('Available', 'Fully Occupied', 'Maintenance')
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
-                  justify="left").grid(column=0, row=5, sticky="w")
+                  justify="left").grid(column=0, row=5, padx=2.5, pady=2.5, sticky="w")
 
         self.room_capacity_sp = ttk.Spinbox(forms_lf, from_=0, to=30, wrap=True)
         self.room_capacity_sp.grid(column=1, row=5, sticky="w")
 
         ttk.Label(forms_lf, text='Room price', style="h2.TLabel",
-                  justify="left").grid(column=0, row=6, sticky="w")
+                  justify="left").grid(column=0, row=6, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
         self.room_price_sp.grid(column=1, row=6, sticky="w")
@@ -1278,16 +1288,16 @@ class Window:
         forms_lf.pack(side="top", pady=10, fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Room price', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
-        self.room_price_sp.grid(column=1, row=0, sticky="w")
+        self.room_price_sp.grid(column=1, row=0, padx=2.5, pady=2.5, sticky="w")
 
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=2, row=0, sticky="w")
 
         ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.room_type_e = ttk.Entry(forms_lf, width=40)
         self.room_type_e.grid(column=1, row=1, columnspan=2)
@@ -1361,14 +1371,14 @@ class Window:
         forms2_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
         self.tenant_id_sp.grid(column=1, row=0, sticky="w")
         self.tenant_id_sp.focus()
 
         ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
         self.payment_amount_sp.grid(column=1, row=1, sticky="w")
@@ -1409,15 +1419,15 @@ class Window:
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms_lf, text='Name', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+        ttk.Label(forms_lf, text='Tenant Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_name_e = ttk.Entry(forms_lf, width=60)
         self.tenant_name_e.grid(column=1, row=0)
         self.tenant_name_e.focus()
 
         ttk.Label(forms_lf, text='Tenant Status', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
         self.tenant_status_cb['values'] = ('Active', 'Inactive')
@@ -1460,15 +1470,15 @@ class Window:
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms_lf, text='Name', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+        ttk.Label(forms_lf, text='Tenant Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_name_e = ttk.Entry(forms_lf, width=60)
         self.tenant_name_e.grid(column=1, row=0)
         self.tenant_name_e.focus()
 
         ttk.Label(forms_lf, text='Tenant Status', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
         self.tenant_status_cb['values'] = ('Active', 'Inactive')
@@ -1522,7 +1532,7 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Discount Code', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_code_e = ttk.Entry(forms_lf, width=30)
         self.discount_code_e.grid(column=1, row=0)
@@ -1532,7 +1542,7 @@ class Window:
                   style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
         ttk.Label(forms_lf, text='Discount Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_amount_sp = ttk.Spinbox(forms_lf, from_=0, to=100, wrap=True)
         self.discount_amount_sp.grid(column=1, row=2, sticky="w")
@@ -1541,7 +1551,7 @@ class Window:
                   style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Discount Status', style="h2.TLabel",
-                  justify="left").grid(column=0, row=4, sticky="w")
+                  justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_status_cb = ttk.Combobox(forms_lf)
         self.discount_status_cb['values'] = ('Active', 'Inactive')
@@ -1585,7 +1595,7 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Discount Code', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_code_e = ttk.Entry(forms_lf, width=30)
         self.discount_code_e.grid(column=1, row=0)
@@ -1595,7 +1605,7 @@ class Window:
                   style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
         ttk.Label(forms_lf, text='Discount Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_amount_sp = ttk.Spinbox(forms_lf, from_=0, to=100, wrap=True)
         self.discount_amount_sp.grid(column=1, row=2, sticky="w")
@@ -1604,7 +1614,7 @@ class Window:
                   style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Discount Status', style="h2.TLabel",
-                  justify="left").grid(column=0, row=4, sticky="w")
+                  justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.discount_status_cb = ttk.Combobox(forms_lf)
         self.discount_status_cb['values'] = ('Active', 'Inactive')
@@ -1658,13 +1668,13 @@ class Window:
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms_lf, text='Username', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+        ttk.Label(forms_lf, text='Username', style="h2.TLabel").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.change_username_e = ttk.Entry(forms_lf, width=60)
         self.change_username_e.grid(column=1, row=0, sticky="w", padx=10)
         self.change_username_e.focus()
 
-        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.change_password_e = ttk.Entry(forms_lf, show="*", width=60)
         self.change_password_e.grid(column=1, row=1, sticky="w", padx=10)
@@ -1708,20 +1718,20 @@ class Window:
         forms_lf.pack(side="top", fill="both", expand=True)
 
         ttk.Label(forms_lf, text='Employee Name', style="h2.TLabel",
-                  justify="left").grid(column=0, row=0, sticky="w")
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.employee_username_e = ttk.Entry(forms_lf, width=60)
         self.employee_username_e.grid(column=1, row=0)
         self.employee_username_e.focus()
 
         ttk.Label(forms_lf, text='Employee Password', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.employee_password_e = ttk.Entry(forms_lf, width=60)
         self.employee_password_e.grid(column=1, row=1)
 
         ttk.Label(forms_lf, text='Role', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.employee_role_e = ttk.Entry(forms_lf, width=60)
         self.employee_role_e.grid(column=1, row=2)
@@ -1767,7 +1777,7 @@ class Window:
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms_lf, text='Bug description', style="h2.TLabel").pack(side="top", anchor="nw")
+        ttk.Label(forms_lf, text='Bug description', style="h2.TLabel").pack(side="top", padx=2.5, pady=2.5, anchor="nw")
 
         self.bug_description_e = ttk.Entry(forms_lf, width=60)
         self.bug_description_e.pack()
@@ -1814,13 +1824,13 @@ class Window:
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms_lf, text='User Name', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+        ttk.Label(forms_lf, text='User Name', style="h2.TLabel").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.admin_access_username_e = ttk.Entry(forms_lf, width=60)
         self.admin_access_username_e.grid(column=1, row=0, sticky="w", padx=10)
         self.admin_access_username_e.focus()
 
-        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+        ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.admin_access_password_e = ttk.Entry(forms_lf, width=60)
         self.admin_access_password_e.grid(column=1, row=1, sticky="w", padx=10)
@@ -2766,8 +2776,9 @@ class Window:
         ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
         # Buttons
-        tk.Button(self.info_buttons_lf, text="Modify", font="OpenSans, 12",
-                  fg="#FFFFFF", bg="#4C8404").pack(side="left", pady=5, padx=10, anchor="w")
+        tk.Button(self.info_buttons_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left",
+                  justify="left").pack(side="left", pady=5, padx=10, anchor="w")
 
         tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
@@ -2820,8 +2831,9 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 12", fg="#4C8404",
-                  bg="#FFFFFF", relief="flat", command=self.modify_tenant_account_dialog).pack(side="top", fill="x")
+        tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left", justify="left",
+                  command=self.modify_tenant_account_dialog).pack(side="top", fill="x")
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
@@ -2875,8 +2887,9 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 12", fg="#4C8404",
-                  bg="#FFFFFF", relief="flat", command=self.modify_discount_dialog).pack(side="top", fill="x")
+        tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left", justify="left",
+                  command=self.modify_discount_dialog).pack(side="top", fill="x")
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
