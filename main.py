@@ -13,6 +13,7 @@ from email.mime.multipart import MIMEMultipart
 from random import randint
 from tkinter import Menu
 from datetime import datetime
+
 # import time
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
@@ -48,8 +49,15 @@ class Window:
         self.room_cost_l = ttk.Label
 
         # PhotoImage
-        self.db_logo_resized = tk.PhotoImage
-        self.db_logo_resized_2 = tk.PhotoImage
+        db_logo = PhotoImage(file=r"Dormbuilt_logo.png")
+        self.db_logo_resized = db_logo.subsample(2, 2)
+        self.db_logo_resized_2 = db_logo.subsample(6, 6)
+
+        signin_im = PhotoImage(file=r"signin_l.png")
+        self.signin_im_resized = signin_im.subsample(1, 1)
+
+        signup_im = PhotoImage(file=r"signup_l.png")
+        self.signup_im_resized = signup_im.subsample(1, 1)
 
         logout_im = PhotoImage(file=r"exit_b.png")
         self.logout_im_resized = logout_im.subsample(1, 1)
@@ -65,6 +73,9 @@ class Window:
 
         create_im = PhotoImage(file=r"create_b.png")
         self.create_im_resized = create_im.subsample(1, 1)
+
+        empty_im = PhotoImage(file=r"empty_l.png")
+        self.empty_im_resized = empty_im.subsample(1, 1)
 
         home_active_im = PhotoImage(file=r"home_active_b.png")
         self.home_active_im_resized = home_active_im.subsample(1, 1)
@@ -207,9 +218,6 @@ class Window:
         logo_f = ttk.Frame(top_f, style="Basic.TFrame")
         logo_f.pack(side="left", padx=20)
 
-        db_logo = PhotoImage(file=r"Dormbuilt_logo.png")
-        self.db_logo_resized = db_logo.subsample(2, 2)
-
         ttk.Label(logo_f, image=self.db_logo_resized).pack(pady=5)
 
         ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(pady=5)
@@ -224,17 +232,19 @@ class Window:
         self.login_register_lf = tk.LabelFrame(top_f, bg="#FFFFFF")
         self.login_register_lf.pack(side="right", padx=20, pady=20)
 
-        ttk.Label(self.login_register_lf, text='Sign In', style="h1.TLabel").pack(side="top", pady=10, anchor="nw")
+        tk.Label(self.login_register_lf, image=self.signin_im_resized, bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(self.login_register_lf, text='Sign In', style="h1.TLabel").pack(side="top", pady=10, anchor="center")
 
         form_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         form_f.pack(side="top", ipadx=10, ipady=5, fill="both")
 
-        ttk.Label(form_f, text='User Name', style="h2.TLabel").grid(column=0, row=0, sticky="w")
+        ttk.Label(form_f, text='User Name', style="h2.TLabel").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.signin_username_e = ttk.Entry(form_f)
         self.signin_username_e.grid(column=1, row=0)
 
-        ttk.Label(form_f, text='Password', style="h2.TLabel").grid(column=0, row=1, sticky="w")
+        ttk.Label(form_f, text='Password', style="h2.TLabel").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.signin_password_e = ttk.Entry(form_f, show="*")
         self.signin_password_e.grid(column=1, row=1)
@@ -275,23 +285,28 @@ class Window:
         Content_control.destroy_content(self.login_register_lf)
 
         # ================================================ Login UI ====================================================
-        ttk.Label(self.login_register_lf, text='Sign Up', style="h1.TLabel").pack(side="top", pady=10, anchor="nw")
+        tk.Label(self.login_register_lf, image=self.signup_im_resized, bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(self.login_register_lf, text='Sign Up', style="h1.TLabel").pack(side="top", pady=10, anchor="center")
 
         form_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         form_f.pack(side="top", ipadx=10, ipady=10, fill="both")
 
-        ttk.Label(form_f, text='User Name', style="h2.TLabel", justify="left").grid(column=0, row=0, sticky="w")
+        ttk.Label(form_f, text='User Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.signup_username_e = ttk.Entry(form_f)
         self.signup_username_e.grid(column=1, row=0)
         self.signup_username_e.focus()
 
-        ttk.Label(form_f, text='Password', style="h2.TLabel", justify="left").grid(column=0, row=1, sticky="w")
+        ttk.Label(form_f, text='Password', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.signup_password_e = ttk.Entry(form_f, show="*")
         self.signup_password_e.grid(column=1, row=1)
 
-        ttk.Label(form_f, text='Email', style="h2.TLabel", justify="left").grid(column=0, row=2, sticky="w")
+        ttk.Label(form_f, text='Email', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.signup_email_e = ttk.Entry(form_f)
         self.signup_email_e.grid(column=1, row=2)
@@ -333,9 +348,6 @@ class Window:
         # ================================================ Top-Nav Interface ===========================================
         top_nav_lf = tk.LabelFrame(self.master, bg="#FFFFFF", relief="flat")
         top_nav_lf.pack(side="top", fill="x")
-
-        db_logo = PhotoImage(file=r"Dormbuilt_logo.png")
-        self.db_logo_resized_2 = db_logo.subsample(6, 6)
 
         ttk.Label(top_nav_lf, image=self.db_logo_resized_2).pack(side="left", pady=5)
 
@@ -776,8 +788,11 @@ class Window:
         self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
         self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
-        ttk.Label(self.info_buttons_lf, text="! Click on a room to open this section",
-                  style="small_info_colored.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on a room to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.room_info_section)
@@ -820,8 +835,11 @@ class Window:
         self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
         self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
-        ttk.Label(self.info_buttons_lf, text="! Click on an account to open this section",
-                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on an account to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.tenant_info_section)
@@ -866,8 +884,11 @@ class Window:
         self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
         self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
-        ttk.Label(self.info_buttons_lf, text="! Click on a discount code to open this section",
-                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on a discount to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.discount_info_section)
@@ -904,9 +925,11 @@ class Window:
         self.info_buttons_lf = tk.LabelFrame(self.info_tree_lf, bg="#FFFFFF", relief="flat")
         self.info_buttons_lf.pack(side="top", pady=5, padx=10, anchor="w")
 
-        ttk.Label(self.info_buttons_lf, text="! Click an employee account on the\n list to open this section",
-                  style="small_info.TLabel").pack(side="top", pady=5, padx=10, anchor="nw")
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
 
+        ttk.Label(self.info_buttons_lf, text="Click on an account to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.employee_info_section)
 
@@ -2743,10 +2766,10 @@ class Window:
         ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
         # Buttons
-        tk.Button(self.info_buttons_lf, text="Modify", font="OpenSans, 15",
+        tk.Button(self.info_buttons_lf, text="Modify", font="OpenSans, 12",
                   fg="#FFFFFF", bg="#4C8404").pack(side="left", pady=5, padx=10, anchor="w")
 
-        tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+        tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
                   command=self.remove_employee_account_request).pack(side="left", pady=5, padx=10, anchor="w")
 
@@ -2797,10 +2820,10 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 15", fg="#4C8404",
+        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 12", fg="#4C8404",
                   bg="#FFFFFF", relief="flat", command=self.modify_tenant_account_dialog).pack(side="top", fill="x")
 
-        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
                   command=self.remove_tenant_account_request).pack(side="top", pady=5, fill="x")
 
@@ -2852,10 +2875,10 @@ class Window:
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 15", fg="#4C8404",
+        tk.Button(modify_b_lf, text="Modify", font="OpenSans, 12", fg="#4C8404",
                   bg="#FFFFFF", relief="flat", command=self.modify_discount_dialog).pack(side="top", fill="x")
 
-        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 15", fg="#FFFFFF", bg="#BD1E51",
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
                   command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
 
