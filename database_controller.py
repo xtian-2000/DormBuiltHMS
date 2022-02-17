@@ -192,6 +192,16 @@ class Database:
             print("discount_code column could not be created successfully")
             print(e)
 
+        # Add payment_description column to the payment table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`payment` ADD COLUMN `payment_description` VARCHAR(45) "
+                                  "NOT NULL AFTER `discount_code`;")
+            print("payment_description column is added to the payment table successfully")
+        except Exception as e:
+            print("payment_description column could not be created successfully")
+            print(e)
+
         # Creating discount table in database
         try:
             self.mycursor = self.db1.cursor()

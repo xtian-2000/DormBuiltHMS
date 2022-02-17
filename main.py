@@ -149,6 +149,7 @@ class Window:
 
         self.room_description_e = ttk.Entry
         self.room_type_e = ttk.Entry
+        self.new_room_type_e = ttk.Entry
 
         self.tenant_name_e = ttk.Entry
 
@@ -162,7 +163,6 @@ class Window:
         self.room_price_sp = ttk.Spinbox
         self.tenant_id_sp = ttk.Spinbox
         self.payment_amount_sp = ttk.Spinbox
-
         self.discount_amount_sp = ttk.Spinbox
 
         # ComboBox
@@ -171,6 +171,8 @@ class Window:
         self.tenant_status_cb = ttk.Combobox
 
         self.discount_status_cb = ttk.Combobox
+
+        self.payment_description_cb = ttk.Combobox
 
         # Treeview
         self.info_tree = ttk.Treeview
@@ -451,6 +453,16 @@ class Window:
                                              style="link.TLabel")
         set_room_price_to_type_l.pack(side="top", anchor="w")
         set_room_price_to_type_l.bind("<Button-1>", self.set_room_price_to_type_dialog)
+
+        set_room_capacity_to_type_l = ttk.Label(room_dashboard_links_lf,
+                                                text='Set room capacity according to room type', style="link.TLabel")
+        set_room_capacity_to_type_l.pack(side="top", anchor="w")
+        set_room_capacity_to_type_l.bind("<Button-1>", self.set_room_capacity_to_type_dialog)
+
+        set_room_type_to_type_l = ttk.Label(room_dashboard_links_lf, text='Change current room type',
+                                            style="link.TLabel")
+        set_room_type_to_type_l.pack(side="top", anchor="w")
+        set_room_type_to_type_l.bind("<Button-1>", self.set_room_type_to_type_dialog)
 
         # ================================================ Room info ===============================================
         room_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
@@ -771,7 +783,7 @@ class Window:
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
                                       yscrollcommand=info_tree_scr.set)
         self.info_tree["columns"] = ("Room ID", "Room Number", "Description", "Type", "Availability", "Capacity",
-                                     "Price", "Current Occupants")
+                                     "Room Price", "Current Occupants")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
@@ -781,7 +793,7 @@ class Window:
         self.info_tree.column("Type", anchor="w", width=120)
         self.info_tree.column("Availability", anchor="w", width=120)
         self.info_tree.column("Capacity", anchor="w", width=120)
-        self.info_tree.column("Price", anchor="center", width=80)
+        self.info_tree.column("Room Price", anchor="center", width=80)
         self.info_tree.column("Current Occupants", anchor="center", width=80)
 
         # Create headings
@@ -792,7 +804,7 @@ class Window:
         self.info_tree.heading("Type", text="Type", anchor="w")
         self.info_tree.heading("Availability", text="Availability", anchor="w")
         self.info_tree.heading("Capacity", text="Capacity", anchor="w")
-        self.info_tree.heading("Price", text="Price", anchor="center")
+        self.info_tree.heading("Room Price", text="Room Price", anchor="center")
         self.info_tree.heading("Current Occupants", text="Current Occupants", anchor="center")
 
         self.info_tree.pack(side="top", fill="x")
@@ -1297,7 +1309,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
-        self.room_price_sp.grid(column=1, row=0, padx=2.5, pady=2.5, sticky="w")
+        self.room_price_sp.grid(column=1, row=0, sticky="w")
 
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=2, row=0, sticky="w")
@@ -1311,10 +1323,111 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Set price", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Set price", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
                   command=self.set_room_price_to_type_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to set the room price \naccording to room type!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+        print(event)
+
+    def set_room_capacity_to_type_dialog(self, event):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Set room capacity")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Set room capacity',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", pady=10, fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.room_capacity_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
+        self.room_capacity_sp.grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.room_type_e = ttk.Entry(forms_lf, width=40)
+        self.room_type_e.grid(column=1, row=1, columnspan=2)
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Set capacity", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.set_room_price_to_type_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to set the room capacity \naccording to room type!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+        print(event)
+
+    def set_room_type_to_type_dialog(self, event):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Set room prices")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Set room type',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", pady=10, fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='New room type', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.new_room_type_e = ttk.Entry(forms_lf, width=40)
+        self.new_room_type_e.grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms_lf, text='Current room type', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.room_type_e = ttk.Entry(forms_lf, width=40)
+        self.room_type_e.grid(column=1, row=1)
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Set room type", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.set_room_type_to_type_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to set a new room type \naccording to current room type!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -1370,29 +1483,38 @@ class Window:
         apply_b_lf = tk.LabelFrame(forms1_lf, bd=1, bg="#585456", relief="flat")
         apply_b_lf.grid(column=2, row=2, padx=10)
 
-        tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#4C8404", bg="#FFFFFF",
+        tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#585456", bg="#FFFFFF",
                   relief="flat", command=self.apply_discount_request).pack(fill="x")
 
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+        ttk.Label(forms2_lf, text='Payment description', style="h2.TLabel",
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
+        self.payment_description_cb = ttk.Combobox(forms2_lf)
+        self.payment_description_cb['values'] = ('Application fee', 'Confirmation fee', 'Processing fee')
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
         self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.tenant_id_sp.grid(column=1, row=0, sticky="w")
+        self.tenant_id_sp.grid(column=1, row=1, sticky="w")
         self.tenant_id_sp.focus()
 
         ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+        self.payment_amount_sp.grid(column=1, row=2, sticky="w")
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
                   command=self.create_transaction_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create transaction!",
@@ -2141,7 +2263,29 @@ class Window:
                 self.db1.close()
                 self.mycursor.close()
 
-                messagebox.showinfo("Success", "Removed room successfully")
+                messagebox.showinfo("Success", "Set room price successfully")
+
+                self.dialog_box_top.destroy()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
+    def set_room_type_to_type_request(self):
+        if not self.new_room_type_e.get():
+            self.invalid_input()
+        if not self.room_type_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("UPDATE room SET room_type='" + self.new_room_type_e.get() +
+                                      "' WHERE admin_id='" + str(self.admin_id_str) + "' and room_type='"
+                                      + self.room_type_e.get() + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Changed room type successfully")
 
                 self.dialog_box_top.destroy()
             except Exception as e:
