@@ -80,6 +80,9 @@ class Window:
         empty_im = PhotoImage(file=r"empty_l.png")
         self.empty_im_resized = empty_im.subsample(1, 1)
 
+        add_basic_im = PhotoImage(file=r"add_basic_b.png")
+        self.add_basic_im_resized = add_basic_im.subsample(1, 1)
+
         home_active_im = PhotoImage(file=r"home_active_b.png")
         self.home_active_im_resized = home_active_im.subsample(1, 1)
 
@@ -226,7 +229,7 @@ class Window:
         ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(side="top", pady=5, anchor="center")
 
         ttk.Label(logo_f, text='Dormbuilt is a company that recognizes housing needs of the community within\n '
-                               '    the institution and dedicates its expertise to better serve them.',
+                               'the institution and dedicates its expertise to better serve them.',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
         tk.Label(logo_f, bg="#FFFFFF").pack(side="top", pady=20, anchor="center")
@@ -234,8 +237,10 @@ class Window:
         tk.Label(logo_f, image=self.hms_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", padx=10, pady=5, anchor="center")
 
-        ttk.Label(logo_f, text='Dormbuilt is a company that recognizes housing needs of the community within\n '
-                               '    the institution and dedicates its expertise to better serve them.',
+        ttk.Label(logo_f, text="Hotel Management System comes with a slew of capabilities, from a user-friendly \n"
+                               "interface to extensive data management controls,as well as extra data visualization\n"
+                               "options. Extend your business with a centralized system that takes care of the hassle\n"
+                               "of data processing.",
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
         # ================================================ Sign In Form Interface ======================================
@@ -1049,7 +1054,7 @@ class Window:
                   justify="left").grid(column=0, row=6, padx=2.5, pady=2.5, sticky="w")
 
         self.room_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
-        self.room_price_sp.grid(column=1, row=6, padx=2.5, pady=2.5, sticky="w")
+        self.room_price_sp.grid(column=1, row=6, sticky="w")
 
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=1, row=7, sticky="w")
@@ -1057,7 +1062,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat", image=self.add_basic_im_resized, compound="left",
                   command=self.create_room_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create room!",
