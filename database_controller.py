@@ -134,6 +134,16 @@ class Database:
             print("alteration could not be created successfully")
             print(e)
 
+        # Add amenities_price column to the room table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` ADD COLUMN `amenities_price` INT NULL DEFAULT "
+                                  "'0' AFTER `current_occupants`;")
+            print("alter amenities_price column is added to the room table successfully")
+        except Exception as e:
+            print("alteration could not be created successfully")
+            print(e)
+
         # Creating tenant's table in database
         try:
             self.mycursor = self.db1.cursor()

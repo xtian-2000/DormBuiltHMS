@@ -54,7 +54,7 @@ class Window:
         self.db_logo_resized_2 = db_logo_im.subsample(6, 6)
 
         hms_logo_im = PhotoImage(file=r"pongodev_hms_small_logo.png")
-        self.hms_logo_im_resized = hms_logo_im.subsample(8, 8)
+        self.hms_logo_im_resized = hms_logo_im.subsample(9, 9)
 
         signin_im = PhotoImage(file=r"signin_l.png")
         self.signin_im_resized = signin_im.subsample(1, 1)
@@ -789,7 +789,7 @@ class Window:
         self.info_tree.column("#0", width=0, stretch=False)
         self.info_tree.column("Room ID", anchor="center", width=0, stretch=False)
         self.info_tree.column("Room Number", anchor="center", width=80)
-        self.info_tree.column("Description", anchor="w", width=120)
+        self.info_tree.column("Description", anchor="center", width=0, stretch=False)
         self.info_tree.column("Type", anchor="w", width=120)
         self.info_tree.column("Availability", anchor="w", width=120)
         self.info_tree.column("Capacity", anchor="w", width=120)
@@ -1375,7 +1375,7 @@ class Window:
 
         tk.Button(buttons_lf, text=" Set capacity", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
                   image=self.add_basic_im_resized, compound="left",
-                  command=self.set_room_price_to_type_request).pack(side="left")
+                  command=self.set_room_capacity_to_type_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to set the room capacity \naccording to room type!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -2264,6 +2264,28 @@ class Window:
                 self.mycursor.close()
 
                 messagebox.showinfo("Success", "Set room price successfully")
+
+                self.dialog_box_top.destroy()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
+    def set_room_capacity_to_type_request(self):
+        if not self.room_capacity_sp.get():
+            self.invalid_input()
+        if not self.room_type_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("UPDATE room SET room_capacity='" + self.room_capacity_sp.get() +
+                                      "' WHERE admin_id='" + str(self.admin_id_str) + "' and room_type='"
+                                      + self.room_type_e.get() + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Set room capacity successfully")
 
                 self.dialog_box_top.destroy()
             except Exception as e:
