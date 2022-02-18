@@ -23,7 +23,7 @@ password = "44966874"
 date_time = datetime.now()
 date_time_str = date_time.strftime("%d/%m/%Y %H:%M:%S")
 
-hms_version = "DORv1.14"
+hms_version = "DORv1.21"
 
 
 class Window:
@@ -226,6 +226,7 @@ class Window:
         width = self.master.winfo_screenwidth()
         height = self.master.winfo_screenheight()
         self.master.geometry("%dx%d" % (width, height))
+        self.master.iconbitmap(r"pongodev_logo.ico")
 
         # Initialize class for default styles
         Content.widget_styles(self.master)
@@ -316,63 +317,63 @@ class Window:
         middle_f.pack(side="top", fill="both", expand=True)
 
         # Minimalist feature
-        minimalist_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
-        minimalist_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+        minimalist_logo_lf = tk.LabelFrame(middle_f, bg="#FFFFFF")
+        minimalist_logo_lf.pack(side="left", ipady=10, padx=20, pady=40, anchor="n", fill="x", expand=True)
 
-        tk.Label(minimalist_logo_f, image=self.minimalist_logo_im_resized,
+        tk.Label(minimalist_logo_lf, image=self.minimalist_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(minimalist_logo_f, text='Minimalist Design',
+        ttk.Label(minimalist_logo_lf, text='Minimalist Design',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(minimalist_logo_f, text="The interface of Dormbuilt's Hotel Management \n"
-                                          "System's is aimed towards a minimalist design \n"
-                                          "for a clean and concise look.",
+        ttk.Label(minimalist_logo_lf, text="The interface of Dormbuilt's Hotel Management \n"
+                                           "System's is aimed towards a minimalist design \n"
+                                           "for a clean and concise look.",
                   style="h2.TLabel").pack(side="top", pady=5, anchor="center")
 
         # Cloud Database feature
-        cloud_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
-        cloud_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+        cloud_logo_lf = tk.LabelFrame(middle_f, bg="#FFFFFF")
+        cloud_logo_lf.pack(side="left", ipady=10, padx=20, pady=40, anchor="n", fill="x", expand=True)
 
-        tk.Label(cloud_logo_f, image=self.cloud_logo_im_resized,
+        tk.Label(cloud_logo_lf, image=self.cloud_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(cloud_logo_f, text='Cloud Database',
+        ttk.Label(cloud_logo_lf, text='Cloud Database',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(cloud_logo_f, text="The Dormbuilt's Hotel Management System  \n"
-                                     "uses the service of cloud database in storing\n "
-                                     "information.",
+        ttk.Label(cloud_logo_lf, text="The Dormbuilt's Hotel Management System  \n"
+                                      "uses the service of cloud database in storing\n "
+                                      "information.",
                   style="h2.TLabel").pack(side="top", pady=5, anchor="center")
 
         # Intuitive interface feature
-        cloud_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
-        cloud_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+        intuitive_logo_lf = tk.LabelFrame(middle_f, bg="#FFFFFF")
+        intuitive_logo_lf.pack(side="left", ipady=10, padx=20, pady=40, anchor="n", fill="x", expand=True)
 
-        tk.Label(cloud_logo_f, image=self.intuitive_logo_im_resized,
+        tk.Label(intuitive_logo_lf, image=self.intuitive_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(cloud_logo_f, text='Intuitive interface',
+        ttk.Label(intuitive_logo_lf, text='Intuitive interface',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(cloud_logo_f, text="The interface of Dormbuilt's Hotel Management \n"
-                                     "System is designed for ease of operation and \n"
-                                     "intuitive interface structure. ",
+        ttk.Label(intuitive_logo_lf, text="The interface of Dormbuilt's Hotel Management \n"
+                                          "System is designed for ease of operation and \n"
+                                          "intuitive interface structure. ",
                   style="h2.TLabel").pack(side="top", pady=5, anchor="center")
 
         # Website feature
-        web_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
-        web_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+        web_logo_lf = tk.LabelFrame(middle_f, bg="#FFFFFF")
+        web_logo_lf.pack(side="left", ipady=10, padx=20, pady=40, anchor="n", fill="x", expand=True)
 
-        tk.Label(web_logo_f, image=self.web_logo_im_resized,
+        tk.Label(web_logo_lf, image=self.web_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(web_logo_f, text='Online Reservation Module',
+        ttk.Label(web_logo_lf, text='Online Reservation Module',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(web_logo_f, text="The Dormbuilt's Hotel Management System is paired \n"
-                                   "with an online rervation module that enables the hotel\n "
-                                   "to expand its operations online.",
+        ttk.Label(web_logo_lf, text="The Dormbuilt's Hotel Management System is paired \n"
+                                    "with an online reservation module that enables the \n"
+                                    "hotel to expand its operations online.",
                   style="h2.TLabel").pack(side="top", pady=5, anchor="center")
 
         # ================================================ Footer Interface ===========================================
@@ -1667,7 +1668,7 @@ class Window:
 
         print(event)
 
-    def create_transaction_dialog(self):
+    def create_room_transaction_dialog(self):
         self.dialog_box_top = tk.Toplevel(self.master)
         self.dialog_box_top.title("Create transaction")
         self.dialog_box_top.configure(bg="#FFFFFF")
@@ -1723,7 +1724,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms2_lf)
-        self.payment_description_cb['values'] = ('Application fee', 'Confirmation fee', 'Processing fee')
+        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee')
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
 
@@ -1745,7 +1746,7 @@ class Window:
 
         tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
                   image=self.add_basic_im_resized, compound="left",
-                  command=self.create_transaction_request).pack(side="left")
+                  command=self.create_room_transaction_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create transaction!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -1860,6 +1861,79 @@ class Window:
                   command=self.modify_tenant_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to modify tenant account!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+    def create_tenant_transaction_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create transaction")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Create transaction',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        ttk.Label(forms1_lf, text='Discount Code', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, sticky="w")
+
+        self.discount_code_e = ttk.Entry(forms1_lf, width=30)
+        self.discount_code_e.grid(column=1, row=2)
+
+        apply_b_lf = tk.LabelFrame(forms1_lf, bd=1, bg="#585456", relief="flat")
+        apply_b_lf.grid(column=2, row=2, padx=10)
+
+        tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#585456", bg="#FFFFFF",
+                  relief="flat", command=self.apply_discount_request).pack(fill="x")
+
+        forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms2_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms2_lf, text='Payment description', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_description_cb = ttk.Combobox(forms2_lf)
+        self.payment_description_cb['values'] = ('Application fee', )
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.tenant_id_sp.grid(column=1, row=1, sticky="w")
+        self.tenant_id_sp.insert(0, self.tenant_id)
+        self.tenant_id_sp.config(state="disabled")
+
+        ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.payment_amount_sp.grid(column=1, row=2, sticky="w")
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.create_tenant_transaction_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create transaction!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -2599,7 +2673,7 @@ class Window:
                 self.invalid_request()
                 print(e)
 
-    def create_transaction_request(self):
+    def create_room_transaction_request(self):
         if not self.tenant_id_sp.get():
             self.invalid_input()
         if not self.payment_amount_sp.get():
@@ -2778,6 +2852,34 @@ class Window:
         self.db1.commit()
         self.mycursor.close()
         self.db1.close()
+
+    def create_tenant_transaction_request(self):
+        if not self.tenant_id_sp.get():
+            self.invalid_input()
+        if not self.payment_amount_sp.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, discount_code) VALUES (%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), self.tenant_id_sp.get(),
+                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       self.discount_code_e.get()))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                # self.room_add_occupant()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
 
     # Payment
     def payment_info_treeview_request(self):
@@ -3189,7 +3291,7 @@ class Window:
 
         tk.Button(buttons_lf, text=" Create transaction", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   relief="flat", image=self.create_im_resized, compound="left", justify="left",
-                  command=self.create_transaction_dialog).pack(side="top", pady=5, fill="x")
+                  command=self.create_room_transaction_dialog).pack(side="top", pady=5, fill="x")
 
         copy_create_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         copy_create_b_lf.pack(side="top", pady=5, fill="x")
@@ -3290,6 +3392,10 @@ class Window:
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        tk.Button(buttons_lf, text=" Create transaction", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+                  relief="flat", image=self.create_im_resized, compound="left", justify="left",
+                  command=self.create_tenant_transaction_dialog).pack(side="top", pady=5, fill="x")
 
         modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         modify_b_lf.pack(side="top", pady=5, fill="x")

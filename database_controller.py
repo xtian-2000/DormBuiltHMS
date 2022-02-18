@@ -206,7 +206,7 @@ class Database:
         try:
             self.mycursor = self.db1.cursor()
             self.mycursor.execute("ALTER TABLE `hmsdatabase`.`payment` CHANGE COLUMN `discount_code` `discount_code` "
-                                  "VARCHAR(45) NULL DEFAULT '\"None\"' ;")
+                                  "VARCHAR(45) NULL DEFAULT NULL ;")
             print("Default is changed to the payment table successfully")
         except Exception as e:
             print("Default could not be changed successfully")
