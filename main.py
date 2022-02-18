@@ -50,11 +50,26 @@ class Window:
 
         # PhotoImage
         db_logo_im = PhotoImage(file=r"Dormbuilt_logo.png")
-        self.db_logo_resized = db_logo_im.subsample(2, 2)
+        self.db_logo_resized = db_logo_im.subsample(1, 1)
         self.db_logo_resized_2 = db_logo_im.subsample(6, 6)
 
         hms_logo_im = PhotoImage(file=r"pongodev_hms_small_logo.png")
-        self.hms_logo_im_resized = hms_logo_im.subsample(9, 9)
+        self.hms_logo_im_resized = hms_logo_im.subsample(8, 8)
+
+        minimalist_logo_im = PhotoImage(file=r"minimalist_l.png")
+        self.minimalist_logo_im_resized = minimalist_logo_im.subsample(1, 1)
+
+        cloud_logo_im = PhotoImage(file=r"cloud_database_l.png")
+        self.cloud_logo_im_resized = cloud_logo_im.subsample(1, 1)
+
+        intuitive_logo_im = PhotoImage(file=r"intuitive_interface_l.png")
+        self.intuitive_logo_im_resized = intuitive_logo_im.subsample(1, 1)
+
+        web_logo_im = PhotoImage(file=r"online_reservation_module_l.png")
+        self.web_logo_im_resized = web_logo_im.subsample(1, 1)
+
+        blue_line_im = PhotoImage(file=r"blue_line_l.png")
+        self.blue_line_im_resized = blue_line_im.subsample(1, 1)
 
         signin_im = PhotoImage(file=r"signin_l.png")
         self.signin_im_resized = signin_im.subsample(1, 1)
@@ -164,6 +179,7 @@ class Window:
         self.tenant_id_sp = ttk.Spinbox
         self.payment_amount_sp = ttk.Spinbox
         self.discount_amount_sp = ttk.Spinbox
+        self.amenity_price_sp = ttk.Spinbox
 
         # ComboBox
         self.room_availability_cb = ttk.Combobox
@@ -223,27 +239,35 @@ class Window:
         top_f.pack(side="top", fill="x")
 
         # ================================================ Logo Interface ==============================================
-        logo_f = ttk.Frame(top_f, style="Basic.TFrame")
-        logo_f.pack(side="left", padx=20, fill="both", expand=True)
+        db_logo_f = ttk.Frame(top_f, style="Basic.TFrame")
+        db_logo_f.pack(side="left", padx=20, fill="both", expand=True)
 
-        tk.Label(logo_f, image=self.db_logo_resized, bg="#FFFFFF").pack(side="top", pady=5, anchor="center")
+        tk.Label(db_logo_f, image=self.db_logo_resized, bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(side="top", pady=5, anchor="center")
+        ttk.Label(db_logo_f, text='DormBuilt Inc.', style="h1.TLabel").pack(side="top", pady=5, anchor="center")
 
-        ttk.Label(logo_f, text='Dormbuilt is a company that recognizes housing needs of the community within\n '
-                               'the institution and dedicates its expertise to better serve them.',
+        ttk.Label(db_logo_f, text='Dormbuilt is a company that recognizes housing \n'
+                                  'needs of the community within the institution and\n '
+                                  'dedicates its expertise to better serve them.',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
-        tk.Label(logo_f, bg="#FFFFFF").pack(side="top", pady=20, anchor="center")
+        tk.Label(db_logo_f, image=self.blue_line_im_resized, bg="#FFFFFF").pack(side="top", pady=5, anchor="center")
 
-        tk.Label(logo_f, image=self.hms_logo_im_resized,
+        hms_logo_f = ttk.Frame(top_f, style="Basic.TFrame")
+        hms_logo_f.pack(side="left", fill="both", expand=True)
+
+        tk.Label(hms_logo_f, image=self.hms_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", padx=10, pady=5, anchor="center")
 
-        ttk.Label(logo_f, text="Hotel Management System comes with a slew of capabilities, from a user-friendly \n"
-                               "interface to extensive data management controls,as well as extra data visualization\n"
-                               "options. Extend your business with a centralized system that takes care of the hassle\n"
-                               "of data processing.",
+        ttk.Label(hms_logo_f, text="Hotel Management System comes with a slew of \n"
+                                   "capabilities, from a user-friendly interface \n"
+                                   "to extensive data management controls,as well \n"
+                                   "as extra data visualization options. Extend your\n"
+                                   "business with a centralized system that takes care\n"
+                                   "of the hassle of data processing.",
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        tk.Label(hms_logo_f, image=self.blue_line_im_resized, bg="#FFFFFF").pack(side="top", pady=5, anchor="center")
 
         # ================================================ Sign In Form Interface ======================================
         self.login_register_lf = tk.LabelFrame(top_f, bg="#FFFFFF")
@@ -290,6 +314,66 @@ class Window:
         # ================================================ Filler Interface ===========================================
         middle_f = ttk.Frame(self.master, style="Basic.TFrame")
         middle_f.pack(side="top", fill="both", expand=True)
+
+        # Minimalist feature
+        minimalist_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
+        minimalist_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+
+        tk.Label(minimalist_logo_f, image=self.minimalist_logo_im_resized,
+                 bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(minimalist_logo_f, text='Minimalist Design',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        ttk.Label(minimalist_logo_f, text="The interface of Dormbuilt's Hotel Management \n"
+                                          "System's is aimed towards a minimalist design \n"
+                                          "for a clean and concise look.",
+                  style="h2.TLabel").pack(side="top", pady=5, anchor="center")
+
+        # Cloud Database feature
+        cloud_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
+        cloud_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+
+        tk.Label(cloud_logo_f, image=self.cloud_logo_im_resized,
+                 bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(cloud_logo_f, text='Cloud Database',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        ttk.Label(cloud_logo_f, text="The Dormbuilt's Hotel Management System  \n"
+                                     "uses the service of cloud database in storing\n "
+                                     "information.",
+                  style="h2.TLabel").pack(side="top", pady=5, anchor="center")
+
+        # Intuitive interface feature
+        cloud_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
+        cloud_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+
+        tk.Label(cloud_logo_f, image=self.intuitive_logo_im_resized,
+                 bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(cloud_logo_f, text='Intuitive interface',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        ttk.Label(cloud_logo_f, text="The interface of Dormbuilt's Hotel Management \n"
+                                     "System is designed for ease of operation and \n"
+                                     "intuitive interface structure. ",
+                  style="h2.TLabel").pack(side="top", pady=5, anchor="center")
+
+        # Website feature
+        web_logo_f = ttk.Frame(middle_f, style="Basic.TFrame")
+        web_logo_f.pack(side="left", padx=20, pady=40, anchor="n", fill="x", expand=True)
+
+        tk.Label(web_logo_f, image=self.web_logo_im_resized,
+                 bg="#FFFFFF").pack(side="top", anchor="center")
+
+        ttk.Label(web_logo_f, text='Online Reservation Module',
+                  style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
+
+        ttk.Label(web_logo_f, text="The Dormbuilt's Hotel Management System is paired \n"
+                                   "with an online rervation module that enables the hotel\n "
+                                   "to expand its operations online.",
+                  style="h2.TLabel").pack(side="top", pady=5, anchor="center")
 
         # ================================================ Footer Interface ===========================================
         footer_f = ttk.Frame(self.master, style="Basic.TFrame")
@@ -412,7 +496,7 @@ class Window:
         ttk.Label(left_nav_lf, text=hms_version, style="small_info.TLabel").pack(side="bottom", pady=20)
 
         # ================================================ Left-Nav widgets ============================================
-        self.content_lf = tk.LabelFrame(self.master, bg="#FFFFFF")
+        self.content_lf = tk.LabelFrame(self.master)
         self.content_lf.pack(side="left", fill="both", expand=True)
 
         # Initialize home_content_interface method
@@ -453,6 +537,11 @@ class Window:
                                              style="link.TLabel")
         set_room_price_to_type_l.pack(side="top", anchor="w")
         set_room_price_to_type_l.bind("<Button-1>", self.set_room_price_to_type_dialog)
+
+        set_amenities_price_to_type_l = ttk.Label(room_dashboard_links_lf, text='Set amenities price according to '
+                                                                                'room type', style="link.TLabel")
+        set_amenities_price_to_type_l.pack(side="top", anchor="w")
+        set_amenities_price_to_type_l.bind("<Button-1>", self.set_room_amenities_to_type_dialog)
 
         set_room_capacity_to_type_l = ttk.Label(room_dashboard_links_lf,
                                                 text='Set room capacity according to room type', style="link.TLabel")
@@ -595,7 +684,7 @@ class Window:
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat", command=self.show_tenant_information_module).pack(side="top", fill="x")
+                  bg="#89CFF0", relief="flat", command=self.show_payment_information_module).pack(side="top", fill="x")
 
     def discount_content_interface(self):
         self.change_button_color()
@@ -783,7 +872,7 @@ class Window:
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
                                       yscrollcommand=info_tree_scr.set)
         self.info_tree["columns"] = ("Room ID", "Room Number", "Description", "Type", "Availability", "Capacity",
-                                     "Room Price", "Current Occupants")
+                                     "Room Price", "Amenities Price", "Current Occupants")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
@@ -792,8 +881,9 @@ class Window:
         self.info_tree.column("Description", anchor="center", width=0, stretch=False)
         self.info_tree.column("Type", anchor="w", width=120)
         self.info_tree.column("Availability", anchor="w", width=120)
-        self.info_tree.column("Capacity", anchor="w", width=120)
+        self.info_tree.column("Capacity", anchor="center", width=120)
         self.info_tree.column("Room Price", anchor="center", width=80)
+        self.info_tree.column("Amenities Price", anchor="center", width=80)
         self.info_tree.column("Current Occupants", anchor="center", width=80)
 
         # Create headings
@@ -803,8 +893,9 @@ class Window:
         self.info_tree.heading("Description", text="Description", anchor="w")
         self.info_tree.heading("Type", text="Type", anchor="w")
         self.info_tree.heading("Availability", text="Availability", anchor="w")
-        self.info_tree.heading("Capacity", text="Capacity", anchor="w")
+        self.info_tree.heading("Capacity", text="Capacity", anchor="center")
         self.info_tree.heading("Room Price", text="Room Price", anchor="center")
+        self.info_tree.heading("Amenities Price", text="Amenities Price", anchor="center")
         self.info_tree.heading("Current Occupants", text="Current Occupants", anchor="center")
 
         self.info_tree.pack(side="top", fill="x")
@@ -870,6 +961,62 @@ class Window:
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.tenant_info_section)
+
+    # Payment
+    def show_payment_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = ("Payment ID", "Payment Amount", "Room ID", "Tenant ID", "Admin ID",
+                                     "Basic User ID", "Discount ID", "Payment Description", "Date created")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Payment ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Payment Amount", anchor="center", width=60)
+        self.info_tree.column("Room ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Tenant ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Admin ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Basic User ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Discount ID", anchor="center", width=60)
+        self.info_tree.column("Payment Description", anchor="w", width=60)
+        self.info_tree.column("Date created", anchor="center")
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Payment ID", text="Payment ID", anchor="center")
+        self.info_tree.heading("Payment Amount", text="Payment Amount", anchor="center")
+        self.info_tree.heading("Room ID", text="Room ID", anchor="center")
+        self.info_tree.heading("Tenant ID", text="Tenant ID", anchor="center")
+        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Basic User ID", text="Basic User ID", anchor="center")
+        self.info_tree.heading("Discount ID", text="Discount ID", anchor="center")
+        self.info_tree.heading("Payment Description", text="Payment Description", anchor="w")
+        self.info_tree.heading("Date created", text="Date created", anchor="center")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.payment_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on a payment to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.payment_info_section)
 
     # Discount
     def show_discount_information_module(self):
@@ -1071,6 +1218,15 @@ class Window:
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=1, row=7, sticky="w")
 
+        ttk.Label(forms_lf, text='Amenity price', style="h2.TLabel",
+                  justify="left").grid(column=0, row=8, padx=2.5, pady=2.5, sticky="w")
+
+        self.amenity_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
+        self.amenity_price_sp.grid(column=1, row=8, sticky="w")
+
+        ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=9, sticky="w")
+
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
@@ -1153,6 +1309,15 @@ class Window:
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=1, row=7, sticky="w")
 
+        ttk.Label(forms_lf, text='Amenity price', style="h2.TLabel",
+                  justify="left").grid(column=0, row=8, padx=2.5, pady=2.5, sticky="w")
+
+        self.amenity_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
+        self.amenity_price_sp.grid(column=1, row=8, sticky="w")
+
+        ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=9, sticky="w")
+
         # Grab record number
         selected = self.info_tree.focus()
 
@@ -1167,6 +1332,7 @@ class Window:
         self.room_availability_cb.insert(0, values[4])
         self.room_capacity_sp.insert(0, values[5])
         self.room_price_sp.insert(0, values[6])
+        self.amenity_price_sp.insert(0, values[7])
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -1247,6 +1413,15 @@ class Window:
         ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
                   justify="left").grid(column=1, row=7, sticky="w")
 
+        ttk.Label(forms_lf, text='Amenity price', style="h2.TLabel",
+                  justify="left").grid(column=0, row=8, padx=2.5, pady=2.5, sticky="w")
+
+        self.amenity_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
+        self.amenity_price_sp.grid(column=1, row=8, sticky="w")
+
+        ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=9, sticky="w")
+
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
@@ -1265,6 +1440,7 @@ class Window:
         self.room_availability_cb.insert(0, values[4])
         self.room_capacity_sp.insert(0, values[5])
         self.room_price_sp.insert(0, values[6])
+        self.amenity_price_sp.insert(0, values[7])
 
         # Disable widgets
         self.room_description_e.config(state="disabled")
@@ -1272,9 +1448,10 @@ class Window:
         self.room_availability_cb.config(state="disabled")
         self.room_capacity_sp.config(state="disabled")
         self.room_price_sp.config(state="disabled")
+        self.amenity_price_sp.config(state="disabled")
 
-        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404",
-                  relief="flat", command=self.create_room_request).pack(side="left")
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left", command=self.create_room_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create new room \nfrom derived information!",
                   style="small_info.TLabel").pack(side="left", padx=10)
@@ -1328,6 +1505,59 @@ class Window:
                   command=self.set_room_price_to_type_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to set the room price \naccording to room type!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+        print(event)
+
+    def set_room_amenities_to_type_dialog(self, event):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Set amenity price")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Set amenity price',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", pady=10, fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Amenity price', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.amenity_price_sp = ttk.Spinbox(forms_lf, from_=0, to=99999, wrap=True)
+        self.amenity_price_sp.grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms_lf, text='per person', style="small_info.TLabel",
+                  justify="left").grid(column=2, row=0, sticky="w")
+
+        ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.room_type_e = ttk.Entry(forms_lf, width=40)
+        self.room_type_e.grid(column=1, row=1, columnspan=2)
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Set price", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.set_amenities_price_to_type_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to set the amenity price \naccording to room type!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -2166,11 +2396,12 @@ class Window:
             try:
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO room (room_number, room_description, room_type, room_availability,"
-                                      " room_capacity, admin_id, room_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      " room_capacity, admin_id, room_price, amenities_price) VALUES (%s,%s,%s,%s,%s,"
+                                      "%s,%s,%s)",
                                       (self.room_number_sp.get(), self.room_description_e.get(),
                                        self.room_type_e.get(),
                                        self.room_availability_cb.get(), self.room_capacity_sp.get(), self.admin_id_str,
-                                       self.room_price_sp.get()))
+                                       self.room_price_sp.get(), self.amenity_price_sp.get()))
 
                 self.db1.commit()
                 self.db1.close()
@@ -2179,7 +2410,6 @@ class Window:
                 messagebox.showinfo("Success", "Room is  created")
 
                 self.dialog_box_top.destroy()
-                self.show_room_information_module()
 
             except Exception as e:
                 self.invalid_input()
@@ -2202,7 +2432,8 @@ class Window:
                                       + self.room_type_e.get() + "', room_availability = '"
                                       + self.room_availability_cb.get() + "', room_capacity = '"
                                       + self.room_capacity_sp.get() + "', room_price = '"
-                                      + self.room_price_sp.get() + "' WHERE room_id = '"
+                                      + self.room_price_sp.get() + "', amenities_price = '"
+                                      + self.amenity_price_sp.get() + "' WHERE room_id = '"
                                       + self.room_id + "';")
 
                 self.db1.commit()
@@ -2221,7 +2452,8 @@ class Window:
     def room_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT room.room_id, room.room_number, room.room_description, room.room_type, "
-                              "room.room_availability, room.room_capacity, room.room_price, room.current_occupants "
+                              "room.room_availability, room.room_capacity, room.room_price, room.amenities_price, "
+                              "room.current_occupants "
                               "FROM room where admin_id = ' "
                               + str(self.admin_id_str) + "';")
 
@@ -2236,12 +2468,12 @@ class Window:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7]),
+                                              record[6], record[7], record[8]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7]),
+                                              record[6], record[7], record[8]),
                                       tags=("evenrow",))
             count += 1
 
@@ -2258,6 +2490,28 @@ class Window:
             try:
                 self.database_connect()
                 self.mycursor.execute("UPDATE room SET room_price='" + self.room_price_sp.get() + "' WHERE admin_id='" +
+                                      str(self.admin_id_str) + "' and room_type='" + self.room_type_e.get() + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Set room price successfully")
+
+                self.dialog_box_top.destroy()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
+    def set_amenities_price_to_type_request(self):
+        if not self.amenity_price_sp.get():
+            self.invalid_input()
+        if not self.room_type_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("UPDATE room SET amenities_price='" + self.amenity_price_sp.get() +
+                                      "' WHERE admin_id='" +
                                       str(self.admin_id_str) + "' and room_type='" + self.room_type_e.get() + "';")
                 self.db1.commit()
                 self.db1.close()
@@ -2518,6 +2772,38 @@ class Window:
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4]),
+                                      tags=("evenrow",))
+            count += 1
+
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
+
+    # Payment
+    def payment_info_treeview_request(self):
+        self.database_connect()
+        self.mycursor.execute("SELECT payment.payment_id, payment.payment_amount, payment.room_id, "
+                              "payment.tenant_id, payment.admin_id, payment.basic_user_id, payment.discount_code, "
+                              "payment.payment_description, payment.date_created FROM payment where admin_id = ' "
+                              + str(self.admin_id_str) + "';")
+
+        payments = self.mycursor.fetchall()
+
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+        count = 0
+        for record in payments:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7], record[8]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7], record[8]),
                                       tags=("evenrow",))
             count += 1
 
@@ -2872,25 +3158,30 @@ class Window:
 
         ttk.Label(room_info_label_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
-        ttk.Label(room_info_label_lf, text='Room Type: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+        ttk.Label(room_info_label_lf, text='Amenities Price: ',
+                  style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
-        ttk.Label(room_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+        ttk.Label(room_info_label_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(room_info_label_lf, text='Room Type: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(room_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
 
         ttk.Label(room_info_label_lf, text='Current Occupants: ',
-                  style="small_info.TLabel").grid(column=0, row=5, sticky="w")
-
-        ttk.Label(room_info_label_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
-
-        ttk.Label(room_info_label_lf, text='Room Availability: ',
                   style="small_info.TLabel").grid(column=0, row=6, sticky="w")
 
-        ttk.Label(room_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
+        ttk.Label(room_info_label_lf, text=values[8], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
 
-        ttk.Label(room_info_label_lf, text='Room Description: ',
+        ttk.Label(room_info_label_lf, text='Room Availability: ',
                   style="small_info.TLabel").grid(column=0, row=7, sticky="w")
 
+        ttk.Label(room_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
+
+        ttk.Label(room_info_label_lf, text='Room Description: ',
+                  style="small_info.TLabel").grid(column=0, row=8, sticky="w")
+
         ttk.Label(room_info_label_lf, text=values[2],
-                  style="small_info.TLabel").grid(column=1, row=7, columnspan=2, sticky="w")
+                  style="small_info.TLabel").grid(column=1, row=8, columnspan=2, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
@@ -3010,6 +3301,67 @@ class Window:
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
                   command=self.remove_tenant_account_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def payment_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Payment Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(info_lf, text='Payment ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Payment amount: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Room ID: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant ID: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(info_lf, text='Discount code: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+
+        ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[8], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        ttk.Label(info_lf, text='Payment description: ', style="small_info.TLabel").grid(column=0, row=6, sticky="w")
+
+        ttk.Label(info_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
+        modify_b_lf.pack(side="top", pady=5, fill="x")
+
+        tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left", justify="left",
+                  command=self.modify_discount_dialog).pack(side="top", fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 

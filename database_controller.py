@@ -202,6 +202,16 @@ class Database:
             print("discount_code column could not be created successfully")
             print(e)
 
+        # Change default to the payment table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`payment` CHANGE COLUMN `discount_code` `discount_code` "
+                                  "VARCHAR(45) NULL DEFAULT '\"None\"' ;")
+            print("Default is changed to the payment table successfully")
+        except Exception as e:
+            print("Default could not be changed successfully")
+            print(e)
+
         # Add payment_description column to the payment table
         try:
             self.mycursor = self.db1.cursor()
