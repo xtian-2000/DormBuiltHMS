@@ -172,6 +172,16 @@ class Database:
         # Alter tenant table
         try:
             self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` ADD COLUMN `tenant_email` VARCHAR(45) NULL "
+                                  "AFTER `admin_id`;")
+            print("Alteration is added successfully")
+        except Exception as e:
+            print("Alteration is not added successfully")
+            print(e)
+
+        # Alter tenant table
+        try:
+            self.mycursor = self.db1.cursor()
             self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` ADD COLUMN `tenant_status` VARCHAR(45) NOT NULL "
                                   "AFTER `tenant_balance`;")
             print("Alteration is added successfully")
