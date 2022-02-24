@@ -7,9 +7,6 @@ from style import Content
 from tkinter import PhotoImage
 # from database_controller import Database
 import mysql.connector as mysql
-# import smtplib
-# from email.mime.text import MIMEText
-# from email.mime.multipart import MIMEMultipart
 from random import randint
 from tkinter import Menu
 from datetime import datetime
@@ -20,12 +17,28 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+import pandas as pd
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkcalendar import DateEntry
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
+
 date_time = datetime.now()
 date_time_str = date_time.strftime("%d/%m/%Y %H:%M:%S")
+
+date_today = datetime.now()
+date_today_str = date_today.strftime("%d/%m/%Y %H:%M:%S")
+
+# Create variable for first day of the month
+fday_month = datetime.today().replace(day=1)
+fday_month = fday_month.strftime("%d/%m/%Y %H:%M:%S")
+
+# Create variable for current day of the month
+currentday_month = datetime.today()
+currentday_month = currentday_month.strftime("%d/%m/%Y %H:%M:%S")
 
 hms_version = "DORv1.21"
 
@@ -68,6 +81,9 @@ class Window:
 
         receipt_im = PhotoImage(file=r"receipt_b.png")
         self.receipt_im_resized = receipt_im.subsample(1, 1)
+
+        report_im = PhotoImage(file=r"report_b.png")
+        self.report_im_resized = report_im.subsample(1, 1)
 
         minimalist_logo_im = PhotoImage(file=r"minimalist_l.png")
         self.minimalist_logo_im_resized = minimalist_logo_im.subsample(1, 1)
@@ -158,6 +174,10 @@ class Window:
 
         notif_inactive_im = PhotoImage(file=r"notif_inactive_b.png")
         self.notif_inactive_im_resized = notif_inactive_im.subsample(1, 1)
+
+        # DateEntry
+        self.dashboard_filter_from = DateEntry
+        self.dashboard_filter_to = DateEntry
 
         # Buttons
         self.home_b = tk.Button
@@ -625,75 +645,53 @@ class Window:
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
 
-        # ================================================ Home content ============================================
-        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        panel_lf.pack(side="top", fill="x")
+        # ================================================ Tenant info ===============================================
+        payment_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        payment_info_lf.pack(side="top", fill="x")
 
-        # ================================================ Room Settings ============================================
-        room_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
-        room_dashboard_lf.pack(side="left", padx=10, pady=10)
+        payment_info_title_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        payment_info_title_lf.pack(side="top", fill="x")
 
-        room_dashboard_label_lf = tk.LabelFrame(room_dashboard_lf, bg="#FFFFFF", relief="flat")
-        room_dashboard_label_lf.pack(side="top", fill="x")
-
-        ttk.Label(room_dashboard_label_lf, text='Room Dashboard',
+        ttk.Label(payment_info_title_lf, text='Sales Dashboard',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(room_dashboard_label_lf, text='basic',
+        ttk.Label(payment_info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        room_dashboard_links_lf = tk.LabelFrame(room_dashboard_lf, bg="#FFFFFF", relief="flat")
-        room_dashboard_links_lf.pack(side="top", anchor="nw", pady=10)
-
-        create_room_l = ttk.Label(room_dashboard_links_lf, text='Create room', style="link.TLabel")
-        create_room_l.pack(side="top", anchor="w")
-        create_room_l.bind("<Button-1>", self.create_room_dialog)
-
-        set_room_price_to_type_l = ttk.Label(room_dashboard_links_lf, text='Set room price according to room type',
-                                             style="link.TLabel")
-        set_room_price_to_type_l.pack(side="top", anchor="w")
-        set_room_price_to_type_l.bind("<Button-1>", self.set_room_price_to_type_dialog)
-
-        set_amenities_price_to_type_l = ttk.Label(room_dashboard_links_lf, text='Set amenities price according to '
-                                                                                'room type', style="link.TLabel")
-        set_amenities_price_to_type_l.pack(side="top", anchor="w")
-        set_amenities_price_to_type_l.bind("<Button-1>", self.set_room_amenities_to_type_dialog)
-
-        set_room_capacity_to_type_l = ttk.Label(room_dashboard_links_lf,
-                                                text='Set room capacity according to room type', style="link.TLabel")
-        set_room_capacity_to_type_l.pack(side="top", anchor="w")
-        set_room_capacity_to_type_l.bind("<Button-1>", self.set_room_capacity_to_type_dialog)
-
-        set_room_type_to_type_l = ttk.Label(room_dashboard_links_lf, text='Change current room type',
-                                            style="link.TLabel")
-        set_room_type_to_type_l.pack(side="top", anchor="w")
-        set_room_type_to_type_l.bind("<Button-1>", self.set_room_type_to_type_dialog)
-
-        # ================================================ Room info ===============================================
-        room_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        room_info_lf.pack(side="top", pady=20, fill="x")
-
-        room_info_title_lf = tk.LabelFrame(room_info_lf, bg="#FFFFFF", relief="flat")
-        room_info_title_lf.pack(side="top", fill="x")
-
-        ttk.Label(room_info_title_lf, text='Room Information',
-                  style="h1.TLabel").pack(side="left", anchor="nw")
-
-        ttk.Label(room_info_title_lf, text='basic',
-                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
-
-        refresh_b_lf = tk.LabelFrame(room_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(payment_info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456", bg="#FFFFFF", relief="flat",
-                  command=self.show_room_information_module).pack(fill="x")
+                  command=self.show_sales_dashboard_module).pack(fill="x")
+
+        # Filter
+        self.dashboard_filter_to = DateEntry(payment_info_title_lf, width=15,
+                                             date_pattern="DD/mm/yyyy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(payment_info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                                  anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(payment_info_title_lf, width=15,
+                                               date_pattern="DD/mm/yyyy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(payment_info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                                     anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, currentday_month)
 
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(room_info_lf, bg="#FAFAFA", relief="flat")
-        self.info_content_lf.pack(side="top", fill="both", expand=True)
+        self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat", command=self.show_room_information_module).pack(side="top", fill="x")
+                  bg="#89CFF0", relief="flat", command=self.show_sales_dashboard_module).pack(side="top", fill="x")
 
     def tenant_content_interface(self):
         self.change_button_color()
@@ -972,7 +970,7 @@ class Window:
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456", bg="#FFFFFF", relief="flat",
-                  command=self.show_room_information_module).pack(fill="x")
+                  command=self.show_action_information_module).pack(fill="x")
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FAFAFA", relief="flat")
@@ -1112,6 +1110,46 @@ class Window:
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.tenant_info_section)
+
+    # Dashboard
+    def show_sales_dashboard_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        pandasdb = mysql.connect(host=host,
+                                 user=user,
+                                 password=password,
+                                 database="hmsdatabase",
+                                 use_pure=True)
+
+        print(self.dashboard_filter_from.get())
+
+        query = "Select p.payment_amount FROM payment p WHERE date_created >= '" \
+                + self.dashboard_filter_from.get() + "' AND date_created <= '" \
+                + self.dashboard_filter_to.get() + "' AND admin_id = '" + self.admin_id_str + "';"
+
+        df = pd.read_sql(query, pandasdb)
+        pandasdb.close()
+
+        print("Payments dataframe")
+        print(df)
+
+        width = self.master.winfo_screenmmwidth()
+
+        fig = Figure(figsize=(width / 25.4, 5), dpi=75)
+        ax1 = fig.add_subplot(111)
+        ax1.plot(df, marker="o", label="payment amount in PHP")
+        ax1.set_title("Payments Dashboard")
+        ax1.set_xlabel("No. of payments")
+        ax1.set_ylabel("Payment amounts in Philippine Peso")
+        ax1.legend()
+
+        canvas = FigureCanvasTkAgg(fig, self.info_content_lf)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side="top", padx=10, pady=10, fill="both", expand=True)
+
+        tk.Button(self.info_content_lf, text="Generate report", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+                  image=self.report_im_resized, compound="left", relief="flat",
+                  command=self.generate_sales_report_request).pack(side="left", padx=10, pady=10)
 
     # Payment
     def show_payment_information_module(self):
@@ -1275,7 +1313,8 @@ class Window:
 
         # Create treeview
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
-        self.info_tree["columns"] = ("Action ID", "Action Description", "Admin ID", "Current User", "Privilege Access", "Date Created")
+        self.info_tree["columns"] = (
+            "Action ID", "Action Description", "Admin ID", "Current User", "Privilege Access", "Date Created")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
@@ -3026,6 +3065,33 @@ class Window:
             self.invalid_input()
             print(e)
 
+    # Dashboard
+    def generate_sales_report_request(self):
+        save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
+                                                    defaultextension='.pdf',
+                                                    title="Save file")
+        receipt_pdf = FPDF()
+        receipt_pdf.set_font('helvetica', '', 10)
+        receipt_pdf.add_page()
+
+        """
+        # create a cell
+        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", ln=1, align='c')
+        receipt_pdf.cell(200, 10, txt="DormBuilt, Inc.", ln=1, align='w')
+        receipt_pdf.cell(200, 10, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=2, align='w')
+        receipt_pdf.cell(200, 10, txt="Congressional Ave., Dasmarinas, Cavite", ln=2, align='w')
+        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=3, align='w')
+        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=3, align='w')
+        receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=4, align='w')
+        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=5, align='w')
+        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=6, align='w')
+        receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=7, align='w')
+        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=7, align='w')
+        """
+
+        # save the pdf with name .pdf
+        receipt_pdf.output(dest='F', name=save_file_dialog.name)
+
     # Tenant
     def create_tenant_request(self):
         if not self.tenant_name_e.get():
@@ -3240,7 +3306,6 @@ class Window:
 
         # save the pdf with name .pdf
         receipt_pdf.output(dest='F', name=self.save_file_dialog.name)
-        print(type(self.save_file_dialog.name))
 
     def send_receipt_email_request(self):
         if not self.tenant_email_e.get():
@@ -3508,7 +3573,7 @@ class Window:
             self.db1.close()
             self.mycursor.close()
 
-            tk.messagebox.showinfo("Removed account successfully")
+            messagebox.showinfo("Success", "Removed account successfully")
 
             self.account_settings_content_interface()
         except Exception as e:
@@ -3560,6 +3625,30 @@ class Window:
             print("Action history is recorded successfully")
         except Exception as e:
             self.invalid_input()
+            print(e)
+
+    def remove_action_request(self):
+        try:
+            self.database_connect()
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+
+            self.mycursor.execute("DELETE FROM action_history WHERE action_id = '" + values[0] +
+                                  "';")
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            messagebox.showinfo("Success", "Removed action successfully")
+
+        except Exception as e:
+            self.invalid_request()
             print(e)
 
     # Menu
@@ -4028,7 +4117,7 @@ class Window:
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
-                  command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
+                  command=self.remove_action_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
