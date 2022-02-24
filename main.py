@@ -21,8 +21,6 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-# import time
-
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
@@ -228,6 +226,7 @@ class Window:
         self.basic_user_id_str = str
         self.current_user = None
         self.admin_access_status = None
+        self.action_description = str
 
         # Int
         self.room_id = int
@@ -246,7 +245,6 @@ class Window:
 
         # Initialize method for login interface
         self.signin_interface()
-        # self.main_interface()
 
         # Initialize class for database
         # Database()
@@ -981,7 +979,7 @@ class Window:
         self.info_content_lf.pack(side="top", fill="both", expand=True)
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat", command=self.show_room_information_module).pack(side="top", fill="x")
+                  bg="#89CFF0", relief="flat", command=self.show_action_information_module).pack(side="top", fill="x")
 
     def notif_content_interface(self):
         self.change_button_color()
@@ -1264,6 +1262,55 @@ class Window:
                   style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.employee_info_section)
+
+    # Action History
+    def show_action_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = ("Action ID", "Action Description", "Admin ID", "Current User", "Privilege Access", "Date Created")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Action ID", anchor="center", width=80)
+        self.info_tree.column("Action Description", anchor="w")
+        self.info_tree.column("Admin ID", anchor="c", width=0, stretch=False)
+        self.info_tree.column("Current User", anchor="center", width=80)
+        self.info_tree.column("Privilege Access", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Date Created", anchor="w", width=80)
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Action ID", text="Action ID", anchor="center")
+        self.info_tree.heading("Action Description", text="Action Description", anchor="w")
+        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Current User", text="Current User", anchor="center")
+        self.info_tree.heading("Privilege Access", text="Privilege Access", anchor="center")
+        self.info_tree.heading("Date Created", text="Date Created", anchor="w")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.action_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on an action to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.action_info_section)
 
     # ================================================ Dialog Boxes Interface ==========================================
 
@@ -2537,6 +2584,8 @@ class Window:
 
                 # Instantiate methods
                 self.admin_get_current_user()
+                self.action_description = "Admin Sign in"
+                self.action_history_request()
                 self.main_interface()
 
             self.db1.close()
@@ -2984,6 +3033,7 @@ class Window:
         else:
             try:
                 self.database_connect()
+
                 self.mycursor.execute("INSERT INTO tenant (tenant_name, tenant_email, tenant_status, date_created, "
                                       "admin_id) VALUES (%s,%s,%s,%s,%s)",
                                       (self.tenant_name_e.get(), self.tenant_email_e.get(), self.tenant_status_cb.get(),
@@ -3465,6 +3515,53 @@ class Window:
             self.invalid_input()
             print(e)
 
+    # Action History
+    def action_info_treeview_request(self):
+        self.database_connect()
+        self.mycursor.execute("SELECT a.action_id, a.action_description, a.admin_id, a.user_current, "
+                              "a.privilege_access, a.date_created FROM action_history a WHERE admin_id = ' "
+                              + str(self.admin_id_str) + "';")
+
+        actions = self.mycursor.fetchall()
+        print(actions)
+
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+        count = 0
+        for record in actions:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("evenrow",))
+            count += 1
+
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
+
+    def action_history_request(self):
+        try:
+            self.database_connect()
+
+            # Record action to action history
+            self.mycursor.execute("INSERT INTO action_history (action_description, admin_id, user_current, "
+                                  "privilege_access, date_created) "
+                                  "VALUES (%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
+                                                              self.current_user, str(self.admin_access), date_time_str))
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+            print("Action history is recorded successfully")
+        except Exception as e:
+            self.invalid_input()
+            print(e)
+
     # Menu
     def bug_report(self):
         if not self.bug_description_e.get():
@@ -3875,6 +3972,59 @@ class Window:
         tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
                   bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left", justify="left",
                   command=self.modify_discount_dialog).pack(side="top", fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_discount_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def action_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Action History Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        self.discount_id = values[0]
+
+        ttk.Label(info_lf, text='Action ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Action Description: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Admin ID: ',
+                  style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Current User: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(info_lf, text='Privilege Access: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",

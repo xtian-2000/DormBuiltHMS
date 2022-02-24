@@ -255,3 +255,36 @@ class Database:
         except Exception as e:
             print("discount_status column could not be created successfully")
             print(e)
+
+        # Creating action_history table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`action_history` (`action_id` INT NOT NULL, "
+                                  "`action_description` VARCHAR(45) NOT NULL, `admin_id` INT NOT NULL, `current_user` "
+                                  "VARCHAR(45) NOT NULL, `privilege_access` VARCHAR(45) NOT NULL, `date_created` "
+                                  "VARCHAR(45) NOT NULL, PRIMARY KEY (`action_id`));")
+            print("'action_history' table is created successfully")
+        except Exception as e:
+            print("'action_history' table could not be created")
+            print(e)
+
+        # Alter action_history table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`action_history` CHANGE COLUMN `action_id` `action_id` "
+                                  "INT NOT NULL AUTO_INCREMENT ;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # Alter action_history table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`action_history` CHANGE COLUMN `current_user` "
+                                  "`user_current` VARCHAR(45) NOT NULL ;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
