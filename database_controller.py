@@ -288,3 +288,14 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Creating booking table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`booking` (`booking_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`tenant_name` VARCHAR(45) NOT NULL, `tenant_email` VARCHAR(45) NOT NULL, `admin_id` "
+                                  "INT NOT NULL, `date_created` VARCHAR(45) NOT NULL, PRIMARY KEY (`booking_id`));")
+            print("'booking' table is created successfully")
+        except Exception as e:
+            print("'booking' table could not be created")
+            print(e)
+
