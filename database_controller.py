@@ -299,3 +299,15 @@ class Database:
             print("'booking' table could not be created")
             print(e)
 
+        # Creating notif table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`notif` (`notif_id` INT NOT NULL AUTO_INCREMENT, "
+                                  "`notif_subject` VARCHAR(45) NOT NULL, `notif_description` VARCHAR(45) NOT NULL, "
+                                  "`date_created` VARCHAR(45) NOT NULL, `admin_id` VARCHAR(45) NOT NULL, PRIMARY KEY "
+                                  "(`notif_id`));")
+            print("'notif' table is created successfully")
+        except Exception as e:
+            print("'notif' table could not be created")
+            print(e)
+

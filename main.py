@@ -83,6 +83,12 @@ class Window:
         receipt_im = PhotoImage(file=r"receipt_b.png")
         self.receipt_im_resized = receipt_im.subsample(1, 1)
 
+        single_bed_im = PhotoImage(file=r"single_bed_l.png")
+        self.single_bed_im_resized = single_bed_im.subsample(1, 1)
+
+        double_bed_im = PhotoImage(file=r"double_bed_l.png")
+        self.double_bed_im_resized = double_bed_im.subsample(1, 1)
+
         report_im = PhotoImage(file=r"report_b.png")
         self.report_im_resized = report_im.subsample(1, 1)
 
@@ -593,32 +599,32 @@ class Window:
         room_dashboard_links_lf.pack(side="top", anchor="nw", pady=10)
 
         create_room_l = ttk.Label(room_dashboard_links_lf, text='Create room', style="link.TLabel")
-        create_room_l.pack(side="top", anchor="w")
+        create_room_l.grid(column=0, row=0, sticky="w")
         create_room_l.bind("<Button-1>", self.create_room_dialog)
 
         set_room_price_to_type_l = ttk.Label(room_dashboard_links_lf, text='Set room price according to room type',
                                              style="link.TLabel")
-        set_room_price_to_type_l.pack(side="top", anchor="w")
+        set_room_price_to_type_l.grid(column=0, row=1, sticky="w")
         set_room_price_to_type_l.bind("<Button-1>", self.set_room_price_to_type_dialog)
 
         set_amenities_price_to_type_l = ttk.Label(room_dashboard_links_lf, text='Set amenities price according to '
                                                                                 'room type', style="link.TLabel")
-        set_amenities_price_to_type_l.pack(side="top", anchor="w")
+        set_amenities_price_to_type_l.grid(column=0, row=2, sticky="w")
         set_amenities_price_to_type_l.bind("<Button-1>", self.set_room_amenities_to_type_dialog)
 
         set_room_capacity_to_type_l = ttk.Label(room_dashboard_links_lf,
                                                 text='Set room capacity according to room type', style="link.TLabel")
-        set_room_capacity_to_type_l.pack(side="top", anchor="w")
+        set_room_capacity_to_type_l.grid(column=1, row=0, sticky="w")
         set_room_capacity_to_type_l.bind("<Button-1>", self.set_room_capacity_to_type_dialog)
 
         set_room_type_to_type_l = ttk.Label(room_dashboard_links_lf, text='Change current room type',
                                             style="link.TLabel")
-        set_room_type_to_type_l.pack(side="top", anchor="w")
+        set_room_type_to_type_l.grid(column=1, row=1, sticky="w")
         set_room_type_to_type_l.bind("<Button-1>", self.set_room_type_to_type_dialog)
 
         # ================================================ Room info ===============================================
         room_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        room_info_lf.pack(side="top", pady=20, fill="x")
+        room_info_lf.pack(side="top", fill="x")
 
         room_info_title_lf = tk.LabelFrame(room_info_lf, bg="#FFFFFF", relief="flat")
         room_info_title_lf.pack(side="top", fill="x")
@@ -761,26 +767,9 @@ class Window:
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
 
-        # ================================================ Home content ============================================
-        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        panel_lf.pack(side="top", fill="x")
-
-        # ================================================ Room Settings ============================================
-        payment_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
-        payment_dashboard_lf.pack(side="left", padx=10, pady=10)
-
-        payment_dashboard_label_lf = tk.LabelFrame(payment_dashboard_lf, bg="#FFFFFF", relief="flat")
-        payment_dashboard_label_lf.pack(side="top", fill="x")
-
-        ttk.Label(payment_dashboard_label_lf, text='Payments Settings',
-                  style="h1.TLabel").pack(side="left", anchor="nw")
-
-        ttk.Label(payment_dashboard_label_lf, text='basic',
-                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
-
-        # ================================================ Tenant info ===============================================
+        # ================================================ Payment info ===============================================
         payment_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        payment_info_lf.pack(side="top", pady=20, fill="x")
+        payment_info_lf.pack(side="top", fill="x")
 
         payment_info_title_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
         payment_info_title_lf.pack(side="top", fill="x")
@@ -1007,14 +996,14 @@ class Window:
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
-                  bg="#FFFFFF", relief="flat").pack(fill="x")
+                  bg="#FFFFFF", relief="flat", command=self.show_notif_information_module).pack(fill="x")
 
         # ================================================ Notification content ========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FAFAFA", relief="flat")
         self.info_content_lf.pack(side="top", fill="both", expand=True)
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat").pack(side="top", fill="x")
+                  bg="#89CFF0", relief="flat", command=self.show_notif_information_module).pack(side="top", fill="x")
 
     # ================================================ Modularized Interface ===========================================
 
@@ -1058,7 +1047,7 @@ class Window:
         self.info_tree.heading("Amenities Price", text="Amenities Price", anchor="center")
         self.info_tree.heading("Current Occupants", text="Current Occupants", anchor="center")
 
-        self.info_tree.pack(side="top", fill="x")
+        self.info_tree.pack(side="top", fill="both")
 
         # Initialize method for inserting items in a list
         self.room_info_treeview_request()
@@ -1071,6 +1060,9 @@ class Window:
 
         ttk.Label(self.info_buttons_lf, text="Click on a room to open this section!",
                   style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        self.footer_lf = tk.LabelFrame(self.info_tree_lf, bg="#FFFFFF", relief="flat")
+        self.footer_lf.pack(side="top", fill="x")
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.room_info_section)
@@ -1361,6 +1353,54 @@ class Window:
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.action_info_section)
+
+    # Notif
+    def show_notif_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = (
+            "Notif ID", "Notif Subject", "Description", "Admin ID", "Date Created")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Notif ID", anchor="center", width=80)
+        self.info_tree.column("Notif Subject", anchor="w", width=80)
+        self.info_tree.column("Description", anchor="center", width=80)
+        self.info_tree.column("Admin ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Date Created", anchor="w", width=80)
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Notif ID", text="Notif ID", anchor="center")
+        self.info_tree.heading("Notif Subject", text="Notif Subject", anchor="w")
+        self.info_tree.heading("Description", text="Description", anchor="center")
+        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Date Created", text="Date Created", anchor="w")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.notif_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on a notif to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.notif_info_section)
 
     # ================================================ Dialog Boxes Interface ==========================================
 
@@ -2990,7 +3030,6 @@ class Window:
                     discount_amount = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                     discounted_price = (int(self.room_cost_l.cget("text")) - (int(self.room_cost_l.cget("text")) *
                                                                               discount_amount / 100))
-                    print(discounted_price)
                     self.room_cost_l.config(text=discounted_price)
 
                 self.db1.close()
@@ -3004,33 +3043,56 @@ class Window:
             self.invalid_input()
         if not self.payment_amount_sp.get():
             self.invalid_input()
+        if self.payment_description_cb.get() == "Processing fee":
+            self.database_connect()
+
+            self.mycursor.execute(
+                "SELECT DISTINCT current_occupants FROM room where room_id = '"
+                + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
+
+            # Converts the tuple into integer
+            current_occupant_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+            current_occupant = current_occupant_convert + 1
+            print(current_occupant)
+            print(type(current_occupant))
+
+            self.mycursor.execute("UPDATE room SET current_occupants = '"
+                                  + str(current_occupant) + "' WHERE room_id = '"
+                                  + self.room_id + "';")
+
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            self.create_room_transaction_child_request()
         else:
-            try:
-                # remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
+            self.create_room_transaction_child_request()
 
-                self.database_connect()
-                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), str(self.room_id),
-                                       self.tenant_id_sp.get(),
-                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+    def create_room_transaction_child_request(self):
+        try:
+            self.database_connect()
+            self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                  "basic_user_id, date_created, discount_code, payment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.payment_amount_sp.get(), str(self.room_id),
+                                   self.tenant_id_sp.get(),
+                                   str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                   self.discount_code_e.get(), self.payment_description_cb.get()))
 
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
 
-                # self.room_add_occupant()
+            # self.room_add_occupant()
 
-                messagebox.showinfo("Success", "Transaction is  created")
+            messagebox.showinfo("Success", "Transaction is  created")
 
-                self.dialog_box_top.destroy()
-                self.show_room_information_module()
+            self.dialog_box_top.destroy()
+            self.show_room_information_module()
 
-            except Exception as e:
-                self.invalid_request()
-                print(e)
+        except Exception as e:
+            self.invalid_request()
+            print(e)
 
     def room_add_occupant(self):
         remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
@@ -3658,6 +3720,60 @@ class Window:
             self.invalid_request()
             print(e)
 
+    # Notif
+    def notif_info_treeview_request(self):
+        self.database_connect()
+        self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
+                              "n.date_created FROM notif n WHERE admin_id = ' "
+                              + str(self.admin_id_str) + "';")
+
+        notif = self.mycursor.fetchall()
+        print(notif)
+
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+        count = 0
+        for record in notif:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      tags=("evenrow",))
+            count += 1
+
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
+
+    def remove_notif_request(self):
+        try:
+            self.database_connect()
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+
+            self.mycursor.execute("DELETE FROM notif WHERE notif_id = '" + values[0] +
+                                  "';")
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            messagebox.showinfo("Success", "Removed notif successfully")
+
+        except Exception as e:
+            self.invalid_request()
+            print(e)
+
     # Menu
     def bug_report(self):
         if not self.bug_description_e.get():
@@ -3759,6 +3875,7 @@ class Window:
 
     def room_info_section(self, event):
         Content_control.destroy_content(self.info_buttons_lf)
+        Content_control.destroy_content(self.footer_lf)
 
         ttk.Label(self.info_buttons_lf, text='Room Information',
                   style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
@@ -3842,6 +3959,29 @@ class Window:
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left", justify="left",
                   command=self.remove_room_account_request).pack(side="top", pady=5, fill="x")
+
+        # ================================================ Room graphical representation ===============================
+        # Condition for tenant capacity
+        if values[5] == "1":
+            img = self.single_bed_im_resized
+            capacity = "1 Tenant Capacity"
+        else:
+            img = self.double_bed_im_resized
+            capacity = "2 or more Tenant Capacity"
+
+        # Condition for room availability
+
+        footer_title_lf = tk.LabelFrame(self.footer_lf, bg="#FFFFFF", relief="flat")
+        footer_title_lf.pack(side="top", fill="x")
+
+        ttk.Label(footer_title_lf, text=('Room Number: ' + values[1]),
+                  style="h2_on.TLabel").grid(column=0, row=0, columnspan=2, pady=10, sticky="w")
+
+        tk.Label(footer_title_lf, image=img,
+                 bg="#FFFFFF").grid(column=0, row=1, columnspan=2)
+
+        ttk.Label(footer_title_lf, text=capacity,
+                  style="h1_body.TLabel").grid(column=0, row=2, columnspan=2)
 
         print(event)
 
@@ -4125,6 +4265,53 @@ class Window:
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
                   command=self.remove_action_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def notif_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Notif Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(info_lf, text='Notif ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Notif Subject: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Notif Description: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Admin ID: ',
+                  style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_notif_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
