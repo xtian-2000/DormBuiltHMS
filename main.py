@@ -493,6 +493,7 @@ class Window:
         # Creating help menu
         help_menu = Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="User Manual", command=self.generate_user_manual)
+        help_menu.add_command(label="Developer's Information", command=self.developer_information)
         help_menu.add_separator()
         help_menu.add_command(label="User Ratings", command=self.user_ratings)
         help_menu.add_command(label="Bug report", command=self.bug_report_dialog)
@@ -4143,6 +4144,10 @@ class Window:
     @staticmethod
     def user_ratings():
         webbrowser.open_new(r"https://forms.gle/WwUhJdmagMNMgJ9s6")
+
+    @staticmethod
+    def developer_information():
+        webbrowser.open_new(r"https://drive.google.com/file/d/17REEVoNwuCFHGVorARgzM8rNrAfojNYj/view?usp=sharing")
 
     @staticmethod
     def button_clicked():
