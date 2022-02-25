@@ -1121,8 +1121,6 @@ class Window:
                                  database="hmsdatabase",
                                  use_pure=True)
 
-        print(self.dashboard_filter_from.get())
-
         query = "Select p.payment_amount FROM payment p WHERE date_created >= '" \
                 + self.dashboard_filter_from.get() + "' AND date_created <= '" \
                 + self.dashboard_filter_to.get() + "' AND admin_id = '" + self.admin_id_str + "';"
@@ -3067,30 +3065,51 @@ class Window:
 
     # Dashboard
     def generate_sales_report_request(self):
+        pandasdb = mysql.connect(host=host,
+                                 user=user,
+                                 password=password,
+                                 database="hmsdatabase",
+                                 use_pure=True)
+
+        query = "Select p.payment_id, p.payment_amount, p.tenant_id, t.tenant_name, p.date_created FROM payment p " \
+                "INNER JOIN tenant t WHERE p.date_created >= '" \
+                + self.dashboard_filter_from.get() + "' AND p.date_created <= '" \
+                + self.dashboard_filter_to.get() + "' AND p.tenant_id = t.tenant_id AND p.admin_id = '" \
+                + self.admin_id_str + "';"
+
+        df = pd.read_sql(query, pandasdb)
+        pandasdb.close()
+
+        print("Payments dataframe")
+        print(df.sum())
+
+        save_file_dialog = filedialog.asksaveasfile(filetypes=[('CSV file', '*.csv')], defaultextension='CSV file',
+                                                    title="Save data")
+        df.to_csv(save_file_dialog, index=False)
+
+        save_file_dialog.close()
+
+        """
         save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
                                                     defaultextension='.pdf',
                                                     title="Save file")
         receipt_pdf = FPDF()
         receipt_pdf.set_font('helvetica', '', 10)
         receipt_pdf.add_page()
-
-        """
+        
         # create a cell
-        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", ln=1, align='c')
-        receipt_pdf.cell(200, 10, txt="DormBuilt, Inc.", ln=1, align='w')
-        receipt_pdf.cell(200, 10, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=2, align='w')
-        receipt_pdf.cell(200, 10, txt="Congressional Ave., Dasmarinas, Cavite", ln=2, align='w')
-        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=4, align='w')
-        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=5, align='w')
-        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=6, align='w')
-        receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=7, align='w')
-        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=7, align='w')
-        """
+        receipt_pdf.cell(200, 10, txt="Sales Report  ", ln=1, align='c')
+        receipt_pdf.cell(200, 10, txt="DormBuilt, Inc.", ln=2, align='c')
+        receipt_pdf.cell(200, 10, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=3, align='c')
+        receipt_pdf.cell(200, 10, txt="Congressional Ave., Dasmarinas, Cavite", ln=4, align='c')
+        receipt_pdf.cell(200, 10, txt="", ln=5, align='c')
+        receipt_pdf.cell(200, 10, txt=("Date from " + self.dashboard_filter_from.get()), ln=3, align='w')
+        receipt_pdf.cell(200, 10, txt=("to " + self.dashboard_filter_to.get()), ln=3, align='w')
+        receipt_pdf.cell(200, 10, txt=("Number of payments: " + values[0]), ln=4, align='w')
+        receipt_pdf.cell(200, 10, txt=("Sum of payments: " + values[1]), ln=5, align='w')
 
         # save the pdf with name .pdf
-        receipt_pdf.output(dest='F', name=save_file_dialog.name)
+        receipt_pdf.output(dest='F', name=save_file_dialog.name)"""
 
     # Tenant
     def create_tenant_request(self):
