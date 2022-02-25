@@ -21,6 +21,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import DateEntry
+import webbrowser
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
@@ -491,8 +492,10 @@ class Window:
 
         # Creating help menu
         help_menu = Menu(menu_bar, tearoff=0)
-        help_menu.add_command(label="Bug report", command=self.bug_report_dialog)
+        help_menu.add_command(label="User Manual", command=self.generate_user_manual)
         help_menu.add_separator()
+        help_menu.add_command(label="User Ratings", command=self.user_ratings)
+        help_menu.add_command(label="Bug report", command=self.bug_report_dialog)
         menu_bar.add_cascade(label="Help", menu=help_menu)
 
         # ================================================ Top-Nav Interface ===========================================
@@ -986,22 +989,31 @@ class Window:
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
 
-        # ================================================ Notif content ===============================================
-        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        panel_lf.pack(side="top", fill="x")
+        # ================================================ Notification ================================================
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        # ================================================ Notif Dashboard =============================================
-        notif_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
-        notif_dashboard_lf.pack(side="left", padx=10, pady=10)
+        title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
 
-        notif_dashboard_title_lf = tk.LabelFrame(notif_dashboard_lf, bg="#FFFFFF", relief="flat")
-        notif_dashboard_title_lf.pack(side="top", fill="x")
-
-        ttk.Label(notif_dashboard_title_lf, text='Notification Dashboard',
+        ttk.Label(title_lf, text='Notifications',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(notif_dashboard_title_lf, text='basic',
+        ttk.Label(title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        refresh_b_lf = tk.LabelFrame(title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat").pack(fill="x")
+
+        # ================================================ Notification content ========================================
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FAFAFA", relief="flat")
+        self.info_content_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat").pack(side="top", fill="x")
 
     # ================================================ Modularized Interface ===========================================
 
@@ -3083,33 +3095,8 @@ class Window:
         print("Payments dataframe")
         print(df.sum())
 
-        save_file_dialog = filedialog.asksaveasfile(filetypes=[('CSV file', '*.csv')], defaultextension='CSV file',
-                                                    title="Save data")
-        df.to_csv(save_file_dialog, index=False)
-
-        save_file_dialog.close()
-
-        """
-        save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
-                                                    defaultextension='.pdf',
-                                                    title="Save file")
-        receipt_pdf = FPDF()
-        receipt_pdf.set_font('helvetica', '', 10)
-        receipt_pdf.add_page()
-        
-        # create a cell
-        receipt_pdf.cell(200, 10, txt="Sales Report  ", ln=1, align='c')
-        receipt_pdf.cell(200, 10, txt="DormBuilt, Inc.", ln=2, align='c')
-        receipt_pdf.cell(200, 10, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=3, align='c')
-        receipt_pdf.cell(200, 10, txt="Congressional Ave., Dasmarinas, Cavite", ln=4, align='c')
-        receipt_pdf.cell(200, 10, txt="", ln=5, align='c')
-        receipt_pdf.cell(200, 10, txt=("Date from " + self.dashboard_filter_from.get()), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("to " + self.dashboard_filter_to.get()), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("Number of payments: " + values[0]), ln=4, align='w')
-        receipt_pdf.cell(200, 10, txt=("Sum of payments: " + values[1]), ln=5, align='w')
-
-        # save the pdf with name .pdf
-        receipt_pdf.output(dest='F', name=save_file_dialog.name)"""
+        file = filedialog.asksaveasfilename(defaultextension=".xlsx")
+        df.to_excel(file)
 
     # Tenant
     def create_tenant_request(self):
@@ -4148,6 +4135,14 @@ class Window:
     @staticmethod
     def invalid_request():
         messagebox.showerror("Error", "Database request unsuccessful! \n Please your internet connection.")
+
+    @staticmethod
+    def generate_user_manual():
+        webbrowser.open_new(r"https://drive.google.com/file/d/1jHGevZruEFuYLzLiJhKODUiuTCyPD0_s/view?usp=sharing")
+
+    @staticmethod
+    def user_ratings():
+        webbrowser.open_new(r"https://forms.gle/WwUhJdmagMNMgJ9s6")
 
     @staticmethod
     def button_clicked():
