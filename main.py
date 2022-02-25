@@ -41,7 +41,7 @@ fday_month = fday_month.strftime("%d/%m/%Y %H:%M:%S")
 currentday_month = datetime.today()
 currentday_month = currentday_month.strftime("%d/%m/%Y %H:%M:%S")
 
-hms_version = "DORv1.21"
+hms_version = "DORv1.32"
 
 
 class Window:
@@ -60,6 +60,7 @@ class Window:
         self.info_content_lf = None
         self.info_tree_lf = None
         self.info_buttons_lf = None
+        self.footer_lf = None
 
         # Label
         self.admin_access_status_l = ttk.Label
@@ -88,6 +89,21 @@ class Window:
 
         double_bed_im = PhotoImage(file=r"double_bed_l.png")
         self.double_bed_im_resized = double_bed_im.subsample(1, 1)
+
+        available_im = PhotoImage(file=r"available_im.png")
+        self.available_im_resized = available_im.subsample(1, 1)
+
+        full_im = PhotoImage(file=r"full_im.png")
+        self.full_im_resized = full_im.subsample(1, 1)
+
+        maintenance_im = PhotoImage(file=r"maintenance_im.png")
+        self.maintenance_im_resized = maintenance_im.subsample(1, 1)
+
+        modify_basic_im = PhotoImage(file=r"modify_basic_b.png")
+        self.modify_basic_im_resized = modify_basic_im.subsample(1, 1)
+
+        modify_admin_im = PhotoImage(file=r"modify_admin_b.png")
+        self.modify_admin_im_resized = modify_admin_im.subsample(1, 1)
 
         report_im = PhotoImage(file=r"report_b.png")
         self.report_im_resized = report_im.subsample(1, 1)
@@ -261,6 +277,8 @@ class Window:
         self.tenant_id = int
 
         self.discount_id = int
+
+        self.employee_id = int
 
         # Boolean
         self.admin_access = False
@@ -930,6 +948,13 @@ class Window:
         ttk.Label(employee_info_title_lf, text='admin',
                   style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
+        refresh_b_lf = tk.LabelFrame(employee_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat", command=self.show_employee_information_module).pack(fill="x")
+
+        # ================================================ Show more info ==============================================
         self.info_tree_lf = tk.LabelFrame(employee_info_lf, bg="#FFFFFF", relief="flat")
         self.info_tree_lf.pack(side="top", fill="both")
 
@@ -1266,43 +1291,49 @@ class Window:
 
     # Accounts
     def show_employee_information_module(self):
-        Content_control.destroy_content(self.info_tree_lf)
+        if not self.admin_access:
+            self.admin_access_validation_dialog()
+            self.show_employee_information_module()
+        else:
+            Content_control.destroy_content(self.info_tree_lf)
 
-        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
-        info_tree_scr.pack(side="right", fill="y")
+            info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+            info_tree_scr.pack(side="right", fill="y")
 
-        # Create treeview
-        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
-                                      yscrollcommand=info_tree_scr.set)
-        self.info_tree["columns"] = ("ID", "Name", "Role")
+            # Create treeview
+            self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
+                                          yscrollcommand=info_tree_scr.set)
+            self.info_tree["columns"] = ("ID", "Name", "Password", "Role")
 
-        # Create columns
-        self.info_tree.column("#0", width=0, stretch=False)
-        self.info_tree.column("ID", anchor="center", width=80)
-        self.info_tree.column("Name", anchor="w", width=120)
-        self.info_tree.column("Role", anchor="w", width=120)
+            # Create columns
+            self.info_tree.column("#0", width=0, stretch=False)
+            self.info_tree.column("ID", anchor="center", width=80)
+            self.info_tree.column("Name", anchor="w", width=120)
+            self.info_tree.column("Password", anchor="w", width=120)
+            self.info_tree.column("Role", anchor="w", width=120)
 
-        # Create headings
-        self.info_tree.heading("#0", text="", anchor="w")
-        self.info_tree.heading("ID", text="ID", anchor="center")
-        self.info_tree.heading("Name", text="Name", anchor="w")
-        self.info_tree.heading("Role", text="Role", anchor="w")
+            # Create headings
+            self.info_tree.heading("#0", text="", anchor="w")
+            self.info_tree.heading("ID", text="ID", anchor="center")
+            self.info_tree.heading("Name", text="Name", anchor="w")
+            self.info_tree.heading("Password", text="Password", anchor="w")
+            self.info_tree.heading("Role", text="Role", anchor="w")
 
-        self.info_tree.pack(side="top", fill="x")
+            self.info_tree.pack(side="top", fill="x")
 
-        # Initialize method for inserting items in a list
-        self.employee_info_treeview_request()
+            # Initialize method for inserting items in a list
+            self.employee_info_treeview_request()
 
-        self.info_buttons_lf = tk.LabelFrame(self.info_tree_lf, bg="#FFFFFF", relief="flat")
-        self.info_buttons_lf.pack(side="top", pady=5, padx=10, anchor="w")
+            self.info_buttons_lf = tk.LabelFrame(self.info_tree_lf, bg="#FFFFFF", relief="flat")
+            self.info_buttons_lf.pack(side="top", pady=5, padx=10, anchor="w")
 
-        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
-                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+            tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                     bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
 
-        ttk.Label(self.info_buttons_lf, text="Click on an account to open this section!",
-                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
-        # Bind the treeview to database_view_info method
-        self.info_tree.bind("<ButtonRelease-1>", self.employee_info_section)
+            ttk.Label(self.info_buttons_lf, text="Click on an account to open this section!",
+                      style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+            # Bind the treeview to database_view_info method
+            self.info_tree.bind("<ButtonRelease-1>", self.employee_info_section)
 
     # Action History
     def show_action_information_module(self):
@@ -1632,7 +1663,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.modify_basic_im_resized, compound="left",
                   command=self.modify_room_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to modify room information!",
@@ -2170,7 +2202,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.modify_basic_im_resized, compound="left",
                   command=self.modify_tenant_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to modify tenant account!",
@@ -2431,7 +2464,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text="Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.modify_basic_im_resized, compound="left",
                   command=self.modify_discount_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to modify discount!",
@@ -2550,6 +2584,76 @@ class Window:
         self.dialog_box_top.mainloop()
 
         print(event)
+
+    def modify_employee_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create employee account")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Modify employee account',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(forms_lf, text='Employee Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.employee_username_e = ttk.Entry(forms_lf, width=60)
+        self.employee_username_e.grid(column=1, row=0)
+        self.employee_username_e.focus()
+
+        ttk.Label(forms_lf, text='Employee Password', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.employee_password_e = ttk.Entry(forms_lf, width=60)
+        self.employee_password_e.grid(column=1, row=1)
+
+        ttk.Label(forms_lf, text='Role', style="h2.TLabel",
+                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+
+        self.employee_role_e = ttk.Entry(forms_lf, width=60)
+        self.employee_role_e.grid(column=1, row=2)
+
+        ttk.Label(forms_lf, text='ex. Manager, Operator', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=3, sticky="w")
+
+        # Insert values to entry widgets
+        self.employee_username_e.insert(0, values[1])
+        self.employee_password_e.insert(0, values[2])
+        self.employee_role_e.insert(0, values[3])
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Modify", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  image=self.modify_admin_im_resized, compound="left",
+                  command=self.modify_employee_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to modify an\n employee account!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
 
     # Menu
     def bug_report_dialog(self):
@@ -2883,8 +2987,6 @@ class Window:
                 messagebox.showinfo("Success", "Room information is modified")
 
                 self.dialog_box_top.destroy()
-                self.show_room_information_module()
-
             except Exception as e:
                 self.invalid_input()
                 print(e)
@@ -3044,27 +3146,67 @@ class Window:
         if not self.payment_amount_sp.get():
             self.invalid_input()
         if self.payment_description_cb.get() == "Processing fee":
+            # Get room_capacity
+            self.database_connect()
+
+            self.mycursor.execute(
+                "SELECT DISTINCT room_capacity FROM room where room_id = '"
+                + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
+
+            # Converts the tuple into integer
+            capacity_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+            self.db1.close()
+            self.mycursor.close()
+
+            # Get current_occupants
             self.database_connect()
 
             self.mycursor.execute(
                 "SELECT DISTINCT current_occupants FROM room where room_id = '"
                 + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
+            self.db1.close()
+            self.mycursor.close()
 
             # Converts the tuple into integer
             current_occupant_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
             current_occupant = current_occupant_convert + 1
-            print(current_occupant)
-            print(type(current_occupant))
 
-            self.mycursor.execute("UPDATE room SET current_occupants = '"
-                                  + str(current_occupant) + "' WHERE room_id = '"
-                                  + self.room_id + "';")
+            if capacity_convert <= current_occupant_convert:
+                self.room_full_error()
+            else:
+                if capacity_convert <= current_occupant:
+                    room_status = "Fully Occupied"
+                    self.database_connect()
+                    self.mycursor.execute("UPDATE room SET room_availability = '"
+                                          + str(room_status) + "' WHERE room_id = '"
+                                          + self.room_id + "';")
 
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+                else:
+                    print("Not fully occupied")
 
-            self.create_room_transaction_child_request()
+                self.database_connect()
+                self.mycursor.execute("UPDATE room SET current_occupants = '"
+                                      + str(current_occupant) + "' WHERE room_id = '"
+                                      + self.room_id + "';")
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                self.database_connect()
+                status = "Active"
+                self.mycursor.execute("UPDATE tenant SET tenant_status = '" + status + "' WHERE tenant_id = '"
+                                      + self.tenant_id_sp.get() + "';")
+                print(self.tenant_id_sp.get())
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                self.create_room_transaction_child_request()
         else:
             self.create_room_transaction_child_request()
 
@@ -3209,8 +3351,6 @@ class Window:
                 messagebox.showinfo("Success", "Tenant information is modified successfully")
 
                 self.dialog_box_top.destroy()
-                self.show_tenant_information_module()
-
             except Exception as e:
                 self.invalid_input()
                 print(e)
@@ -3384,10 +3524,8 @@ class Window:
         else:
             self.download_receipt_request()
 
-            body = '''Hello,
-            This is the body of the email
-            sincerely yours
-            G.G.
+            body = '''Good Day! Below is an attachment for the digital copy of 
+            your payment for Dormbuilt, Inc. Thank you!
             '''
 
             sender = 'pongodev0914@gmail.com'
@@ -3598,11 +3736,39 @@ class Window:
                 self.invalid_input()
                 print(e)
 
+    def modify_employee_request(self):
+        if not self.employee_username_e.get():
+            self.invalid_input()
+        if not self.employee_password_e.get():
+            self.invalid_input()
+        if not self.employee_role_e.get():
+            self.invalid_input()
+        if not self.admin_access:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("UPDATE basic_user SET username = '"
+                                      + self.employee_username_e.get() + "', password = '"
+                                      + self.employee_password_e.get() + "', role = '"
+                                      + self.employee_role_e.get() + "'  WHERE basic_user_id = '"
+                                      + self.employee_id + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Employee Account is successfully modified")
+
+                self.dialog_box_top.destroy()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
     def employee_info_treeview_request(self):
         self.database_connect()
-        self.mycursor.execute("SELECT basic_user.basic_user_id, basic_user.username, basic_user.role "
-                              "FROM basic_user where admin_id = ' "
-                              + str(self.admin_id_str) + "' ORDER BY basic_user.basic_user_id;")
+        self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role "
+                              "FROM basic_user b WHERE b.admin_id = ' "
+                              + str(self.admin_id_str) + "' ORDER BY b.basic_user_id;")
 
         employees = self.mycursor.fetchall()
 
@@ -3614,10 +3780,10 @@ class Window:
         for record in employees:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2]), tags=("oddrow",))
+                                      values=(record[0], record[1], record[2], record[3]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2]), tags=("evenrow",))
+                                      values=(record[0], record[1], record[2], record[3]), tags=("evenrow",))
             count += 1
 
         self.db1.commit()
@@ -3970,6 +4136,17 @@ class Window:
             capacity = "2 or more Tenant Capacity"
 
         # Condition for room availability
+        if values[4] == "Available":
+            availability_im = self.available_im_resized
+            availability = "Available"
+        if values[4] == "Fully Occupied":
+            availability_im = self.full_im_resized
+            availability = "Fully Occupied"
+        if values[4] == "Maintenance":
+            availability_im = self.maintenance_im_resized
+            availability = "Maintenance"
+
+        # Condition for room availability
 
         footer_title_lf = tk.LabelFrame(self.footer_lf, bg="#FFFFFF", relief="flat")
         footer_title_lf.pack(side="top", fill="x")
@@ -3978,10 +4155,16 @@ class Window:
                   style="h2_on.TLabel").grid(column=0, row=0, columnspan=2, pady=10, sticky="w")
 
         tk.Label(footer_title_lf, image=img,
-                 bg="#FFFFFF").grid(column=0, row=1, columnspan=2)
+                 bg="#FFFFFF").grid(column=0, row=1)
 
         ttk.Label(footer_title_lf, text=capacity,
-                  style="h1_body.TLabel").grid(column=0, row=2, columnspan=2)
+                  style="h1_body.TLabel").grid(column=0, row=2, padx=10)
+
+        tk.Label(footer_title_lf, image=availability_im,
+                 bg="#FFFFFF").grid(column=1, row=1)
+
+        ttk.Label(footer_title_lf, text=availability,
+                  style="h1_body.TLabel").grid(column=1, row=2, padx=10)
 
         print(event)
 
@@ -4000,6 +4183,8 @@ class Window:
         # Grab record values
         values = self.info_tree.item(selected, "values")
 
+        self.employee_id = values[0]
+
         ttk.Label(employee_info_label_lf, text='ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
 
         ttk.Label(employee_info_label_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
@@ -4008,14 +4193,19 @@ class Window:
 
         ttk.Label(employee_info_label_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
+        ttk.Label(employee_info_label_lf, text='Password: ',
+                  style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
         ttk.Label(employee_info_label_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+        ttk.Label(employee_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
         # Buttons
         tk.Button(self.info_buttons_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
                   bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left",
-                  justify="left").pack(side="left", pady=5, padx=10, anchor="w")
+                  justify="left", command=self.modify_employee_dialog).pack(side="left", pady=5, padx=10, anchor="w")
 
         tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
@@ -4323,6 +4513,10 @@ class Window:
     @staticmethod
     def invalid_request():
         messagebox.showerror("Error", "Database request unsuccessful! \n Please your internet connection.")
+
+    @staticmethod
+    def room_full_error():
+        messagebox.showerror("Error", "The room is currently fully occupied.")
 
     @staticmethod
     def generate_user_manual():
