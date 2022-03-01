@@ -64,8 +64,9 @@ class Window:
 
         # Label
         self.admin_access_status_l = ttk.Label
-
         self.room_cost_l = ttk.Label
+        self.amount_to_be_paid_l = ttk.Label
+        self.discount_l = ttk.Label
 
         # PhotoImage
         db_logo_im = PhotoImage(file=r"Dormbuilt_logo.png")
@@ -426,7 +427,7 @@ class Window:
         tk.Label(intuitive_logo_lf, image=self.intuitive_logo_im_resized,
                  bg="#FFFFFF").pack(side="top", anchor="center")
 
-        ttk.Label(intuitive_logo_lf, text='Intuitive interface',
+        ttk.Label(intuitive_logo_lf, text='Intuitive Interface',
                   style="h1_body.TLabel").pack(side="top", pady=5, anchor="center")
 
         ttk.Label(intuitive_logo_lf, text="The interface of Dormbuilt's Hotel Management \n"
@@ -754,7 +755,7 @@ class Window:
 
         # ================================================ Tenant info ===============================================
         tenant_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        tenant_info_lf.pack(side="top", pady=20, fill="x")
+        tenant_info_lf.pack(side="top", fill="x")
 
         tenant_info_title_lf = tk.LabelFrame(tenant_info_lf, bg="#FFFFFF", relief="flat")
         tenant_info_title_lf.pack(side="top", fill="x")
@@ -844,7 +845,7 @@ class Window:
 
         # ================================================ Tenant info ===============================================
         discount_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        discount_info_lf.pack(side="top", pady=20, fill="x")
+        discount_info_lf.pack(side="top", fill="x")
 
         discount_info_title_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
         discount_info_title_lf.pack(side="top", fill="x")
@@ -938,7 +939,7 @@ class Window:
 
         # ================================================ Employee info ===============================================
         employee_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        employee_info_lf.pack(side="top", pady=20, fill="x")
+        employee_info_lf.pack(side="top", fill="x")
 
         employee_info_title_lf = tk.LabelFrame(employee_info_lf, bg="#FFFFFF", relief="flat")
         employee_info_title_lf.pack(side="top", fill="x")
@@ -1104,13 +1105,15 @@ class Window:
 
         # Create treeview
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
-        self.info_tree["columns"] = ("Tenant ID", "Tenant Name", "Status", "Balance", "Email", "Date created")
+        self.info_tree["columns"] = ("Tenant ID", "Tenant Name", "Status", "Room ID", "Balance", "Email",
+                                     "Date created")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
-        self.info_tree.column("Tenant ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Tenant ID", anchor="center", width=80)
         self.info_tree.column("Tenant Name", anchor="w", width=120)
         self.info_tree.column("Status", anchor="center", width=80)
+        self.info_tree.column("Room ID", anchor="center", width=80)
         self.info_tree.column("Balance", anchor="w", width=80)
         self.info_tree.column("Email", anchor="w", width=80)
         self.info_tree.column("Date created", anchor="w", width=0, stretch=False)
@@ -1120,6 +1123,7 @@ class Window:
         self.info_tree.heading("Tenant ID", text="Tenant ID", anchor="center")
         self.info_tree.heading("Tenant Name", text="Tenant Name", anchor="w")
         self.info_tree.heading("Status", text="Status", anchor="center")
+        self.info_tree.heading("Room ID", text="Room ID", anchor="center")
         self.info_tree.heading("Balance", text="Balance", anchor="w")
         self.info_tree.heading("Email", text="Email", anchor="w")
         self.info_tree.heading("Date created", text="Date created", anchor="w")
@@ -2005,7 +2009,8 @@ class Window:
 
         # Grab record values
         values = self.info_tree.item(selected, "values")
-        print(values)
+
+        amount_to_be_paid = int(values[6]) + int(values[7])
 
         # ================================================ Widgets for resetting password ==========================
         main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
@@ -2022,50 +2027,77 @@ class Window:
         forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
 
-        ttk.Label(forms1_lf, text='Payment Information',
-                  style="on.TLabel").grid(column=0, row=0, sticky="w")
+        ttk.Label(forms1_lf, text='Payment Description', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
-        ttk.Label(forms1_lf, text='Room cost', style="small_info.TLabel",
-                  justify="left").grid(column=0, row=1, sticky="w")
+        self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
+        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee')
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+        self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
 
-        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
-        self.room_cost_l.grid(column=1, row=1, sticky="w")
+        tk.Button(forms1_lf, text=" Transaction info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.payment_transaction_help).grid(column=2, row=0, sticky="w")
 
+        # Apply discount section
         ttk.Label(forms1_lf, text='Discount Code', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=1, rowspan=2, padx=2.5, pady=20, sticky="w")
 
         self.discount_code_e = ttk.Entry(forms1_lf, width=30)
-        self.discount_code_e.grid(column=1, row=2)
+        self.discount_code_e.grid(column=1, row=1, rowspan=2, sticky="w")
 
         apply_b_lf = tk.LabelFrame(forms1_lf, bd=1, bg="#585456", relief="flat")
-        apply_b_lf.grid(column=2, row=2, padx=10)
+        apply_b_lf.grid(column=2, row=1, rowspan=2, padx=5, sticky="w")
 
         tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#585456", bg="#FFFFFF",
                   relief="flat", command=self.apply_discount_request).pack(fill="x")
 
+        # Payment information section
+        ttk.Label(forms1_lf, text='Payment Information',
+                  style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=4, sticky="w")
+
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[7], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+
+        self.discount_l = ttk.Label(forms1_lf, text="None applied", style="small_info.TLabel", justify="left")
+        self.discount_l.grid(column=1, row=6, sticky="w")
+
+        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=7, padx=2.5, sticky="w")
+
+        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=amount_to_be_paid,
+                                             style="small_info.TLabel", justify="left")
+        self.amount_to_be_paid_l.grid(column=1, row=7, sticky="w")
+
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms2_lf, text='Payment description', style="h2.TLabel",
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
-        self.payment_description_cb = ttk.Combobox(forms2_lf)
-        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee')
-        self.payment_description_cb.current(0)
-        self.payment_description_cb.grid(column=1, row=0, sticky="w")
-
-        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
-
         self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.tenant_id_sp.grid(column=1, row=1, sticky="w")
+        self.tenant_id_sp.grid(column=1, row=0, sticky="w")
         self.tenant_id_sp.focus()
 
         ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.payment_amount_sp.grid(column=1, row=2, sticky="w")
+        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+        self.payment_amount_sp.insert(0, amount_to_be_paid)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -2101,6 +2133,10 @@ class Window:
         ttk.Label(title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
+        tk.Button(title_lf, text=" Status info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.tenant_status_transaction_help).pack(side="right", anchor="ne", padx=5, pady=5)
+
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
@@ -2124,14 +2160,16 @@ class Window:
                   justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
-        self.tenant_status_cb['values'] = ('Active', 'Inactive', "Delinquent")
-        self.tenant_status_cb.current(1)
+        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Active', 'Inactive',
+                                           "Delinquent")
+        self.tenant_status_cb.current(0)
         self.tenant_status_cb.grid(column=1, row=3, sticky="w")
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Create account", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Create account", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
                   command=self.create_tenant_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create a tenant account!",
@@ -2161,6 +2199,10 @@ class Window:
         ttk.Label(title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
+        tk.Button(title_lf, text=" Status info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.tenant_status_transaction_help).pack(side="right", anchor="ne", padx=5, pady=5)
+
         forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms_lf.pack(side="top", fill="both", expand=True)
 
@@ -2184,8 +2226,9 @@ class Window:
                   justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
-        self.tenant_status_cb['values'] = ('Active', 'Inactive', "Delinquent")
-        self.tenant_status_cb.current(1)
+        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Active', 'Inactive',
+                                           "Delinquent")
+        self.tenant_status_cb.current(0)
         self.tenant_status_cb.grid(column=1, row=3, sticky="w")
 
         # Grab record number
@@ -2197,7 +2240,7 @@ class Window:
 
         # Insert values to entry widgets
         self.tenant_name_e.insert(0, values[1])
-        self.tenant_email_e.insert(0, values[4])
+        self.tenant_email_e.insert(0, values[5])
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -2220,6 +2263,8 @@ class Window:
         self.dialog_box_top.configure(bg="#FFFFFF")
         self.dialog_box_top.resizable(False, False)
 
+        amount_to_be_paid = 500
+
         # ================================================ Widgets for resetting password ==========================
         main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
         main_lf.pack(padx=15, pady=15, fill="both", expand=True)
@@ -2232,45 +2277,73 @@ class Window:
         ttk.Label(title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
+        tk.Button(title_lf, text=" Transaction info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.payment_transaction_help).pack(side="right", anchor="ne", padx=5, pady=5)
+
         forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
 
+        ttk.Label(forms1_lf, text='Payment Description', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
+        self.payment_description_cb['values'] = ('Application fee',)
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+        self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
+
+        # Apply discount section
         ttk.Label(forms1_lf, text='Discount Code', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, sticky="w")
+                  justify="left").grid(column=0, row=1, rowspan=2, padx=2.5, pady=20, sticky="w")
 
         self.discount_code_e = ttk.Entry(forms1_lf, width=30)
-        self.discount_code_e.grid(column=1, row=2)
+        self.discount_code_e.grid(column=1, row=1, rowspan=2, sticky="w")
 
         apply_b_lf = tk.LabelFrame(forms1_lf, bd=1, bg="#585456", relief="flat")
-        apply_b_lf.grid(column=2, row=2, padx=10)
+        apply_b_lf.grid(column=2, row=1, rowspan=2, padx=5, sticky="w")
 
         tk.Button(apply_b_lf, text="Apply", font="OpenSans, 10", fg="#585456", bg="#FFFFFF",
                   relief="flat", command=self.apply_discount_request).pack(fill="x")
 
+        # Payment information section
+        ttk.Label(forms1_lf, text='Payment Information',
+                  style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=amount_to_be_paid, style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=4, sticky="w")
+
+        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
+
+        self.discount_l = ttk.Label(forms1_lf, text="None applied", style="small_info.TLabel", justify="left")
+        self.discount_l.grid(column=1, row=5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+
+        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=amount_to_be_paid,
+                                             style="small_info.TLabel", justify="left")
+        self.amount_to_be_paid_l.grid(column=1, row=6, sticky="w")
+
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
 
-        ttk.Label(forms2_lf, text='Payment description', style="h2.TLabel",
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
-        self.payment_description_cb = ttk.Combobox(forms2_lf)
-        self.payment_description_cb['values'] = ('Application fee',)
-        self.payment_description_cb.current(0)
-        self.payment_description_cb.grid(column=1, row=0, sticky="w")
-
-        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
-                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
-
-        self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.tenant_id_sp.grid(column=1, row=1, sticky="w")
-        self.tenant_id_sp.insert(0, self.tenant_id)
-        self.tenant_id_sp.config(state="disabled")
+        ttk.Label(forms2_lf, text=self.tenant_id, style="small_info.TLabel",
+                  justify="left").grid(column=1, row=0, sticky="w")
 
         ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
-        self.payment_amount_sp.grid(column=1, row=2, sticky="w")
+        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+        self.payment_amount_sp.insert(0, amount_to_be_paid)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -3110,53 +3183,66 @@ class Window:
                 self.invalid_input()
                 print(e)
 
-    def apply_discount_request(self):
-        if not self.discount_code_e.get():
-            self.invalid_input()
-        else:
-            try:
-                self.database_connect()
-
-                self.mycursor.execute(
-                    "SELECT * FROM discount where discount_code = '" + self.discount_code_e.get() +
-                    "' and admin_id = '" + str(self.admin_id_str) + "';")
-                myresult = self.mycursor.fetchone()
-                if myresult is None:
-                    tk.messagebox.showerror("Error", "Invalid Discount Code")
-                else:
-                    self.mycursor.execute(
-                        "SELECT DISTINCT discount_amount FROM discount where discount_code = '"
-                        + self.discount_code_e.get() + "' and admin_id = '" + str(self.admin_id_str) + "';")
-
-                    # Converts the tuple into integer
-                    discount_amount = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
-                    discounted_price = (int(self.room_cost_l.cget("text")) - (int(self.room_cost_l.cget("text")) *
-                                                                              discount_amount / 100))
-                    self.room_cost_l.config(text=discounted_price)
-
-                self.db1.close()
-                self.mycursor.close()
-            except Exception as e:
-                self.invalid_request()
-                print(e)
-
     def create_room_transaction_request(self):
         if not self.tenant_id_sp.get():
             self.invalid_input()
         if not self.payment_amount_sp.get():
             self.invalid_input()
+        if self.payment_description_cb.get() == "Confirmation fee":
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), str(self.room_id),
+                                       self.tenant_id_sp.get(),
+                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
+                                      + self.room_id + "' WHERE tenant_id = '"
+                                      + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                # self.room_add_occupant()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
         if self.payment_description_cb.get() == "Processing fee":
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+            print(values)
+
+            capacity_convert = values[5]
+            current_occupant = values[8]
+            print(capacity_convert)
+            print(current_occupant)
+            print(type(current_occupant))
+            print(type(int(current_occupant)))
+
+            """
             # Get room_capacity
             self.database_connect()
-
+            
+            
             self.mycursor.execute(
                 "SELECT DISTINCT room_capacity FROM room where room_id = '"
                 + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
 
             # Converts the tuple into integer
             capacity_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
-            self.db1.close()
-            self.mycursor.close()
 
             # Get current_occupants
             self.database_connect()
@@ -3206,7 +3292,7 @@ class Window:
                 self.db1.close()
                 self.mycursor.close()
 
-                self.create_room_transaction_child_request()
+                self.create_room_transaction_child_request()"""
         else:
             self.create_room_transaction_child_request()
 
@@ -3220,7 +3306,6 @@ class Window:
                                    self.tenant_id_sp.get(),
                                    str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
                                    self.discount_code_e.get(), self.payment_description_cb.get()))
-
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
@@ -3230,7 +3315,6 @@ class Window:
             messagebox.showinfo("Success", "Transaction is  created")
 
             self.dialog_box_top.destroy()
-            self.show_room_information_module()
 
         except Exception as e:
             self.invalid_request()
@@ -3275,7 +3359,6 @@ class Window:
 
             messagebox.showinfo("Success", "Removed room successfully")
 
-            self.home_content_interface()
         except Exception as e:
             self.invalid_input()
             print(e)
@@ -3374,8 +3457,8 @@ class Window:
 
     def tenant_info_treeview_request(self):
         self.database_connect()
-        self.mycursor.execute("SELECT tenant.tenant_id, tenant.tenant_name, tenant.tenant_status, "
-                              "tenant.tenant_balance, tenant.tenant_email, tenant.date_created FROM tenant where "
+        self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                              "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t where "
                               "admin_id = '" + str(self.admin_id_str) + "';")
 
         tenants = self.mycursor.fetchall()
@@ -3388,12 +3471,12 @@ class Window:
         for record in tenants:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                      tags=("oddrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                      tags=("evenrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]), tags=("evenrow",))
             count += 1
 
         self.db1.commit()
@@ -3401,20 +3484,20 @@ class Window:
         self.db1.close()
 
     def create_tenant_transaction_request(self):
-        if not self.tenant_id_sp.get():
-            self.invalid_input()
         if not self.payment_amount_sp.get():
             self.invalid_input()
-        else:
+        if self.payment_description_cb.get() == "Application fee":
             try:
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
                                       "basic_user_id, date_created, discount_code, payment_description) "
                                       "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), self.tenant_id_sp.get(),
+                                      (self.payment_amount_sp.get(), self.tenant_id,
                                        str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
 
+                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Application' WHERE tenant_id = '"
+                                      + self.tenant_id + "' AND admin_id = '" + self.admin_id_str + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -3422,6 +3505,29 @@ class Window:
                 # self.room_add_occupant()
 
                 messagebox.showinfo("Success", "Transaction is  created")
+                print("Application")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), self.tenant_id,
+                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+                print("Not application")
 
                 self.dialog_box_top.destroy()
 
@@ -3683,6 +3789,39 @@ class Window:
         except Exception as e:
             self.invalid_input()
             print(e)
+
+    def apply_discount_request(self):
+        if not self.discount_code_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+
+                self.mycursor.execute(
+                    "SELECT * FROM discount where discount_code = '" + self.discount_code_e.get() +
+                    "' and admin_id = '" + str(self.admin_id_str) + "';")
+                myresult = self.mycursor.fetchone()
+                if myresult is None:
+                    tk.messagebox.showerror("Error", "Invalid Discount Code")
+                else:
+                    self.mycursor.execute(
+                        "SELECT DISTINCT discount_amount FROM discount where discount_code = '"
+                        + self.discount_code_e.get() + "' and admin_id = '" + str(self.admin_id_str) + "';")
+
+                    # Converts the tuple into integer
+                    discount_amount = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                    discounted_price = (int(self.amount_to_be_paid_l.cget("text")) -
+                                        (int(self.amount_to_be_paid_l.cget("text")) * discount_amount / 100))
+                    self.amount_to_be_paid_l.config(text=discounted_price)
+                    self.discount_l.config(text=discount_amount)
+                    self.payment_amount_sp.delete(0, "end")
+                    self.payment_amount_sp.insert(0, discounted_price)
+
+                self.db1.close()
+                self.mycursor.close()
+            except Exception as e:
+                self.invalid_request()
+                print(e)
 
     # Accounts
 
@@ -4026,6 +4165,28 @@ class Window:
         self.action_history_b.configure(fg='#7c8084', image=self.action_history_inactive_im_resized)
         self.notif_b.configure(fg='#7c8084', image=self.notif_inactive_im_resized)
 
+    def change_payment_information(self, event):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        if self.payment_description_cb.get() == "Confirmation fee":
+            amount_to_be_paid = int(values[6]) + int(values[7])
+        elif self.payment_description_cb.get() == "Processing fee":
+            amount_to_be_paid = (((int(values[6]) + int(values[7])) * 2) + 1500)
+        elif self.payment_description_cb.get() == "Application fee":
+            amount_to_be_paid = 500
+        else:
+            amount_to_be_paid = 0
+
+        self.amount_to_be_paid_l.config(text=amount_to_be_paid)
+        self.payment_amount_sp.delete(0, "end")
+        self.payment_amount_sp.insert(0, amount_to_be_paid)
+
+        print(event)
+
     def admin_status(self):
         if self.admin_access:
             self.admin_access_status = "On"
@@ -4038,6 +4199,110 @@ class Window:
             self.admin_access = False
         else:
             pass
+
+    def tenant_status_transaction_help(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Tenant status")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Tenant status',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        content_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        content_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        # Payment transaction information section
+        ttk.Label(content_lf, text='Newly Registered - ', style="on.TLabel").grid(column=0, row=0, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text="Tenant's account is newly registered.",
+                  style="h2_small.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(content_lf, text='Application - ', style="on.TLabel").grid(column=0, row=1, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text='Tenant issued payment for application fee.',
+                  style="h2_small.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(content_lf, text='Confirmation - ', style="on.TLabel").grid(column=0, row=2, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text='Tenant issued payment for confirmation fee.',
+                  style="h2_small.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(content_lf, text='Active - ', style="on.TLabel").grid(column=0, row=3, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text='Tenant are in active lease, and are complete in payments.',
+                  style="h2_small.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(content_lf, text='Inactive - ', style="on.TLabel").grid(column=0, row=4, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text="Tenant's lease are inactive, and are no longer renting in the dorm.",
+                  style="h2_small.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(content_lf, text='Delinquent - ', style="on.TLabel").grid(column=0, row=5, pady=2.5, sticky="w")
+
+        ttk.Label(content_lf, text='Tenant are delinquent in payment.',
+                  style="h2_small.TLabel").grid(column=1, row=5, sticky="w")
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+    def payment_transaction_help(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Payment transactions")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Payment transactions',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        content_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        content_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        # Payment transaction information section
+        ttk.Label(content_lf, text='Application fee - ', style="on.TLabel").grid(column=0, row=0, sticky="nw")
+
+        ttk.Label(content_lf, text='DormBuilt, Inc. requires a fee for tenants that are interested in booking rooms. \n'
+                                   'Application fee amounts to 500 pesos only.',
+                  style="h2_small.TLabel").grid(column=1, row=0, rowspan=3, sticky="w")
+
+        ttk.Label(content_lf, text='Confirmation fee - ', style="on.TLabel").grid(column=0, row=3, sticky="nw")
+
+        ttk.Label(content_lf, text='After payment of the application fee. A confirmation fee is required - 1 month \n'
+                                   'cost of room and amenities. Application and Confirmation Fee are both part of the\n'
+                                   'initial payment required by DormBuilt, Inc.',
+                  style="h2_small.TLabel").grid(column=1, row=3, rowspan=4, sticky="w")
+
+        ttk.Label(content_lf, text='Processing fee - ', style="on.TLabel").grid(column=0, row=7, sticky="nw")
+
+        ttk.Label(content_lf, text='After the initial payment, tenants are then required of payment for Processing \n'
+                                   'fee - One thousand and five hundred pesos plus 2 month security deposit on both\n'
+                                   'the cost of room and amenities.',
+                  style="h2_small.TLabel").grid(column=1, row=7, rowspan=4, sticky="w")
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
 
     def room_info_section(self, event):
         Content_control.destroy_content(self.info_buttons_lf)
