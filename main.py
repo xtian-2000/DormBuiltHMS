@@ -243,6 +243,7 @@ class Window:
         self.bug_description_e = ttk.Entry
 
         self.discount_code_e = ttk.Entry
+        self.search_e = ttk.Entry
 
         # Spinbox
         self.room_number_sp = ttk.Spinbox
@@ -804,6 +805,11 @@ class Window:
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
+
+        self.search_e = ttk.Entry(payment_info_title_lf, width=60)
+        self.search_e.grid(column=1, row=1)
+
+        ttk.Label(payment_info_title_lf, text="Search", style="h2_small.TLabel").pack(side="right", padx=5, pady=5)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
@@ -3217,6 +3223,7 @@ class Window:
             except Exception as e:
                 self.invalid_request()
                 print(e)
+
         if self.payment_description_cb.get() == "Processing fee":
             # Grab record number
             selected = self.info_tree.focus()
@@ -3225,100 +3232,78 @@ class Window:
             values = self.info_tree.item(selected, "values")
             print(values)
 
-            capacity_convert = values[5]
-            current_occupant = values[8]
-            print(capacity_convert)
-            print(current_occupant)
-            print(type(current_occupant))
-            print(type(int(current_occupant)))
+            capacity = int(values[5])
+            current_occupant = int(values[8])
 
-            """
-            # Get room_capacity
-            self.database_connect()
-            
-            
-            self.mycursor.execute(
-                "SELECT DISTINCT room_capacity FROM room where room_id = '"
-                + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
-
-            # Converts the tuple into integer
-            capacity_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
-
-            # Get current_occupants
-            self.database_connect()
-
-            self.mycursor.execute(
-                "SELECT DISTINCT current_occupants FROM room where room_id = '"
-                + str(self.room_id) + "' and admin_id = '" + str(self.admin_id_str) + "';")
-            self.db1.close()
-            self.mycursor.close()
-
-            # Converts the tuple into integer
-            current_occupant_convert = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
-            current_occupant = current_occupant_convert + 1
-
-            if capacity_convert <= current_occupant_convert:
+            if capacity <= current_occupant:
                 self.room_full_error()
-            else:
-                if capacity_convert <= current_occupant:
-                    room_status = "Fully Occupied"
-                    self.database_connect()
-                    self.mycursor.execute("UPDATE room SET room_availability = '"
-                                          + str(room_status) + "' WHERE room_id = '"
-                                          + self.room_id + "';")
+            else:  # 2 1
+                if capacity > current_occupant + 1:
+                    try:
+                        self.database_connect()
 
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
+                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                              "basic_user_id, date_created, discount_code, payment_description) "
+                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                               str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                        self.mycursor.execute("UPDATE room SET current_occupants = '"
+                                              + str(current_occupant + 1) + "' WHERE room_id = '"
+                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+                    except Exception as e:
+                        self.invalid_request()
+                        print(e)
                 else:
-                    print("Not fully occupied")
+                    print("current occupant = capacity")
+                    try:
+                        self.database_connect()
 
-                self.database_connect()
-                self.mycursor.execute("UPDATE room SET current_occupants = '"
-                                      + str(current_occupant) + "' WHERE room_id = '"
-                                      + self.room_id + "';")
+                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                              "basic_user_id, date_created, discount_code, payment_description) "
+                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                               self.admin_id_str, str(self.basic_user_id_str), date_time_str,
+                                               self.discount_code_e.get(), self.payment_description_cb.get()))
 
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+                        self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
+                                              "current_occupants = '"
+                                              + str(current_occupant + 1) + "' WHERE room_id = '"
+                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
 
-                self.database_connect()
-                status = "Active"
-                self.mycursor.execute("UPDATE tenant SET tenant_status = '" + status + "' WHERE tenant_id = '"
-                                      + self.tenant_id_sp.get() + "';")
-                print(self.tenant_id_sp.get())
+                        messagebox.showinfo("Success", "Tenant's account is created")
 
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+                        self.dialog_box_top.destroy()
 
-                self.create_room_transaction_child_request()"""
+                    except Exception as e:
+                        self.invalid_request()
+                        print(e)
         else:
-            self.create_room_transaction_child_request()
+            try:
+                self.database_connect()
 
-    def create_room_transaction_child_request(self):
-        try:
-            self.database_connect()
-            self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                  "basic_user_id, date_created, discount_code, payment_description) "
-                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                  (self.payment_amount_sp.get(), str(self.room_id),
-                                   self.tenant_id_sp.get(),
-                                   str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
-                                   self.discount_code_e.get(), self.payment_description_cb.get()))
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                       self.admin_id_str, str(self.basic_user_id_str), date_time_str,
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
 
-            # self.room_add_occupant()
+                messagebox.showinfo("Success", "Tenant's account is created")
 
-            messagebox.showinfo("Success", "Transaction is  created")
+                self.dialog_box_top.destroy()
 
-            self.dialog_box_top.destroy()
-
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+            except Exception as e:
+                self.invalid_request()
+                print(e)
 
     def room_add_occupant(self):
         remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
@@ -3406,7 +3391,6 @@ class Window:
                 messagebox.showinfo("Success", "Tenant's account is created")
 
                 self.dialog_box_top.destroy()
-                self.tenant_content_interface()
 
             except Exception as e:
                 self.invalid_input()
@@ -3537,36 +3521,40 @@ class Window:
 
     # Payment
     def payment_info_treeview_request(self):
-        self.database_connect()
-        self.mycursor.execute("SELECT p.payment_id, p.tenant_id, tenant.tenant_name, p.payment_amount, p.room_id, "
-                              "p.admin_id, p.basic_user_id, p.discount_code, "
-                              "p.payment_description, p.date_created, tenant.tenant_email FROM payment p "
-                              "INNER JOIN tenant ON p.tenant_id = tenant.tenant_id;")
+        try:
+            self.database_connect()
+            self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                                  "p.admin_id, p.basic_user_id, p.discount_code, "
+                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
+                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id;")
 
-        payments = self.mycursor.fetchall()
-        print(payments)
+            payments = self.mycursor.fetchall()
+            print(payments)
 
-        # Create configure for striped rows
-        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+            # Create configure for striped rows
+            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-        count = 0
-        for record in payments:
-            if count % 2 == 0:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7], record[8], record[9], record[10]),
-                                      tags=("oddrow",))
-            else:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7], record[8], record[9], record[10]),
-                                      tags=("evenrow",))
-            count += 1
+            count = 0
+            for record in payments:
+                if count % 2 == 0:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7], record[8], record[9], record[10]),
+                                          tags=("oddrow",))
+                else:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7], record[8], record[9], record[10]),
+                                          tags=("evenrow",))
+                count += 1
 
-        self.db1.commit()
-        self.mycursor.close()
-        self.db1.close()
+            self.db1.commit()
+            self.mycursor.close()
+            self.db1.close()
+        except Exception as e:
+            self.invalid_request()
+            print(e)
 
     def remove_payment_request(self):
         try:
