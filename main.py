@@ -217,6 +217,7 @@ class Window:
         self.dashboard_b = tk.Button
         self.tenants_b = tk.Button
         self.payments_b = tk.Button
+        self.booking_b = tk.Button
         self.discounts_b = tk.Button
         self.accounts_b = tk.Button
         self.action_history_b = tk.Button
@@ -274,6 +275,9 @@ class Window:
 
         # Treeview
         self.info_tree = ttk.Treeview
+
+        # File Dialog
+        self.save_file_dialog = None
 
         # String
         self.admin_id_str = str
@@ -3771,6 +3775,7 @@ class Window:
         self.save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
                                                          defaultextension='.pdf',
                                                          title="Save file")
+        print(type(self.save_file_dialog))
         receipt_pdf = FPDF()
         receipt_pdf.set_font('helvetica', '', 10)
         receipt_pdf.add_page()
@@ -4281,9 +4286,8 @@ class Window:
     # Notif
     def notif_info_treeview_request(self):
         self.database_connect()
-        self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
-                              "n.date_created FROM notif n WHERE admin_id = ' "
-                              + str(self.admin_id_str) + "';")
+        self.mycursor.execute("SELECT notif_id, notif_subject, notif_description, admin_id, "
+                              "date_created FROM notif  WHERE admin_id = '" + self.admin_id_str + "';")
 
         notif = self.mycursor.fetchall()
         print(notif)
