@@ -291,6 +291,8 @@ class Window:
 
         self.employee_id = int
 
+        self.booking_id = int
+
         # Boolean
         self.admin_access = False
         self.basic_user_access = True
@@ -819,12 +821,12 @@ class Window:
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
-
+        """
         self.search_e = ttk.Entry(payment_info_title_lf, width=60)
         self.search_e.pack(side="right", anchor="nw", padx=5, pady=5)
 
         ttk.Label(payment_info_title_lf, text="Search", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5,
-                                                                                      pady=5)
+                                                                                      pady=5)"""
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
@@ -857,7 +859,7 @@ class Window:
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
-                  bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
+                  bg="#FFFFFF", relief="flat", command=self.show_booking_information_module).pack(fill="x")
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
@@ -1105,7 +1107,7 @@ class Window:
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
-        self.info_tree.column("Room ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Room ID", anchor="center", width=80)
         self.info_tree.column("Room Number", anchor="center", width=80)
         self.info_tree.column("Description", anchor="center", width=0, stretch=False)
         self.info_tree.column("Type", anchor="w", width=120)
@@ -1166,7 +1168,7 @@ class Window:
         self.info_tree.column("#0", width=0, stretch=False)
         self.info_tree.column("Tenant ID", anchor="center", width=80)
         self.info_tree.column("Tenant Name", anchor="w", width=120)
-        self.info_tree.column("Status", anchor="center", width=80)
+        self.info_tree.column("Status", anchor="w", width=80)
         self.info_tree.column("Room ID", anchor="center", width=80)
         self.info_tree.column("Balance", anchor="w", width=80)
         self.info_tree.column("Email", anchor="w", width=80)
@@ -1176,7 +1178,7 @@ class Window:
         self.info_tree.heading("#0", text="", anchor="w")
         self.info_tree.heading("Tenant ID", text="Tenant ID", anchor="center")
         self.info_tree.heading("Tenant Name", text="Tenant Name", anchor="w")
-        self.info_tree.heading("Status", text="Status", anchor="center")
+        self.info_tree.heading("Status", text="Status", anchor="w")
         self.info_tree.heading("Room ID", text="Room ID", anchor="center")
         self.info_tree.heading("Balance", text="Balance", anchor="w")
         self.info_tree.heading("Email", text="Email", anchor="w")
@@ -1310,7 +1312,8 @@ class Window:
 
         # Create treeview
         self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
-        self.info_tree["columns"] = ("Booking ID", "Tenant Name", "Tenant Email", "Admin ID", "Date Created")
+        self.info_tree["columns"] = ("Booking ID", "Tenant Name", "Tenant Email", "Admin ID", "Booking Status",
+                                     "Date Created")
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
@@ -1318,6 +1321,7 @@ class Window:
         self.info_tree.column("Tenant Name", anchor="w", width=80)
         self.info_tree.column("Tenant Email", anchor="w", width=80)
         self.info_tree.column("Admin ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Booking Status", anchor="w", width=80)
         self.info_tree.column("Date Created", anchor="center", width=80)
 
         # Create headings
@@ -1326,6 +1330,7 @@ class Window:
         self.info_tree.heading("Tenant Name", text="Tenant Name", anchor="w")
         self.info_tree.heading("Tenant Email", text="Tenant Email", anchor="w")
         self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Booking Status", text="Booking Status", anchor="w")
         self.info_tree.heading("Date Created", text="Date Created", anchor="center")
 
         self.info_tree.pack(side="top", fill="x")
@@ -3433,9 +3438,9 @@ class Window:
                     try:
                         self.database_connect()
 
-                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                              "basic_user_id, date_created, discount_code, payment_description) "
-                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                              "admin_id, basic_user_id, date_created, discount_code, "
+                                              "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                               (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
                                                self.admin_id_str, str(self.basic_user_id_str), date_time_str,
                                                self.discount_code_e.get(), self.payment_description_cb.get()))
@@ -3444,6 +3449,12 @@ class Window:
                                               "current_occupants = '"
                                               + str(current_occupant + 1) + "' WHERE room_id = '"
                                               + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
+                                              "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                              ('Room Availability',
+                                               ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
+                                               self.admin_id_str))
                         self.db1.commit()
                         self.db1.close()
                         self.mycursor.close()
@@ -3611,7 +3622,7 @@ class Window:
     def tenant_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                              "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t where "
+                              "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
                               "admin_id = '" + str(self.admin_id_str) + "';")
 
         tenants = self.mycursor.fetchall()
@@ -3695,7 +3706,8 @@ class Window:
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, t.tenant_email FROM payment p "
-                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id;")
+                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.admin_id = '" + str(self.admin_id_str) + "';")
 
             payments = self.mycursor.fetchall()
             print(payments)
@@ -3841,7 +3853,7 @@ class Window:
         try:
             self.database_connect()
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.date_created FROM booking b where admin_id = ' "
+                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
                                   + str(self.admin_id_str) + "';")
 
             bookings = self.mycursor.fetchall()
@@ -3855,11 +3867,11 @@ class Window:
             for record in bookings:
                 if count % 2 == 0:
                     self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4]),
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                           tags=("oddrow",))
                 else:
                     self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4]),
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                           tags=("evenrow",))
                 count += 1
 
@@ -3882,7 +3894,8 @@ class Window:
                                       (self.tenant_name_e.get(), self.tenant_email_e.get(), self.tenant_status_cb.get(),
                                        date_time_str, self.admin_id_str))
 
-                self.mycursor.execute("UPDATE booking SET booking_status = 'Registered already';")
+                self.mycursor.execute("UPDATE booking SET booking_status = 'Registered already' WHERE booking_id = '"
+                                      + self.booking_id + "';")
 
                 self.db1.commit()
                 self.db1.close()
@@ -4871,6 +4884,8 @@ class Window:
         values = self.info_tree.item(selected, "values")
         print(values)
 
+        self.booking_id = values[0]
+
         ttk.Label(info_lf, text='Booking ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
 
         ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
@@ -4887,9 +4902,13 @@ class Window:
 
         ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
+        ttk.Label(info_lf, text='Booking Status: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
         ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
-        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
