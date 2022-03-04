@@ -807,9 +807,10 @@ class Window:
                   bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
 
         self.search_e = ttk.Entry(payment_info_title_lf, width=60)
-        self.search_e.grid(column=1, row=1)
+        self.search_e.pack(side="right", anchor="nw", padx=5, pady=5)
 
-        ttk.Label(payment_info_title_lf, text="Search", style="h2_small.TLabel").pack(side="right", padx=5, pady=5)
+        ttk.Label(payment_info_title_lf, text="Search", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5,
+                                                                                      pady=5)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
