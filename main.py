@@ -34,12 +34,14 @@ date_today = datetime.now()
 date_today_str = date_today.strftime("%d/%m/%Y %H:%M:%S")
 
 # Create variable for first day of the month
-fday_month = datetime.today().replace(day=1)
-fday_month = fday_month.strftime("%d/%m/%Y %H:%M:%S")
+fday_month = datetime.today().replace(day=1, hour=00, minute=00, second=00)
+fday_month_dependencies = fday_month.strftime("%d/%m/%Y %H:%M:%S")
+fday_month_temp = fday_month.strftime("%d/%m/%Y")
 
 # Create variable for current day of the month
 currentday_month = datetime.today()
-currentday_month = currentday_month.strftime("%d/%m/%Y %H:%M:%S")
+currentday_month_dependencies = currentday_month.strftime("%d/%m/%Y %H:%M:%S")
+currentday_month_temp = currentday_month.strftime("%d/%m/%Y")
 
 hms_version = "DORv1.32"
 
@@ -715,14 +717,14 @@ class Window:
                   command=self.show_sales_dashboard_module).pack(fill="x")
 
         # Filter
-        self.dashboard_filter_to = DateEntry(payment_info_title_lf, width=15,
+        self.dashboard_filter_to = DateEntry(payment_info_title_lf, width=20,
                                              date_pattern="DD/mm/yyyy", borderwidth=2)
         self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
 
         ttk.Label(payment_info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
                                                                                   anchor="nw", padx=5, pady=5)
 
-        self.dashboard_filter_from = DateEntry(payment_info_title_lf, width=15,
+        self.dashboard_filter_from = DateEntry(payment_info_title_lf, width=20,
                                                date_pattern="DD/mm/yyyy", borderwidth=2)
         self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
 
@@ -731,10 +733,10 @@ class Window:
 
         # Insert values to Date Entry
         self.dashboard_filter_from.delete(0, "end")
-        self.dashboard_filter_from.insert(0, fday_month)
+        self.dashboard_filter_from.insert(0, fday_month_temp)
 
         self.dashboard_filter_to.delete(0, "end")
-        self.dashboard_filter_to.insert(0, currentday_month)
+        self.dashboard_filter_to.insert(0, currentday_month_temp)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
@@ -3427,6 +3429,11 @@ class Window:
                                                str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
                                                self.discount_code_e.get(), self.payment_description_cb.get()))
 
+                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Active', room_id = '"
+                                              + self.room_id + "' WHERE tenant_id = '"
+                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                              + self.admin_id_str + "';")
+
                         self.mycursor.execute("UPDATE room SET current_occupants = '"
                                               + str(current_occupant + 1) + "' WHERE room_id = '"
                                               + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
@@ -3434,11 +3441,15 @@ class Window:
                         self.db1.commit()
                         self.db1.close()
                         self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Payment is created")
+
+                        self.dialog_box_top.destroy()
+
                     except Exception as e:
                         self.invalid_request()
                         print(e)
                 else:
-                    print("current occupant = capacity")
                     try:
                         self.database_connect()
 
@@ -3454,6 +3465,11 @@ class Window:
                                               + str(current_occupant + 1) + "' WHERE room_id = '"
                                               + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
 
+                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing', room_id = '"
+                                              + self.room_id + "' WHERE tenant_id = '"
+                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                              + self.admin_id_str + "';")
+
                         self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
                                               "date_created, admin_id) VALUES (%s,%s,%s,%s)",
                                               ('Room Availability',
@@ -3463,7 +3479,7 @@ class Window:
                         self.db1.close()
                         self.mycursor.close()
 
-                        messagebox.showinfo("Success", "Tenant's account is created")
+                        messagebox.showinfo("Success", "Payment is created")
 
                         self.dialog_box_top.destroy()
 
@@ -3586,25 +3602,71 @@ class Window:
         if not self.tenant_status_cb.get():
             self.invalid_input()
         else:
-            try:
-                self.database_connect()
+            # Grab record number
+            selected = self.info_tree.focus()
 
-                self.mycursor.execute("UPDATE tenant SET tenant_name = '"
-                                      + self.tenant_name_e.get() + "', tenant_email= '"
-                                      + self.tenant_email_e.get() + "', tenant_status = '"
-                                      + self.tenant_status_cb.get() + "'  WHERE tenant_id = '"
-                                      + self.tenant_id + "';")
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+            print(values)
+            print("inactive")
 
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+            if self.tenant_status_cb.get() == 'Inactive' and values[2] == 'Active':
+                try:
+                    self.database_connect()
+                    self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1 WHERE room_id = '"
+                                          + values[3] + "' AND admin_id = '" + self.admin_id_str + "';")
 
-                messagebox.showinfo("Success", "Tenant information is modified successfully")
+                    self.mycursor.execute("UPDATE tenant SET tenant_name = '"
+                                          + self.tenant_name_e.get() + "', tenant_email= '"
+                                          + self.tenant_email_e.get() + "', tenant_status = '"
+                                          + self.tenant_status_cb.get() + "', room_id = '0'  WHERE tenant_id = '"
+                                          + self.tenant_id + "';")
 
-                self.dialog_box_top.destroy()
-            except Exception as e:
-                self.invalid_input()
-                print(e)
+                    self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
+                                          "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                          ('Modify tenant',
+                                           ('Tenant information of ' + self.tenant_name_e.get() + ' is modified.'),
+                                           date_time_str, self.admin_id_str))
+
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+
+                    messagebox.showinfo("Success", "Tenant information is modified successfully")
+
+                    self.dialog_box_top.destroy()
+
+                except Exception as e:
+                    self.invalid_input()
+                    print(e)
+
+            else:
+                try:
+                    self.database_connect()
+
+                    self.mycursor.execute("UPDATE tenant SET tenant_name = '"
+                                          + self.tenant_name_e.get() + "', tenant_email= '"
+                                          + self.tenant_email_e.get() + "', tenant_status = '"
+                                          + self.tenant_status_cb.get() + "'  WHERE tenant_id = '"
+                                          + self.tenant_id + "';")
+
+                    self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
+                                          "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                          ('Modify tenant',
+                                           ('Tenant information of ' + self.tenant_name_e.get() + ' is modified.'),
+                                           date_time_str, self.admin_id_str))
+
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+
+                    messagebox.showinfo("Success", "Tenant information is modified successfully")
+
+                    self.dialog_box_top.destroy()
+
+                except Exception as e:
+                    self.invalid_input()
+                    print(e)
 
     def remove_tenant_account_request(self):
         try:
@@ -4650,6 +4712,8 @@ class Window:
                   command=self.remove_room_account_request).pack(side="top", pady=5, fill="x")
 
         # ================================================ Room graphical representation ===============================
+        availability = "None"
+        availability_im = None
         # Condition for tenant capacity
         if values[5] == "1":
             img = self.single_bed_im_resized
