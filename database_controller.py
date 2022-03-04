@@ -319,6 +319,27 @@ class Database:
             print("'booking' table could not be created")
             print(e)
 
+        # Alter booking table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` ADD COLUMN `status` VARCHAR(45) NOT NULL AFTER "
+                                  "`date_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # Alter booking table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` CHANGE COLUMN `status` `booking_status` "
+                                  "VARCHAR(45) NOT NULL , ADD UNIQUE INDEX `tenant_name_UNIQUE` (`tenant_name` ASC) "
+                                  "VISIBLE, ADD UNIQUE INDEX `tenant_email_UNIQUE` (`tenant_email` ASC) VISIBLE;;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # Creating notif table in database
         try:
             self.mycursor = self.db1.cursor()

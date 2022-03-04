@@ -79,6 +79,9 @@ class Window:
         download_im = PhotoImage(file=r"download_b.png")
         self.download_im_resized = download_im.subsample(1, 1)
 
+        create_tenant_basic_im = PhotoImage(file=r"create_tenant_basic_b.png")
+        self.create_tenant_basic_im_resized = create_tenant_basic_im.subsample(1, 1)
+
         exclamation_im = PhotoImage(file=r"exclamation_mark.png")
         self.exclamation_im_resized = exclamation_im.subsample(1, 1)
 
@@ -168,6 +171,12 @@ class Window:
 
         tenant_inactive_im = PhotoImage(file=r"tenant_inactive_b.png")
         self.tenant_inactive_im_resized = tenant_inactive_im.subsample(1, 1)
+
+        booking_active_im = PhotoImage(file=r"booking_active_b.png")
+        self.booking_active_im_resized = booking_active_im.subsample(1, 1)
+
+        booking_inactive_im = PhotoImage(file=r"booking_inactive_b.png")
+        self.booking_inactive_im_resized = booking_inactive_im.subsample(1, 1)
 
         payment_active_im = PhotoImage(file=r"payment_active_b.png")
         self.payment_active_im_resized = payment_active_im.subsample(1, 1)
@@ -562,6 +571,11 @@ class Window:
                                     compound="left", command=self.payment_content_interface)
         self.payments_b.pack(side="top", anchor="w")
 
+        self.booking_b = tk.Button(left_nav_lf, text=" Booking", font=("OpenSans", 15), fg='#7c8084',
+                                   bg="#FFFFFF", relief="flat", image=self.booking_inactive_im_resized,
+                                   compound="left", command=self.booking_content_interface)
+        self.booking_b.pack(side="top", anchor="w")
+
         self.discounts_b = tk.Button(left_nav_lf, text=" Discounts", font=("OpenSans", 15), fg='#7c8084',
                                      bg="#FFFFFF", relief="flat", image=self.discount_inactive_im_resized,
                                      compound="left", command=self.discount_content_interface)
@@ -818,6 +832,39 @@ class Window:
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#89CFF0", relief="flat", command=self.show_payment_information_module).pack(side="top", fill="x")
+
+    def booking_content_interface(self):
+        self.change_button_color()
+        self.booking_b.configure(fg='#395A68', image=self.booking_active_im_resized)
+
+        # Clean widgets in the master window
+        Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Payment info ===============================================
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
+
+        title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Booking Information',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        refresh_b_lf = tk.LabelFrame(title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
+
+        # ================================================ Room info content ===========================================
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="x")
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat", command=self.show_booking_information_module).pack(side="top", fill="x")
 
     def discount_content_interface(self):
         self.change_button_color()
@@ -1250,6 +1297,53 @@ class Window:
 
         # Bind the treeview to database_view_info method
         self.info_tree.bind("<ButtonRelease-1>", self.payment_info_section)
+
+    # Booking
+    def show_booking_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = ("Booking ID", "Tenant Name", "Tenant Email", "Admin ID", "Date Created")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Booking ID", anchor="center", width=80)
+        self.info_tree.column("Tenant Name", anchor="w", width=80)
+        self.info_tree.column("Tenant Email", anchor="w", width=80)
+        self.info_tree.column("Admin ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Date Created", anchor="center", width=80)
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Booking ID", text="Booking ID", anchor="center")
+        self.info_tree.heading("Tenant Name", text="Tenant Name", anchor="w")
+        self.info_tree.heading("Tenant Email", text="Tenant Email", anchor="w")
+        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Date Created", text="Date Created", anchor="center")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.booking_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on an info to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.booking_info_section)
 
     # Discount
     def show_discount_information_module(self):
@@ -2411,6 +2505,80 @@ class Window:
                   command=self.send_receipt_email_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to send receipt via email",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+    # Booking
+    def register_tenant_account_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Register tenant account")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        # ================================================ Main interface ==============================================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Register tenant account',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(title_lf, text=" Status info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.tenant_status_transaction_help).pack(side="right", anchor="ne", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms_lf, text='Tenant Name', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_name_e = ttk.Entry(forms_lf, width=60)
+        self.tenant_name_e.grid(column=1, row=0)
+        self.tenant_name_e.insert(0, values[1])
+
+        ttk.Label(forms_lf, text='Tenant Email', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_email_e = ttk.Entry(forms_lf, width=60)
+        self.tenant_email_e.grid(column=1, row=1)
+        self.tenant_email_e.insert(0, values[2])
+
+        ttk.Label(forms_lf, text="optional", image=self.exclamation_im_resized, compound="left",
+                  style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(forms_lf, text='Tenant Status', style="h2.TLabel",
+                  justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_status_cb = ttk.Combobox(forms_lf)
+        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Active', 'Inactive',
+                                           "Delinquent")
+        self.tenant_status_cb.current(0)
+        self.tenant_status_cb.grid(column=1, row=3, sticky="w")
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Register account", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.register_tenant_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to register the tenant account!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -3668,6 +3836,89 @@ class Window:
 
             self.dialog_box_top.destroy()
 
+    # Booking
+    def booking_info_treeview_request(self):
+        try:
+            self.database_connect()
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.date_created FROM booking b where admin_id = ' "
+                                  + str(self.admin_id_str) + "';")
+
+            bookings = self.mycursor.fetchall()
+            print(bookings)
+
+            # Create configure for striped rows
+            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+            count = 0
+            for record in bookings:
+                if count % 2 == 0:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4]),
+                                          tags=("oddrow",))
+                else:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4]),
+                                          tags=("evenrow",))
+                count += 1
+
+            self.db1.commit()
+            self.mycursor.close()
+            self.db1.close()
+        except Exception as e:
+            self.invalid_request()
+            print(e)
+
+    def register_tenant_request(self):
+        if not self.tenant_name_e.get():
+            self.invalid_input()
+        else:
+            try:
+                self.database_connect()
+
+                self.mycursor.execute("INSERT INTO tenant (tenant_name, tenant_email, tenant_status, date_created, "
+                                      "admin_id) VALUES (%s,%s,%s,%s,%s)",
+                                      (self.tenant_name_e.get(), self.tenant_email_e.get(), self.tenant_status_cb.get(),
+                                       date_time_str, self.admin_id_str))
+
+                self.mycursor.execute("UPDATE booking SET booking_status = 'Registered already';")
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Tenant's account is created")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
+    def remove_booking_request(self):
+        try:
+            self.database_connect()
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+
+            self.mycursor.execute("DELETE FROM booking WHERE booking_id = '" + values[0] + "';")
+            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            messagebox.showinfo("Success", "Removed booking successfully")
+
+        except Exception as e:
+            self.invalid_request()
+            print(e)
+
     # Discount
     def create_discount_request(self):
         if not self.discount_code_e.get():
@@ -4149,6 +4400,7 @@ class Window:
         self.dashboard_b.configure(fg='#7c8084', image=self.dashboard_inactive_im_resized)
         self.tenants_b.configure(fg='#7c8084', image=self.tenant_inactive_im_resized)
         self.payments_b.configure(fg='#7c8084', image=self.payment_inactive_im_resized)
+        self.booking_b.configure(fg='#7c8084', image=self.booking_inactive_im_resized)
         self.discounts_b.configure(fg='#7c8084', image=self.discount_inactive_im_resized)
         self.accounts_b.configure(fg='#7c8084', image=self.account_inactive_im_resized)
         self.action_history_b.configure(fg='#7c8084', image=self.action_history_inactive_im_resized)
@@ -4600,6 +4852,56 @@ class Window:
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
                   command=self.remove_payment_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def booking_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Booking Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(info_lf, text='Booking ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant Name: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant Email: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Admin ID: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        tk.Button(buttons_lf, text=" Register tenant", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+                  relief="flat", image=self.create_tenant_basic_im_resized, compound="left",
+                  command=self.register_tenant_account_dialog).pack(side="top", pady=5, fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_booking_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
