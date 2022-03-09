@@ -308,6 +308,16 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter action_history table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`action_history` ADD COLUMN `basic_user_id` INT NULL "
+                                  "DEFAULT 0 AFTER `admin_id`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # Creating booking table in database
         try:
             self.mycursor = self.db1.cursor()

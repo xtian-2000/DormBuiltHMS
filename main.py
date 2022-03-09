@@ -285,23 +285,19 @@ class Window:
         self.admin_id_str = str
         self.basic_user_id_str = str
         self.current_user = None
-        self.admin_access_status = None
         self.action_description = str
 
         # Int
         self.room_id = int
-
         self.tenant_id = int
-
         self.discount_id = int
-
         self.employee_id = int
-
         self.booking_id = int
 
         # Boolean
-        self.admin_access = False
-        self.basic_user_access = True
+        self.admin_access_bool = False
+        self.basic_user_access_bool = True
+        self.admin_access_validation_bool = False
 
         # Database
         self.db1 = None
@@ -393,7 +389,7 @@ class Window:
         tk.Button(buttons_f, text="Sign in as Administrator", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
                   relief="flat", command=self.admin_signin_request).pack(side="top", pady=5, padx=10, fill="x")
 
-        tk.Button(buttons_f, text="Sign in as Basic user", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+        tk.Button(buttons_f, text="Sign in as Basic User", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   relief="flat", command=self.basic_user_signin_request).pack(side="top", pady=5, padx=10, fill="x")
 
         signup_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
@@ -938,8 +934,6 @@ class Window:
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
 
-        self.admin_access_status = "Off"
-
         # ================================================ Settings content ============================================
         panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
         panel_lf.pack(side="top", fill="x")
@@ -968,16 +962,20 @@ class Window:
         ttk.Label(description_lf, text='Administrative access: ',
                   style="small_info.TLabel").grid(column=0, row=1, sticky="w")
 
-        self.admin_access_status_l = ttk.Label(description_lf, text=self.admin_access_status)
-        self.admin_access_status_l.grid(column=1, row=1, sticky="w")
+        if self.admin_access_bool:
+            self.admin_access_status_l = ttk.Label(description_lf, text="On", style="on.TLabel")
+            self.admin_access_status_l.grid(column=1, row=1, sticky="w")
 
-        account_settings_links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
-        account_settings_links_lf.pack(side="top", anchor="nw", pady=10)
+            account_settings_links_lf = tk.LabelFrame(account_settings_lf, bg="#FFFFFF", relief="flat")
+            account_settings_links_lf.pack(side="top", anchor="nw", pady=10)
 
-        change_username_password_l = ttk.Label(account_settings_links_lf, text='Change username and password',
-                                               style="link.TLabel")
-        change_username_password_l.pack(side="top", anchor="w")
-        change_username_password_l.bind("<Button-1>", self.change_username_password_dialog)
+            change_username_password_l = ttk.Label(account_settings_links_lf, text='Change username and password',
+                                                   style="link.TLabel")
+            change_username_password_l.pack(side="top", anchor="w")
+            change_username_password_l.bind("<Button-1>", self.change_username_password_dialog)
+        else:
+            self.admin_access_status_l = ttk.Label(description_lf, text="Off", style="off.TLabel")
+            self.admin_access_status_l.grid(column=1, row=1, sticky="w")
 
         # ================================================ Create employee account interface ===========================
         create_account_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
@@ -1024,15 +1022,36 @@ class Window:
         tk.Button(self.info_tree_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#4C8404", relief="flat", command=self.show_employee_information_module).pack(side="top", fill="x")
 
-        # Initialize method for changing content according to admin access
-        self.admin_status()
-
     def action_history_interface(self):
         self.change_button_color()
         self.action_history_b.configure(fg='#395A68', image=self.action_history_active_im_resized)
 
         # Clean widgets in the master window
         Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Home content ============================================
+        panel_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        panel_lf.pack(side="top", fill="x")
+
+        # ================================================ Room Settings ============================================
+        tenant_dashboard_lf = tk.LabelFrame(panel_lf, bg="#FFFFFF")
+        tenant_dashboard_lf.pack(side="left", padx=10, pady=10)
+
+        tenant_dashboard_label_lf = tk.LabelFrame(tenant_dashboard_lf, bg="#FFFFFF", relief="flat")
+        tenant_dashboard_label_lf.pack(side="top", fill="x")
+
+        ttk.Label(tenant_dashboard_label_lf, text='Action History Dashboard',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(tenant_dashboard_label_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tenant_dashboard_links_lf = tk.LabelFrame(tenant_dashboard_lf, bg="#FFFFFF", relief="flat")
+        tenant_dashboard_links_lf.pack(side="top", anchor="nw", pady=10)
+
+        clear_action_history_l = ttk.Label(tenant_dashboard_links_lf, text='Clear action history', style="link.TLabel")
+        clear_action_history_l.pack(side="top", anchor="w")
+        clear_action_history_l.bind("<Button-1>", self.clear_action_history_request)
 
         # ================================================ Action History ==============================================
         info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
@@ -1407,9 +1426,10 @@ class Window:
 
     # Accounts
     def show_employee_information_module(self):
-        if not self.admin_access:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
-            self.show_employee_information_module()
+            print("self.show_employee_information_module")
+            # self.show_employee_information_module()
         else:
             Content_control.destroy_content(self.info_tree_lf)
 
@@ -2143,7 +2163,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee')
+        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee', 'Monthly rental')
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
         self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
@@ -3033,10 +3053,16 @@ class Window:
                 admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                 self.admin_id_str = str(admin_id)
 
-                self.admin_access = True
+                self.admin_access_bool = True
+                self.admin_access_validation_bool = False
 
                 # Instantiate methods
                 self.admin_get_current_user()
+
+                # Set temporary basic user id
+                self.basic_user_id_str = "0"
+
+                # Record action history
                 self.action_description = "Admin Sign in"
                 self.action_history_request()
                 self.main_interface()
@@ -3077,12 +3103,17 @@ class Window:
                 admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                 self.admin_id_str = str(admin_id)
 
-                self.admin_access = False
-                self.basic_user_access = True
+                self.admin_access_bool = False
+                self.basic_user_access_bool = True
 
                 # Instantiate create_widgets method
                 self.basic_user_get_id_request()
                 self.basic_user_get_current_user()
+
+                # Record action history
+                self.action_description = "Basic User Sign in"
+                self.action_history_request()
+
                 self.main_interface()
 
             self.db1.close()
@@ -3097,8 +3128,6 @@ class Window:
         # Converts the tuple into integer
         basic_user_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
         self.basic_user_id_str = str(basic_user_id)
-
-        print(self.basic_user_id_str)
 
         self.db1.close()
         self.mycursor.close()
@@ -3773,7 +3802,7 @@ class Window:
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, t.tenant_email FROM payment p "
                                   "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "';")
+                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name DESC;")
 
             payments = self.mycursor.fetchall()
             print(payments)
@@ -4150,8 +4179,9 @@ class Window:
             self.invalid_input()
         if not self.change_password_e.get():
             self.invalid_input()
-        if not self.admin_access:
+        if not self.admin_access_bool or self.admin_access_validation_bool is True:
             self.admin_access_validation_dialog()
+            print(self.admin_access_validation_bool)
         else:
             self.database_connect()
             self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
@@ -4172,7 +4202,7 @@ class Window:
             self.invalid_input()
         if not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access:
+        if not self.admin_access_bool or self.admin_access_validation_bool is True:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -4202,7 +4232,7 @@ class Window:
             self.invalid_input()
         if not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access:
+        if not self.admin_access_bool or self.admin_access_validation_bool is True:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -4224,62 +4254,68 @@ class Window:
                 print(e)
 
     def employee_info_treeview_request(self):
-        self.database_connect()
-        self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role "
-                              "FROM basic_user b WHERE b.admin_id = ' "
-                              + str(self.admin_id_str) + "' ORDER BY b.basic_user_id;")
+        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+            self.admin_access_validation_dialog()
+        else:
+            self.database_connect()
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role "
+                                  "FROM basic_user b WHERE b.admin_id = ' "
+                                  + str(self.admin_id_str) + "' ORDER BY b.basic_user_id;")
 
-        employees = self.mycursor.fetchall()
+            employees = self.mycursor.fetchall()
 
-        # Create configure for striped rows
-        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+            # Create configure for striped rows
+            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-        count = 0
-        for record in employees:
-            if count % 2 == 0:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3]), tags=("oddrow",))
-            else:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3]), tags=("evenrow",))
-            count += 1
+            count = 0
+            for record in employees:
+                if count % 2 == 0:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3]), tags=("oddrow",))
+                else:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3]), tags=("evenrow",))
+                count += 1
 
-        self.db1.commit()
-        self.mycursor.close()
-        self.db1.close()
+            self.db1.commit()
+            self.mycursor.close()
+            self.db1.close()
 
     def remove_employee_account_request(self):
-        try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                self.database_connect()
+                # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-            # Grab record number
-            selected = self.info_tree.focus()
+                # Grab record number
+                selected = self.info_tree.focus()
 
-            # Grab record values
-            values = self.info_tree.item(selected, "values")
+                # Grab record values
+                values = self.info_tree.item(selected, "values")
 
-            self.mycursor.execute("DELETE FROM basic_user WHERE basic_user_id = '" + values[0] +
-                                  "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                self.mycursor.execute("DELETE FROM basic_user WHERE basic_user_id = '" + values[0] +
+                                      "';")
+                # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
 
-            messagebox.showinfo("Success", "Removed account successfully")
+                messagebox.showinfo("Success", "Removed account successfully")
 
-            self.account_settings_content_interface()
-        except Exception as e:
-            self.invalid_input()
-            print(e)
+                self.account_settings_content_interface()
+            except Exception as e:
+                self.invalid_input()
+                print(e)
 
     # Action History
     def action_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT a.action_id, a.action_description, a.admin_id, a.user_current, "
-                              "a.privilege_access, a.date_created FROM action_history a WHERE admin_id = ' "
-                              + str(self.admin_id_str) + "';")
+                              "a.privilege_access, a.date_created, a.basic_user_id FROM action_history a "
+                              "WHERE admin_id = '" + str(self.admin_id_str) + "';")
 
         actions = self.mycursor.fetchall()
         print(actions)
@@ -4292,12 +4328,12 @@ class Window:
         for record in actions:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                      tags=("oddrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                      tags=("evenrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]), tags=("evenrow",))
             count += 1
 
         self.db1.commit()
@@ -4310,9 +4346,10 @@ class Window:
 
             # Record action to action history
             self.mycursor.execute("INSERT INTO action_history (action_description, admin_id, user_current, "
-                                  "privilege_access, date_created) "
-                                  "VALUES (%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
-                                                              self.current_user, str(self.admin_access), date_time_str))
+                                  "privilege_access, date_created, basic_user_id) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
+                                                                 self.current_user, str(self.admin_access_bool),
+                                                                 date_time_str, self.basic_user_id_str))
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
@@ -4322,28 +4359,57 @@ class Window:
             print(e)
 
     def remove_action_request(self):
-        try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                self.database_connect()
+                # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-            # Grab record number
-            selected = self.info_tree.focus()
+                # Grab record number
+                selected = self.info_tree.focus()
 
-            # Grab record values
-            values = self.info_tree.item(selected, "values")
+                # Grab record values
+                values = self.info_tree.item(selected, "values")
 
-            self.mycursor.execute("DELETE FROM action_history WHERE action_id = '" + values[0] +
-                                  "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                self.mycursor.execute("DELETE FROM action_history WHERE action_id = '" + values[0] +
+                                      "';")
+                # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
 
-            messagebox.showinfo("Success", "Removed action successfully")
+                messagebox.showinfo("Success", "Removed action successfully")
 
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+                # Turn off admin access validation
+                if not self.admin_access_validation_bool:
+                    pass
+                else:
+                    self.admin_access_validation_bool = False
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+
+    def clear_action_history_request(self, event):
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                self.database_connect()
+
+                self.mycursor.execute("DELETE FROM action_history WHERE admin_id = '" + self.admin_id_str +
+                                      "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Cleared action history successfully")
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+        print(event)
 
     # Notif
     def notif_info_treeview_request(self):
@@ -4467,7 +4533,8 @@ class Window:
             if myresult is None:
                 messagebox.showerror("Error", "Invalid User Name And Password")
             else:
-                self.admin_access = True
+                self.admin_access_bool = True
+                self.admin_access_validation_bool = True
                 self.dialog_box_top.destroy()
 
             self.db1.close()
@@ -4507,16 +4574,9 @@ class Window:
 
         print(event)
 
-    def admin_status(self):
-        if self.admin_access:
-            self.admin_access_status = "On"
-            self.admin_access_status_l.config(text=self.admin_access_status, style="on.TLabel")
-        else:
-            self.admin_access_status_l.configure(style='off.TLabel')
-
     def basic_user_status(self):
-        if self.basic_user_access:
-            self.admin_access = False
+        if self.basic_user_access_bool:
+            self.admin_access_bool = False
         else:
             pass
 
@@ -4618,6 +4678,11 @@ class Window:
                                    'fee - One thousand and five hundred pesos plus 2 month security deposit on both\n'
                                    'the cost of room and amenities.',
                   style="h2_small.TLabel").grid(column=1, row=7, rowspan=4, sticky="w")
+
+        ttk.Label(content_lf, text='Monthly rental - ', style="on.TLabel").grid(column=0, row=8, sticky="nw")
+
+        ttk.Label(content_lf, text='A monthly fee of equal to the cost of room and amenities are required from the\n '
+                                   'tenant.', style="h2_small.TLabel").grid(column=1, row=8, rowspan=4, sticky="w")
 
         # Disables underlying window
         self.dialog_box_top.grab_set()
@@ -5064,8 +5129,6 @@ class Window:
         values = self.info_tree.item(selected, "values")
         print(values)
 
-        self.discount_id = values[0]
-
         ttk.Label(info_lf, text='Action ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
 
         ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
@@ -5083,13 +5146,17 @@ class Window:
 
         ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
-        ttk.Label(info_lf, text='Privilege Access: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+        ttk.Label(info_lf, text='Basic User ID: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
-        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+        ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
-        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+        ttk.Label(info_lf, text='Privilege Access: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
 
-        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=6, sticky="w")
+
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
