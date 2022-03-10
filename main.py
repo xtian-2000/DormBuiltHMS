@@ -1132,20 +1132,30 @@ class Window:
         info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
         info_lf.pack(side="top", fill="x")
 
-        title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
-        title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(title_lf, text='Notifications',
+        ttk.Label(info_title_lf, text='Notifications',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_notif_information_module).pack(fill="x")
+
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Notif ID', 'Notif Subject', 'Notif Description', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
 
         # ================================================ Notification content ========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FAFAFA", relief="flat")
@@ -2205,7 +2215,8 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Confirmation fee', 'Processing fee', 'Monthly rental')
+        self.payment_description_cb['values'] = ('Confirmation fee', )
+        self.payment_description_cb['state'] = 'readonly'
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
         self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
@@ -2462,7 +2473,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Application fee',)
+        self.payment_description_cb['values'] = ('Application fee', 'Processing fee', 'Monthly rental fee')
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
         self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
@@ -3480,37 +3491,7 @@ class Window:
             self.invalid_input()
         if not self.payment_amount_sp.get():
             self.invalid_input()
-        if self.payment_description_cb.get() == "Confirmation fee":
-            try:
-                self.database_connect()
-                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), str(self.room_id),
-                                       self.tenant_id_sp.get(),
-                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
-
-                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
-                                      + self.room_id + "' WHERE tenant_id = '"
-                                      + self.tenant_id_sp.get() + "' AND admin_id = '"
-                                      + self.admin_id_str + "';")
-
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
-
-                # self.room_add_occupant()
-
-                messagebox.showinfo("Success", "Transaction is  created")
-
-                self.dialog_box_top.destroy()
-
-            except Exception as e:
-                self.invalid_request()
-                print(e)
-
-        if self.payment_description_cb.get() == "Processing fee":
+        else:
             # Grab record number
             selected = self.info_tree.focus()
 
@@ -3522,94 +3503,72 @@ class Window:
             current_occupant = int(values[8])
 
             if capacity <= current_occupant:
-                self.room_full_error()
-            else:  # 2 1
+                messagebox.showerror("Error", "The room is currently fully occupied.")
+            else:
                 if capacity > current_occupant + 1:
-                    try:
-                        self.database_connect()
+                    # Room will not be fully occupied
+                    self.database_connect()
 
-                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                              "basic_user_id, date_created, discount_code, payment_description) "
-                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                               str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
-                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+                    # Insert data
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                          "basic_user_id, date_created, discount_code, payment_description) "
+                                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                           str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
 
-                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Active', room_id = '"
-                                              + self.room_id + "' WHERE tenant_id = '"
-                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
-                                              + self.admin_id_str + "';")
+                    # Update tenant_status to confirmation
+                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
+                                          + self.room_id + "' WHERE tenant_id = '"
+                                          + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
 
-                        self.mycursor.execute("UPDATE room SET current_occupants = '"
-                                              + str(current_occupant + 1) + "' WHERE room_id = '"
-                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+                    # Update room column
+                    self.mycursor.execute("UPDATE room SET current_occupants = '"
+                                          + str(current_occupant + 1) + "' WHERE room_id = '"
+                                          + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
 
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-                        messagebox.showinfo("Success", "Payment is created")
+                    messagebox.showinfo("Success", "Payment is created")
 
-                        self.dialog_box_top.destroy()
-
-                    except Exception as e:
-                        self.invalid_request()
-                        print(e)
+                    self.dialog_box_top.destroy()
                 else:
-                    try:
-                        self.database_connect()
+                    # Room will be fully occupied
+                    self.database_connect()
 
-                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                              "admin_id, basic_user_id, date_created, discount_code, "
-                                              "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                               self.admin_id_str, str(self.basic_user_id_str), date_time_str,
-                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                          "basic_user_id, date_created, discount_code, payment_description) "
+                                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), str(self.room_id),
+                                           self.tenant_id_sp.get(),
+                                           str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
 
-                        self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
-                                              "current_occupants = '"
-                                              + str(current_occupant + 1) + "' WHERE room_id = '"
-                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+                    self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
+                                          "current_occupants = '"
+                                          + str(current_occupant + 1) + "' WHERE room_id = '"
+                                          + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
 
-                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing', room_id = '"
-                                              + self.room_id + "' WHERE tenant_id = '"
-                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
-                                              + self.admin_id_str + "';")
+                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
+                                          + self.room_id + "' WHERE tenant_id = '"
+                                          + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
 
-                        self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
-                                              "date_created, admin_id) VALUES (%s,%s,%s,%s)",
-                                              ('Room Availability',
-                                               ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
-                                               self.admin_id_str))
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
+                    self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
+                                          "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                          ('Room Availability',
+                                           ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
+                                           self.admin_id_str))
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-                        messagebox.showinfo("Success", "Payment is created")
+                    messagebox.showinfo("Success", "Payment is created")
 
-                        self.dialog_box_top.destroy()
-
-                    except Exception as e:
-                        self.invalid_request()
-                        print(e)
-        else:
-            try:
-                self.database_connect()
-
-                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                       self.admin_id_str, str(self.basic_user_id_str), date_time_str,
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
-
-                messagebox.showinfo("Success", "Tenant's account is created")
-
-                self.dialog_box_top.destroy()
-
-            except Exception as e:
-                self.invalid_request()
-                print(e)
+                    self.dialog_box_top.destroy()
 
     def room_add_occupant(self):
         remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
@@ -3841,11 +3800,13 @@ class Window:
         # self.db1.close()
 
     def create_tenant_transaction_request(self):
+        # Connect to database
+        self.database_connect()
+
         if not self.payment_amount_sp.get():
             self.invalid_input()
         if self.payment_description_cb.get() == "Application fee":
             try:
-                self.database_connect()
                 self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
                                       "basic_user_id, date_created, discount_code, payment_description) "
                                       "VALUES (%s,%s,%s,%s,%s,%s,%s)",
@@ -3869,6 +3830,88 @@ class Window:
             except Exception as e:
                 self.invalid_request()
                 print(e)
+        if self.payment_description_cb.get() == "Processing fee":
+            # Grab record number
+            selected = self.info_tree.focus()
+
+            # Grab record values
+            values = self.info_tree.item(selected, "values")
+            print(values)
+
+            capacity = int(values[5])
+            current_occupant = int(values[8])
+
+            if capacity <= current_occupant:
+                self.room_full_error()
+            else:  # 2 1
+                if capacity > current_occupant + 1:
+                    try:
+                        self.database_connect()
+
+                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
+                                              "basic_user_id, date_created, discount_code, payment_description) "
+                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                               str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Active', room_id = '"
+                                              + self.room_id + "' WHERE tenant_id = '"
+                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                              + self.admin_id_str + "';")
+
+                        self.mycursor.execute("UPDATE room SET current_occupants = '"
+                                              + str(current_occupant + 1) + "' WHERE room_id = '"
+                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Payment is created")
+
+                        self.dialog_box_top.destroy()
+
+                    except Exception as e:
+                        self.invalid_request()
+                        print(e)
+                else:
+                    try:
+                        self.database_connect()
+
+                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                              "admin_id, basic_user_id, date_created, discount_code, "
+                                              "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
+                                               self.admin_id_str, str(self.basic_user_id_str), date_time_str,
+                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                        self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
+                                              "current_occupants = '"
+                                              + str(current_occupant + 1) + "' WHERE room_id = '"
+                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing', room_id = '"
+                                              + self.room_id + "' WHERE tenant_id = '"
+                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                              + self.admin_id_str + "';")
+
+                        self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
+                                              "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                              ('Room Availability',
+                                               ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
+                                               self.admin_id_str))
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Payment is created")
+
+                        self.dialog_box_top.destroy()
+
+                    except Exception as e:
+                        self.invalid_request()
+                        print(e)
         else:
             try:
                 self.database_connect()
@@ -4240,22 +4283,22 @@ class Window:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_id ASC")
+                                  + str(self.admin_id_str) + "' ORDER BY d.discount_id ASC;")
         elif self.order_by_cb.get() == 'Discount Code':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_code ASC")
+                                  + str(self.admin_id_str) + "' ORDER BY d.discount_code ASC;")
         elif self.order_by_cb.get() == 'Discount Amount':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_amount ASC")
+                                  + str(self.admin_id_str) + "' ORDER BY d.discount_amount ASC;")
         elif self.order_by_cb.get() == 'Discount Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_status ASC")
+                                  + str(self.admin_id_str) + "' ORDER BY d.discount_status ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
@@ -4580,9 +4623,30 @@ class Window:
 
     # Notif
     def notif_info_treeview_request(self):
+        Content_control.clear_treeview(self.info_tree)
+        # Connect to database
         self.database_connect()
-        self.mycursor.execute("SELECT notif_id, notif_subject, notif_description, admin_id, "
-                              "date_created FROM notif  WHERE admin_id = '" + self.admin_id_str + "';")
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Notif ID', 'Date Created']:
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
+                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY n.notif_id ASC;")
+        elif self.order_by_cb.get() == 'Notif Subject':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
+                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY n.notif_subject ASC;")
+        elif self.order_by_cb.get() == 'Notif Description':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
+                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY n.notif_description ASC;")
+        else:
+            print('Safety condition')
+            self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
+                                  "n.date_created FROM notif n WHERE admin_id = '" + self.admin_id_str + "';")
 
         notif = self.mycursor.fetchall()
         print(notif)
@@ -4603,7 +4667,6 @@ class Window:
                                       tags=("evenrow",))
             count += 1
 
-        self.db1.commit()
         self.mycursor.close()
         self.db1.close()
 
@@ -4726,12 +4789,14 @@ class Window:
         # Grab record values
         values = self.info_tree.item(selected, "values")
 
-        if self.payment_description_cb.get() == "Confirmation fee":
+        if self.payment_description_cb.get() == "Application fee":
+            amount_to_be_paid = 500
+        elif self.payment_description_cb.get() == "Confirmation fee":
             amount_to_be_paid = int(values[6]) + int(values[7])
         elif self.payment_description_cb.get() == "Processing fee":
             amount_to_be_paid = (((int(values[6]) + int(values[7])) * 2) + 1500)
-        elif self.payment_description_cb.get() == "Application fee":
-            amount_to_be_paid = 500
+        elif self.payment_description_cb.get() == "Monthly rental fee":
+            amount_to_be_paid = int(values[6]) + int(values[7])
         else:
             amount_to_be_paid = 0
 
@@ -5394,10 +5459,6 @@ class Window:
     @staticmethod
     def invalid_request():
         messagebox.showerror("Error", "Database request unsuccessful! \n Please your internet connection.")
-
-    @staticmethod
-    def room_full_error():
-        messagebox.showerror("Error", "The room is currently fully occupied.")
 
     @staticmethod
     def generate_user_manual():
