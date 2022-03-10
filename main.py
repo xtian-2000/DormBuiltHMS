@@ -268,12 +268,10 @@ class Window:
 
         # ComboBox
         self.room_availability_cb = ttk.Combobox
-
         self.tenant_status_cb = ttk.Combobox
-
         self.discount_status_cb = ttk.Combobox
-
         self.payment_description_cb = ttk.Combobox
+        self.order_by_cb = ttk.Combobox
 
         # Treeview
         self.info_tree = ttk.Treeview
@@ -661,26 +659,37 @@ class Window:
         set_room_type_to_type_l.bind("<Button-1>", self.set_room_type_to_type_dialog)
 
         # ================================================ Room info ===============================================
-        room_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        room_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        room_info_title_lf = tk.LabelFrame(room_info_lf, bg="#FFFFFF", relief="flat")
-        room_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(room_info_title_lf, text='Room Information',
+        ttk.Label(info_title_lf, text='Room Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(room_info_title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(room_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456", bg="#FFFFFF", relief="flat",
                   command=self.show_room_information_module).pack(fill="x")
 
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Room ID', 'Room Number', 'Room Type', 'Room Availability', 'Room Capacity',
+                                      'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
+
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(room_info_lf, bg="#FAFAFA", relief="flat")
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FAFAFA", relief="flat")
         self.info_content_lf.pack(side="top", fill="both", expand=True)
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
@@ -773,26 +782,35 @@ class Window:
         create_tenant_l.bind("<Button-1>", self.create_tenant_account_dialog)
 
         # ================================================ Tenant info ===============================================
-        tenant_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        tenant_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        tenant_info_title_lf = tk.LabelFrame(tenant_info_lf, bg="#FFFFFF", relief="flat")
-        tenant_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(tenant_info_title_lf, text='Tenant Information',
+        ttk.Label(info_title_lf, text='Tenant Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(tenant_info_title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(tenant_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456", bg="#FFFFFF", relief="flat",
                   command=self.show_tenant_information_module).pack(fill="x")
 
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Tenant ID', 'Tenant Name', 'Status', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(tenant_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
@@ -806,32 +824,36 @@ class Window:
         Content_control.destroy_content(self.content_lf)
 
         # ================================================ Payment info ===============================================
-        payment_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        payment_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        payment_info_title_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
-        payment_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(payment_info_title_lf, text='Payment Information',
+        ttk.Label(info_title_lf, text='Payment Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(payment_info_title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(payment_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_payment_information_module).pack(fill="x")
-        """
-        self.search_e = ttk.Entry(payment_info_title_lf, width=60)
-        self.search_e.pack(side="right", anchor="nw", padx=5, pady=5)
 
-        ttk.Label(payment_info_title_lf, text="Search", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5,
-                                                                                      pady=5)"""
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Payment ID', 'Tenant Name', 'Payment Description', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
 
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
@@ -848,20 +870,30 @@ class Window:
         info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
         info_lf.pack(side="top", fill="x")
 
-        title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
-        title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(title_lf, text='Booking Information',
+        ttk.Label(info_title_lf, text='Booking Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_booking_information_module).pack(fill="x")
+
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Booking ID', 'Tenant Name', 'Tenant Email', 'Booking Status', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
@@ -902,26 +934,36 @@ class Window:
         create_discount_l.bind("<Button-1>", self.create_discount_dialog)
 
         # ================================================ Tenant info ===============================================
-        discount_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        discount_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        discount_info_title_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
-        discount_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(discount_info_title_lf, text='Discount Information',
+        ttk.Label(info_title_lf, text='Discount Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(discount_info_title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(discount_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_discount_information_module).pack(fill="x")
 
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Discount ID', 'Discount Code', 'Discount Amount', 'Discount Status',
+                                      'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(discount_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
@@ -1393,7 +1435,7 @@ class Window:
 
         # Create columns
         self.info_tree.column("#0", width=0, stretch=False)
-        self.info_tree.column("Discount ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Discount ID", anchor="center", width=80)
         self.info_tree.column("Discount Code", anchor="w", width=80)
         self.info_tree.column("Discount Amount", anchor="center", width=80)
         self.info_tree.column("Discount Status", anchor="center", width=80)
@@ -3280,12 +3322,47 @@ class Window:
                 print(e)
 
     def room_info_treeview_request(self):
+        Content_control.clear_treeview(self.info_tree)
+        # Connect to database
         self.database_connect()
-        self.mycursor.execute("SELECT room.room_id, room.room_number, room.room_description, room.room_type, "
-                              "room.room_availability, room.room_capacity, room.room_price, room.amenities_price, "
-                              "room.current_occupants "
-                              "FROM room where admin_id = ' "
-                              + str(self.admin_id_str) + "';")
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Room ID', 'Date Created']:
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "' ORDER BY r.room_id ASC;")
+        elif self.order_by_cb.get() == 'Room Number':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "' ORDER BY r.room_number ASC;")
+        elif self.order_by_cb.get() == 'Room Type':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "' ORDER BY r.room_type ASC;")
+        elif self.order_by_cb.get() == 'Room Availability':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "' ORDER BY r.room_availability ASC;")
+        elif self.order_by_cb.get() == 'Room Capacity':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "' ORDER BY r.room_capacity ASC;")
+        else:
+            print('Safety condition')
+            self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
+                                  "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
+                                  "r.current_occupants FROM room r where admin_id = '"
+                                  + str(self.admin_id_str) + "';")
 
         rooms = self.mycursor.fetchall()
 
@@ -3715,10 +3792,31 @@ class Window:
             print(e)
 
     def tenant_info_treeview_request(self):
+        Content_control.clear_treeview(self.info_tree)
+        # Connect to database
         self.database_connect()
-        self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                              "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
-                              "admin_id = '" + str(self.admin_id_str) + "';")
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Tenant ID', 'Date Created']:
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
+                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_id ASC;")
+        elif self.order_by_cb.get() == 'Tenant Name':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
+                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
+        elif self.order_by_cb.get() == 'Status':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
+                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_status ASC;")
+        else:
+            print('Safety condition')
+            self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
+                                  "admin_id = '" + str(self.admin_id_str) + "';")
 
         tenants = self.mycursor.fetchall()
 
@@ -3738,9 +3836,9 @@ class Window:
                                               record[6]), tags=("evenrow",))
             count += 1
 
-        self.db1.commit()
+        # self.db1.commit()
         self.mycursor.close()
-        self.db1.close()
+        # self.db1.close()
 
     def create_tenant_transaction_request(self):
         if not self.payment_amount_sp.get():
@@ -3796,41 +3894,63 @@ class Window:
 
     # Payment
     def payment_info_treeview_request(self):
-        try:
-            self.database_connect()
+        # Connect to database
+        self.database_connect()
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Payment ID', 'Date Created']:
+            print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, t.tenant_email FROM payment p "
                                   "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name DESC;")
+                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_id ASC;")
+        elif self.order_by_cb.get() == 'Tenant Name':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                                  "p.admin_id, p.basic_user_id, p.discount_code, "
+                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
+                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
+        elif self.order_by_cb.get() == 'Payment Description':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                                  "p.admin_id, p.basic_user_id, p.discount_code, "
+                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
+                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_description ASC;")
+        else:
+            print('Safety condition')
+            self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                                  "p.admin_id, p.basic_user_id, p.discount_code, "
+                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
+                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.admin_id = '" + str(self.admin_id_str) + "';")
 
-            payments = self.mycursor.fetchall()
-            print(payments)
+        payments = self.mycursor.fetchall()
+        print(payments)
 
-            # Create configure for striped rows
-            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-            count = 0
-            for record in payments:
-                if count % 2 == 0:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                                  record[6], record[7], record[8], record[9], record[10]),
-                                          tags=("oddrow",))
-                else:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                                  record[6], record[7], record[8], record[9], record[10]),
-                                          tags=("evenrow",))
-                count += 1
+        count = 0
+        for record in payments:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7], record[8], record[9], record[10]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7], record[8], record[9], record[10]),
+                                      tags=("evenrow",))
+            count += 1
 
-            self.db1.commit()
-            self.mycursor.close()
-            self.db1.close()
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
 
     def remove_payment_request(self):
         try:
@@ -3946,37 +4066,59 @@ class Window:
 
     # Booking
     def booking_info_treeview_request(self):
-        try:
-            self.database_connect()
+        Content_control.clear_treeview(self.info_tree)
+        # Connect to database
+        self.database_connect()
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Booking ID', 'Date Created']:
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
+                                  + str(self.admin_id_str) + "' ORDER BY b.booking_id ASC;")
+        elif self.order_by_cb.get() == 'Tenant Name':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
+                                  + str(self.admin_id_str) + "' ORDER BY b.tenant_name ASC;")
+        elif self.order_by_cb.get() == 'Tenant Email':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
+                                  + str(self.admin_id_str) + "' ORDER BY b.tenant_email ASC;")
+        elif self.order_by_cb.get() == 'Booking Status':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
+                                  + str(self.admin_id_str) + "' ORDER BY b.booking_status ASC;")
+        else:
+            print('Safety condition')
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
                                   "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
                                   + str(self.admin_id_str) + "';")
 
-            bookings = self.mycursor.fetchall()
-            print(bookings)
+        bookings = self.mycursor.fetchall()
+        print(bookings)
 
-            # Create configure for striped rows
-            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-            count = 0
-            for record in bookings:
-                if count % 2 == 0:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                          tags=("oddrow",))
-                else:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                          tags=("evenrow",))
-                count += 1
+        count = 0
+        for record in bookings:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("evenrow",))
+            count += 1
 
-            self.db1.commit()
-            self.mycursor.close()
-            self.db1.close()
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
 
     def register_tenant_request(self):
         if not self.tenant_name_e.get():
@@ -4089,10 +4231,36 @@ class Window:
                 print(e)
 
     def discount_info_treeview_request(self):
+        Content_control.clear_treeview(self.info_tree)
+        # Connect to database
         self.database_connect()
-        self.mycursor.execute("SELECT discount.discount_id, discount.discount_code, discount.discount_amount, "
-                              "discount.discount_status, discount.date_created FROM discount where admin_id = ' "
-                              + str(self.admin_id_str) + "';")
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() in ['Discount ID', 'Date Created']:
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
+                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_id ASC")
+        elif self.order_by_cb.get() == 'Discount Code':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
+                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_code ASC")
+        elif self.order_by_cb.get() == 'Discount Amount':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
+                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_amount ASC")
+        elif self.order_by_cb.get() == 'Discount Status':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
+                                  + str(self.admin_id_str) + "'; ORDER BY d.discount_status ASC")
+        else:
+            print('Safety condition')
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
+                                  + str(self.admin_id_str) + "';")
 
         discount = self.mycursor.fetchall()
 
@@ -4112,7 +4280,6 @@ class Window:
                                       tags=("evenrow",))
             count += 1
 
-        self.db1.commit()
         self.mycursor.close()
         self.db1.close()
 
@@ -4202,7 +4369,7 @@ class Window:
             self.invalid_input()
         if not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -4254,7 +4421,7 @@ class Window:
                 print(e)
 
     def employee_info_treeview_request(self):
-        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             self.database_connect()
@@ -4895,17 +5062,21 @@ class Window:
 
         ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
-        ttk.Label(info_lf, text='Tenant Balance: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+        ttk.Label(info_lf, text='Room ID: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
 
         ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
-        ttk.Label(info_lf, text='Email: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+        ttk.Label(info_lf, text='Tenant Balance: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
         ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
-        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+        ttk.Label(info_lf, text='Email: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
 
         ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=6, sticky="w")
+
+        ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")

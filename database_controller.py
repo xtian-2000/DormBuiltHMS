@@ -361,4 +361,3 @@ class Database:
         except Exception as e:
             print("'notif' table could not be created")
             print(e)
-
