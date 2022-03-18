@@ -37,9 +37,8 @@ date_today = datetime.now()
 date_today_str = date_today.strftime("%d/%m/%Y %H:%M:%S")
 
 # Create variable for first day of the month
-fday_month = datetime.today().replace(day=1, hour=00, minute=00, second=00)
-fday_month_dependencies = fday_month.strftime("%d/%m/%Y %H:%M:%S")
-fday_month_temp = fday_month.strftime("%d/%m/%Y")
+fday_month = datetime.today().replace(day=1)
+fday_month_str = fday_month.strftime('%x')
 
 # Create variable for current day of the month
 currentday_month = datetime.today()
@@ -741,10 +740,10 @@ class Window:
 
         # Insert values to Date Entry
         self.dashboard_filter_from.delete(0, "end")
-        self.dashboard_filter_from.insert(0, fday_month_temp)
+        self.dashboard_filter_from.insert(0, fday_month_str)
 
         self.dashboard_filter_to.delete(0, "end")
-        self.dashboard_filter_to.insert(0, currentday_month_temp)
+        self.dashboard_filter_to.insert(0, date_str)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
@@ -1346,7 +1345,7 @@ class Window:
         self.info_tree.column("Basic User ID", anchor="center", width=0, stretch=False)
         self.info_tree.column("Discount Code", anchor="center", width=80)
         self.info_tree.column("Payment Description", anchor="w", width=80)
-        self.info_tree.column("Date created", anchor="center", width=80)
+        self.info_tree.column("Date created", anchor="w", width=80)
         self.info_tree.column("Tenant Email", anchor="w", width=0, stretch=False)
 
         # Create headings
@@ -1710,7 +1709,7 @@ class Window:
         self.room_type_e = ttk.Entry(forms_lf, width=60)
         self.room_type_e.grid(column=1, row=2)
 
-        ttk.Label(forms_lf, text='ex. Basic, Suite', style="small_info.TLabel",
+        ttk.Label(forms_lf, text='ex. Large Single, Single, Double', style="small_info.TLabel",
                   justify="left").grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
@@ -4060,17 +4059,17 @@ class Window:
 
         # create a cell
         receipt_pdf.cell(200, 10, txt="Digital copy of receipt", border=1, ln=1, align='C')
-        receipt_pdf.cell(200, 5, txt="DormBuilt, Inc.", ln=1, align='C')
-        receipt_pdf.cell(200, 5, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=1, align='C')
-        receipt_pdf.cell(200, 5, txt="Congressional Ave., Dasmarinas, Cavite", ln=1, align='C')
-        receipt_pdf.cell(200, 10, txt=" ", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DormBuilt, Inc.", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="Congressional Ave., Dasmarinas, Cavite", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt=" ", ln=1, align='C')
         receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Tenant Email: " + values[11]), ln=1, align='L')
-        receipt_pdf.cell(200, 10, txt=("Discount Code" + values[7]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Discount Code: " + values[7]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=1, align='L')
         receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=1, align='L')
 
@@ -4991,10 +4990,10 @@ class Window:
                                    'the cost of room and amenities.',
                   style="h2_small.TLabel").grid(column=1, row=7, rowspan=4, sticky="w")
 
-        ttk.Label(content_lf, text='Monthly rental - ', style="on.TLabel").grid(column=0, row=8, sticky="nw")
+        ttk.Label(content_lf, text='Monthly rental - ', style="on.TLabel").grid(column=0, row=11, sticky="nw")
 
         ttk.Label(content_lf, text='A monthly fee of equal to the cost of room and amenities are required from the\n '
-                                   'tenant.', style="h2_small.TLabel").grid(column=1, row=8, rowspan=4, sticky="w")
+                                   'tenant.', style="h2_small.TLabel").grid(column=1, row=11, rowspan=4, sticky="w")
 
         # Disables underlying window
         self.dialog_box_top.grab_set()
