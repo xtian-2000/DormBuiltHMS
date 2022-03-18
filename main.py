@@ -2592,7 +2592,7 @@ class Window:
 
         self.tenant_email_e = ttk.Entry(forms_lf, width=30)
         self.tenant_email_e.grid(column=1, row=0)
-        self.tenant_email_e.insert(0, values[10])
+        self.tenant_email_e.insert(0, values[11])
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -4059,17 +4059,20 @@ class Window:
         receipt_pdf.add_page()
 
         # create a cell
-        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", ln=1, align='c')
-        receipt_pdf.cell(200, 10, txt="DormBuilt, Inc.", ln=1, align='w')
-        receipt_pdf.cell(200, 10, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=2, align='w')
-        receipt_pdf.cell(200, 10, txt="Congressional Ave., Dasmarinas, Cavite", ln=2, align='w')
-        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=3, align='w')
-        receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=4, align='w')
-        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=5, align='w')
-        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=6, align='w')
-        receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=7, align='w')
-        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=7, align='w')
+        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", border=1, ln=1, align='C')
+        receipt_pdf.cell(200, 5, txt="DormBuilt, Inc.", ln=1, align='C')
+        receipt_pdf.cell(200, 5, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=1, align='C')
+        receipt_pdf.cell(200, 5, txt="Congressional Ave., Dasmarinas, Cavite", ln=1, align='C')
+        receipt_pdf.cell(200, 10, txt=" ", ln=1, align='C')
+        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Email: " + values[11]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Discount Code" + values[7]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=1, align='L')
 
         # save the pdf with name .pdf
         receipt_pdf.output(dest='F', name=self.save_file_dialog.name)
@@ -5293,13 +5296,13 @@ class Window:
 
         ttk.Label(info_lf, text=values[9], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
 
-        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=8, sticky="w")
 
-        ttk.Label(info_lf, text=values[10], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
+        ttk.Label(info_lf, text=values[10], style="small_info.TLabel").grid(column=1, row=8, sticky="w")
 
-        ttk.Label(info_lf, text='Payment description: ', style="small_info.TLabel").grid(column=0, row=8, sticky="w")
+        ttk.Label(info_lf, text='Payment description: ', style="small_info.TLabel").grid(column=0, row=9, sticky="w")
 
-        ttk.Label(info_lf, text=values[8], style="small_info.TLabel").grid(column=1, row=8, sticky="w")
+        ttk.Label(info_lf, text=values[8], style="small_info.TLabel").grid(column=1, row=9, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
