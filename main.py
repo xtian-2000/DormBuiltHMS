@@ -3526,10 +3526,10 @@ class Window:
 
                     # Insert data
                     self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                          "basic_user_id, date_created, discount_code, payment_description) "
-                                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          "basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                           (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str,
+                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
                                            self.discount_code_e.get(), self.payment_description_cb.get()))
 
                     # Update tenant_status to confirmation
@@ -3556,11 +3556,11 @@ class Window:
 
                     # Insert data
                     self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                          "basic_user_id, date_created, discount_code, payment_description) "
-                                          "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          "basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                           (self.payment_amount_sp.get(), str(self.room_id),
                                            self.tenant_id_sp.get(),
-                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str,
+                                           self.admin_id_str, self.basic_user_id_str, date_str, time_str,
                                            self.discount_code_e.get(), self.payment_description_cb.get()))
 
                     # Update room to be Fully Occupied
@@ -3577,9 +3577,9 @@ class Window:
 
                     # Insert to notif that room is_status is changed to fully occupied
                     self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
-                                          "date_created, admin_id) VALUES (%s,%s,%s,%s)",
+                                          "date_created, time_created, admin_id) VALUES (%s,%s,%s,%s,%s)",
                                           ('Room Availability',
-                                           ('Room ' + self.room_id + ' is already Fully Occupied'), date_str,
+                                           ('Room ' + self.room_id + ' is already Fully Occupied'), date_str, time_str,
                                            self.admin_id_str))
                     self.db1.commit()
                     self.db1.close()
@@ -3969,29 +3969,29 @@ class Window:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
-                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
-                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
                                   "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_id ASC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
-                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
-                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
                                   "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Payment Description':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
-                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
-                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
                                   "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_description ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
-                                  "p.payment_description, p.date_created, t.tenant_email FROM payment p "
-                                  "INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                                  "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
                                   "p.admin_id = '" + str(self.admin_id_str) + "';")
 
         payments = self.mycursor.fetchall()
@@ -4006,12 +4006,12 @@ class Window:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7], record[8], record[9], record[10]),
+                                              record[6], record[7], record[8], record[9], record[10], record[11]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7], record[8], record[9], record[10]),
+                                              record[6], record[7], record[8], record[9], record[10], record[11]),
                                       tags=("evenrow",))
             count += 1
 
@@ -4584,8 +4584,8 @@ class Window:
             self.mycursor.execute("INSERT INTO action_history (action_description, admin_id, user_current, "
                                   "privilege_access, date_created, time_created, basic_user_id) "
                                   "VALUES (%s,%s,%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
-                                                                 self.current_user, str(self.admin_access_bool),
-                                                                 date_str, time_str, self.basic_user_id_str))
+                                                                    self.current_user, str(self.admin_access_bool),
+                                                                    date_str, time_str, self.basic_user_id_str))
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
@@ -4657,22 +4657,23 @@ class Window:
         if self.order_by_cb.get() in ['Notif ID', 'Date Created']:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
-                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  "n.date_created, n.time_created FROM notif n WHERE admin_id = '"
                                   + self.admin_id_str + "' ORDER BY n.notif_id ASC;")
         elif self.order_by_cb.get() == 'Notif Subject':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
-                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  "n.date_created, n.time_created FROM notif n WHERE admin_id = '"
                                   + self.admin_id_str + "' ORDER BY n.notif_subject ASC;")
         elif self.order_by_cb.get() == 'Notif Description':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
-                                  "n.date_created FROM notif n WHERE admin_id = '"
+                                  "n.date_created, n.time_created FROM notif n WHERE admin_id = '"
                                   + self.admin_id_str + "' ORDER BY n.notif_description ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
-                                  "n.date_created FROM notif n WHERE admin_id = '" + self.admin_id_str + "';")
+                                  "n.date_created, n.time_created FROM notif n WHERE admin_id = '"
+                                  + self.admin_id_str + "';")
 
         notif = self.mycursor.fetchall()
         print(notif)
@@ -4685,11 +4686,11 @@ class Window:
         for record in notif:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                       tags=("evenrow",))
             count += 1
 
@@ -5274,7 +5275,7 @@ class Window:
 
         ttk.Label(info_lf, text='Tenant Email: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
 
-        ttk.Label(info_lf, text=values[10], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+        ttk.Label(info_lf, text=values[11], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
         ttk.Label(info_lf, text='Payment amount: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
@@ -5291,6 +5292,10 @@ class Window:
         ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
 
         ttk.Label(info_lf, text=values[9], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+
+        ttk.Label(info_lf, text=values[10], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
 
         ttk.Label(info_lf, text='Payment description: ', style="small_info.TLabel").grid(column=0, row=8, sticky="w")
 
@@ -5528,6 +5533,10 @@ class Window:
         ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
 
         ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")

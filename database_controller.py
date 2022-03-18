@@ -283,6 +283,17 @@ class Database:
             print("payment_description column could not be created successfully")
             print(e)
 
+        # Alter payment table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`payment` ADD COLUMN `time_created` VARCHAR(45) NOT NULL "
+                                  "AFTER `date_created`, CHANGE COLUMN `date_created` `date_created` VARCHAR(45) NOT "
+                                  "NULL AFTER `payment_description`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ discount table ==============================================
 
         # Creating discount table in database
@@ -437,4 +448,15 @@ class Database:
             print("'notif' table is created successfully")
         except Exception as e:
             print("'notif' table could not be created")
+            print(e)
+
+        # Alter notif table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`notif` ADD COLUMN `time_created` VARCHAR(45) NOT NULL "
+                                  "AFTER `date_created`, CHANGE COLUMN `admin_id` `admin_id` VARCHAR(45) NOT NULL "
+                                  "AFTER `notif_description`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
             print(e)
