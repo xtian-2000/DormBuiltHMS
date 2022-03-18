@@ -5,7 +5,7 @@ from tkinter.messagebox import showinfo
 from content_controller import Content_control
 from style import Content
 from tkinter import PhotoImage
-# from database_controller import Database
+from database_controller import Database
 import mysql.connector as mysql
 from random import randint
 from tkinter import Menu
@@ -27,8 +27,11 @@ host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
 
-date_time = datetime.now()
-date_time_str = date_time.strftime("%d/%m/%Y %H:%M:%S")
+date = datetime.now()
+date_str = date.strftime('%x')
+
+time = datetime.now()
+time_str = time.strftime('%X')
 
 date_today = datetime.now()
 date_today_str = date_today.strftime("%d/%m/%Y %H:%M:%S")
@@ -305,7 +308,7 @@ class Window:
         self.signin_interface()
 
         # Initialize class for database
-        # Database()
+        Database()
 
         # Root window configuration
         self.master.title('DormBuilt HMS')
@@ -1249,7 +1252,7 @@ class Window:
         self.info_tree.column("Room ID", anchor="center", width=80)
         self.info_tree.column("Balance", anchor="w", width=80)
         self.info_tree.column("Email", anchor="w", width=80)
-        self.info_tree.column("Date created", anchor="w", width=0, stretch=False)
+        self.info_tree.column("Date created", anchor="w", width=80)
 
         # Create headings
         self.info_tree.heading("#0", text="", anchor="w")
@@ -2215,7 +2218,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Confirmation fee', )
+        self.payment_description_cb['values'] = ('Confirmation fee',)
         self.payment_description_cb['state'] = 'readonly'
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
@@ -2448,8 +2451,6 @@ class Window:
         self.dialog_box_top.configure(bg="#FFFFFF")
         self.dialog_box_top.resizable(False, False)
 
-        amount_to_be_paid = 500
-
         # ================================================ Widgets for resetting password ==========================
         main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
         main_lf.pack(padx=15, pady=15, fill="both", expand=True)
@@ -2498,21 +2499,33 @@ class Window:
         ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
 
-        self.room_cost_l = ttk.Label(forms1_lf, text=amount_to_be_paid, style="small_info.TLabel", justify="left")
-        self.room_cost_l.grid(column=1, row=4, sticky="w")
+        self.application_fee_l = ttk.Label(forms1_lf, text=500, style="small_info.TLabel", justify="left")
+        self.application_fee_l.grid(column=1, row=4, sticky="w")
 
-        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
 
-        self.discount_l = ttk.Label(forms1_lf, text="None applied", style="small_info.TLabel", justify="left")
-        self.discount_l.grid(column=1, row=5, sticky="w")
+        self.room_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=5, sticky="w")
 
-        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
 
-        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=amount_to_be_paid,
+        self.amenities_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.amenities_cost_l.grid(column=1, row=6, sticky="w")
+
+        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=7, padx=2.5, sticky="w")
+
+        self.discount_l = ttk.Label(forms1_lf, text="None applied", style="small_info.TLabel", justify="left")
+        self.discount_l.grid(column=1, row=7, sticky="w")
+
+        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=8, padx=2.5, sticky="w")
+
+        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=500,
                                              style="small_info.TLabel", justify="left")
-        self.amount_to_be_paid_l.grid(column=1, row=6, sticky="w")
+        self.amount_to_be_paid_l.grid(column=1, row=8, sticky="w")
 
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
@@ -2528,7 +2541,7 @@ class Window:
 
         self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
         self.payment_amount_sp.grid(column=1, row=1, sticky="w")
-        self.payment_amount_sp.insert(0, amount_to_be_paid)
+        self.payment_amount_sp.insert(0, 500)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -3118,6 +3131,8 @@ class Window:
                 # Record action history
                 self.action_description = "Admin Sign in"
                 self.action_history_request()
+
+                # Go to main interface
                 self.main_interface()
 
             self.db1.close()
@@ -3253,10 +3268,10 @@ class Window:
         else:
             try:
                 self.database_connect()
-                self.mycursor.execute("INSERT INTO admin (username, password, email, date_created)"
-                                      "VALUES (%s,%s,%s,%s)", (self.signup_username_e.get(),
-                                                               self.signup_password_e.get(),
-                                                               self.signup_email_e.get(), date_time_str))
+                self.mycursor.execute("INSERT INTO admin (username, password, email, date_created, time_created)"
+                                      "VALUES (%s,%s,%s,%s,%s)", (self.signup_username_e.get(),
+                                                                  self.signup_password_e.get(),
+                                                                  self.signup_email_e.get(), date_str, time_str))
 
                 self.db1.commit()
                 self.db1.close()
@@ -3514,7 +3529,7 @@ class Window:
                                           "basic_user_id, date_created, discount_code, payment_description) "
                                           "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                           (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                           str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str,
                                            self.discount_code_e.get(), self.payment_description_cb.get()))
 
                     # Update tenant_status to confirmation
@@ -3539,28 +3554,32 @@ class Window:
                     # Room will be fully occupied
                     self.database_connect()
 
+                    # Insert data
                     self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
                                           "basic_user_id, date_created, discount_code, payment_description) "
                                           "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                           (self.payment_amount_sp.get(), str(self.room_id),
                                            self.tenant_id_sp.get(),
-                                           str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str,
                                            self.discount_code_e.get(), self.payment_description_cb.get()))
 
+                    # Update room to be Fully Occupied
                     self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
                                           "current_occupants = '"
                                           + str(current_occupant + 1) + "' WHERE room_id = '"
                                           + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
 
+                    # Update tenant to confirmation
                     self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
                                           + self.room_id + "' WHERE tenant_id = '"
                                           + self.tenant_id_sp.get() + "' AND admin_id = '"
                                           + self.admin_id_str + "';")
 
+                    # Insert to notif that room is_status is changed to fully occupied
                     self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
                                           "date_created, admin_id) VALUES (%s,%s,%s,%s)",
                                           ('Room Availability',
-                                           ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
+                                           ('Room ' + self.room_id + ' is already Fully Occupied'), date_str,
                                            self.admin_id_str))
                     self.db1.commit()
                     self.db1.close()
@@ -3645,15 +3664,19 @@ class Window:
                 self.database_connect()
 
                 self.mycursor.execute("INSERT INTO tenant (tenant_name, tenant_email, tenant_status, date_created, "
-                                      "admin_id) VALUES (%s,%s,%s,%s,%s)",
+                                      "time_created, admin_id) VALUES (%s,%s,%s,%s,%s,%s)",
                                       (self.tenant_name_e.get(), self.tenant_email_e.get(), self.tenant_status_cb.get(),
-                                       date_time_str, self.admin_id_str))
+                                       date_str, time_str, self.admin_id_str))
 
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
 
                 messagebox.showinfo("Success", "Tenant's account is created")
+
+                # Record action history
+                self.action_description = "Tenant named" + self.tenant_name_e.get() + "is created."
+                self.action_history_request()
 
                 self.dialog_box_top.destroy()
 
@@ -3691,7 +3714,7 @@ class Window:
                                           "date_created, admin_id) VALUES (%s,%s,%s,%s)",
                                           ('Modify tenant',
                                            ('Tenant information of ' + self.tenant_name_e.get() + ' is modified.'),
-                                           date_time_str, self.admin_id_str))
+                                           date_str, self.admin_id_str))
 
                     self.db1.commit()
                     self.db1.close()
@@ -3719,7 +3742,7 @@ class Window:
                                           "date_created, admin_id) VALUES (%s,%s,%s,%s)",
                                           ('Modify tenant',
                                            ('Tenant information of ' + self.tenant_name_e.get() + ' is modified.'),
-                                           date_time_str, self.admin_id_str))
+                                           date_str, self.admin_id_str))
 
                     self.db1.commit()
                     self.db1.close()
@@ -3759,23 +3782,23 @@ class Window:
         if self.order_by_cb.get() in ['Tenant ID', 'Date Created']:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
-                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_id ASC;")
+                                  "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
+                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_id ASC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
-                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
+                                  "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
+                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
-                                  "admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_status ASC;")
+                                  "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
+                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_status ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
-                                  "t.tenant_balance, t.tenant_email, t.date_created FROM tenant t WHERE "
-                                  "admin_id = '" + str(self.admin_id_str) + "';")
+                                  "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
+                                  "WHERE admin_id = '" + str(self.admin_id_str) + "';")
 
         tenants = self.mycursor.fetchall()
 
@@ -3788,11 +3811,11 @@ class Window:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]), tags=("oddrow",))
+                                              record[6], record[7]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]), tags=("evenrow",))
+                                              record[6], record[7]), tags=("evenrow",))
             count += 1
 
         # self.db1.commit()
@@ -3800,18 +3823,26 @@ class Window:
         # self.db1.close()
 
     def create_tenant_transaction_request(self):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
         # Connect to database
         self.database_connect()
 
         if not self.payment_amount_sp.get():
             self.invalid_input()
-        if self.payment_description_cb.get() == "Application fee":
+
+        elif self.payment_description_cb.get() == "Application fee":
             try:
+
                 self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                       (self.payment_amount_sp.get(), self.tenant_id,
-                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
 
                 self.mycursor.execute("UPDATE tenant SET tenant_status = 'Application' WHERE tenant_id = '"
@@ -3830,96 +3861,89 @@ class Window:
             except Exception as e:
                 self.invalid_request()
                 print(e)
-        if self.payment_description_cb.get() == "Processing fee":
-            # Grab record number
-            selected = self.info_tree.focus()
+        elif self.payment_description_cb.get() == "Processing fee":
+            print(values[3])
+            if values[3] == 'None':
+                messagebox.showerror("Error", "Cannot proceed with the payment. "
+                                              "No Room ID available, please pay Confirmation fee first.")
+            else:
+                self.database_connect()
 
-            # Grab record values
-            values = self.info_tree.item(selected, "values")
-            print(values)
+                # Insert data
+                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                      "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                      "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                       self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing' WHERE tenant_id = '"
+                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
 
-            capacity = int(values[5])
-            current_occupant = int(values[8])
+                messagebox.showinfo("Success", "Payment is created")
 
-            if capacity <= current_occupant:
-                self.room_full_error()
-            else:  # 2 1
-                if capacity > current_occupant + 1:
-                    try:
-                        self.database_connect()
+                self.dialog_box_top.destroy()
+        elif self.payment_description_cb.get() == "Monthly rental fee":
+            print(values[3])
+            if values[3] == 'None':
+                messagebox.showerror("Error", "Cannot proceed with the payment. "
+                                              "No Room ID available, please pay Confirmation fee\n"
+                                              "and Processing fee first.")
+            else:
+                if values[4] == 'None':
+                    self.database_connect()
 
-                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
-                                              "basic_user_id, date_created, discount_code, payment_description) "
-                                              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                               str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
-                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+                    # Insert data
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
+                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
+                                          + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
+                                          + str(self.tenant_id) + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Active', room_id = '"
-                                              + self.room_id + "' WHERE tenant_id = '"
-                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
-                                              + self.admin_id_str + "';")
+                    messagebox.showinfo("Success", "Payment is created")
 
-                        self.mycursor.execute("UPDATE room SET current_occupants = '"
-                                              + str(current_occupant + 1) + "' WHERE room_id = '"
-                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
-
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
-
-                        messagebox.showinfo("Success", "Payment is created")
-
-                        self.dialog_box_top.destroy()
-
-                    except Exception as e:
-                        self.invalid_request()
-                        print(e)
+                    self.dialog_box_top.destroy()
                 else:
-                    try:
-                        self.database_connect()
+                    self.database_connect()
 
-                        self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                              "admin_id, basic_user_id, date_created, discount_code, "
-                                              "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                              (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                               self.admin_id_str, str(self.basic_user_id_str), date_time_str,
-                                               self.discount_code_e.get(), self.payment_description_cb.get()))
+                    # Insert data
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
+                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
+                                          + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                          "' WHERE tenant_id = '"
+                                          + str(self.tenant_id) + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-                        self.mycursor.execute("UPDATE room SET room_availability = 'Fully Occupied', "
-                                              "current_occupants = '"
-                                              + str(current_occupant + 1) + "' WHERE room_id = '"
-                                              + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
+                    messagebox.showinfo("Success", "Payment is created")
 
-                        self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing', room_id = '"
-                                              + self.room_id + "' WHERE tenant_id = '"
-                                              + self.tenant_id_sp.get() + "' AND admin_id = '"
-                                              + self.admin_id_str + "';")
-
-                        self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
-                                              "date_created, admin_id) VALUES (%s,%s,%s,%s)",
-                                              ('Room Availability',
-                                               ('Room ' + self.room_id + ' is already Fully Occupied'), date_time_str,
-                                               self.admin_id_str))
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
-
-                        messagebox.showinfo("Success", "Payment is created")
-
-                        self.dialog_box_top.destroy()
-
-                    except Exception as e:
-                        self.invalid_request()
-                        print(e)
+                    self.dialog_box_top.destroy()
         else:
             try:
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                       (self.payment_amount_sp.get(), self.tenant_id,
-                                       str(self.admin_id_str), str(self.basic_user_id_str), str(date_time_str),
+                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
 
                 self.db1.commit()
@@ -4117,28 +4141,28 @@ class Window:
         if self.order_by_cb.get() in ['Booking ID', 'Date Created']:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY b.booking_id ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
+                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.booking_id ASC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY b.tenant_name ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
+                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Tenant Email':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY b.tenant_email ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
+                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.tenant_email ASC;")
         elif self.order_by_cb.get() == 'Booking Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY b.booking_status ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
+                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.booking_status ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created FROM booking b where admin_id = ' "
-                                  + str(self.admin_id_str) + "';")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
+                                  "admin_id = ' " + str(self.admin_id_str) + "';")
 
         bookings = self.mycursor.fetchall()
         print(bookings)
@@ -4151,11 +4175,13 @@ class Window:
         for record in bookings:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6]),
                                       tags=("evenrow",))
             count += 1
 
@@ -4171,9 +4197,9 @@ class Window:
                 self.database_connect()
 
                 self.mycursor.execute("INSERT INTO tenant (tenant_name, tenant_email, tenant_status, date_created, "
-                                      "admin_id) VALUES (%s,%s,%s,%s,%s)",
+                                      "time_created, admin_id) VALUES (%s,%s,%s,%s,%s,%s)",
                                       (self.tenant_name_e.get(), self.tenant_email_e.get(), self.tenant_status_cb.get(),
-                                       date_time_str, self.admin_id_str))
+                                       date_str, time_str, self.admin_id_str))
 
                 self.mycursor.execute("UPDATE booking SET booking_status = 'Registered already' WHERE booking_id = '"
                                       + self.booking_id + "';")
@@ -4227,7 +4253,7 @@ class Window:
                 self.mycursor.execute("INSERT INTO discount (discount_code, discount_amount, admin_id,"
                                       " basic_user_id, date_created, discount_status) VALUES (%s,%s,%s,%s,%s,%s)",
                                       (self.discount_code_e.get(), self.discount_amount_sp.get(),
-                                       str(self.admin_id_str), str(self.basic_user_id_str), date_time_str,
+                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str,
                                        self.discount_status_cb.get()))
 
                 self.db1.commit()
@@ -4420,7 +4446,7 @@ class Window:
                 self.mycursor.execute("INSERT INTO basic_user (admin_id, username, password, role, date_created)"
                                       "VALUES (%s,%s,%s,%s,%s)", (self.admin_id_str, self.employee_username_e.get(),
                                                                   self.employee_password_e.get(),
-                                                                  self.employee_role_e.get(), date_time_str))
+                                                                  self.employee_role_e.get(), date_str))
 
                 self.db1.commit()
                 self.db1.close()
@@ -4524,8 +4550,8 @@ class Window:
     def action_info_treeview_request(self):
         self.database_connect()
         self.mycursor.execute("SELECT a.action_id, a.action_description, a.admin_id, a.user_current, "
-                              "a.privilege_access, a.date_created, a.basic_user_id FROM action_history a "
-                              "WHERE admin_id = '" + str(self.admin_id_str) + "';")
+                              "a.privilege_access, a.date_created, a.time_created, a.basic_user_id FROM "
+                              "action_history a WHERE admin_id = '" + self.admin_id_str + "';")
 
         actions = self.mycursor.fetchall()
         print(actions)
@@ -4539,11 +4565,11 @@ class Window:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]), tags=("oddrow",))
+                                              record[6], record[7]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
                                       values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6]), tags=("evenrow",))
+                                              record[6], record[7]), tags=("evenrow",))
             count += 1
 
         self.db1.commit()
@@ -4556,10 +4582,10 @@ class Window:
 
             # Record action to action history
             self.mycursor.execute("INSERT INTO action_history (action_description, admin_id, user_current, "
-                                  "privilege_access, date_created, basic_user_id) "
-                                  "VALUES (%s,%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
+                                  "privilege_access, date_created, time_created, basic_user_id) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s)", (self.action_description, self.admin_id_str,
                                                                  self.current_user, str(self.admin_access_bool),
-                                                                 date_time_str, self.basic_user_id_str))
+                                                                 date_str, time_str, self.basic_user_id_str))
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
@@ -4783,6 +4809,7 @@ class Window:
         self.notif_b.configure(fg='#7c8084', image=self.notif_inactive_im_resized)
 
     def change_payment_information(self, event):
+        amount_to_be_paid = 500
         # Grab record number
         selected = self.info_tree.focus()
 
@@ -4794,9 +4821,58 @@ class Window:
         elif self.payment_description_cb.get() == "Confirmation fee":
             amount_to_be_paid = int(values[6]) + int(values[7])
         elif self.payment_description_cb.get() == "Processing fee":
-            amount_to_be_paid = (((int(values[6]) + int(values[7])) * 2) + 1500)
+            try:
+                # Get the value room and amenities price
+                self.database_connect()
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.room_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                room_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.amenities_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                amount_to_be_paid = (((room_price + amenities_price) * 2) + 1500)
+
+                self.application_fee_l.config(text=0)
+                self.room_cost_l.config(text=room_price)
+                self.amenities_cost_l.config(text=amenities_price)
+            except Exception as e:
+                messagebox.showerror("Error", "Cannot proceed with the payment. Please connect to the internet or \n"
+                                              "if there is no Room ID available, please pay Confirmation fee first.")
+                print(e)
+
         elif self.payment_description_cb.get() == "Monthly rental fee":
-            amount_to_be_paid = int(values[6]) + int(values[7])
+            try:
+                # Get the value room and amenities price
+                self.database_connect()
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.room_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                room_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.amenities_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                amount_to_be_paid = room_price + amenities_price
+
+                self.application_fee_l.config(text=0)
+                self.room_cost_l.config(text=room_price)
+                self.amenities_cost_l.config(text=amenities_price)
+            except Exception as e:
+                messagebox.showerror("Error", "Cannot proceed with the payment. Please connect to the internet or \n"
+                                              "if there is no Room ID available, please pay Confirmation fee first.")
+                print(e)
         else:
             amount_to_be_paid = 0
 
@@ -5143,6 +5219,10 @@ class Window:
 
         ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
 
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+
+        ttk.Label(info_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
+
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
@@ -5279,6 +5359,10 @@ class Window:
 
         ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
@@ -5393,6 +5477,10 @@ class Window:
         ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=6, sticky="w")
 
         ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
+
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+
+        ttk.Label(info_lf, text=values[6], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")

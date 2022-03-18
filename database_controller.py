@@ -39,6 +39,8 @@ class Database:
             print("Could not connect to hmsdatabase")
             print(e)
 
+        # ================================================ admin table =================================================
+
         # Creating admin table in database
         try:
             self.mycursor = self.db1.cursor()
@@ -52,6 +54,18 @@ class Database:
         except Exception as e:
             print("'Admin' table could not be created")
             print(e)
+
+        # Alter admin table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`admin` ADD COLUMN `time_created` VARCHAR(45) NOT NULL "
+                                  "AFTER `date_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # ================================================ basic_user table ============================================
 
         # Creating basic_user table in database
         try:
@@ -78,6 +92,8 @@ class Database:
         except Exception as e:
             print("Foreign key could not be created")
             print(e)
+
+        # ================================================ room table ==================================================
 
         # Creating room table in database
         try:
@@ -144,6 +160,8 @@ class Database:
             print("alteration could not be created successfully")
             print(e)
 
+        # ================================================ tenant table ================================================
+
         # Creating tenant's table in database
         try:
             self.mycursor = self.db1.cursor()
@@ -209,6 +227,19 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter tenant table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` ADD COLUMN `time_created` VARCHAR(45) NOT NULL "
+                                  "AFTER `date_created`, CHANGE COLUMN `date_created` `date_created` VARCHAR(45) NOT "
+                                  "NULL AFTER `room_id`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # ================================================ payment table ===============================================
+
         # Creating payment table in database
         try:
             self.mycursor = self.db1.cursor()
@@ -252,6 +283,8 @@ class Database:
             print("payment_description column could not be created successfully")
             print(e)
 
+        # ================================================ discount table ==============================================
+
         # Creating discount table in database
         try:
             self.mycursor = self.db1.cursor()
@@ -275,6 +308,8 @@ class Database:
         except Exception as e:
             print("discount_status column could not be created successfully")
             print(e)
+
+        # ================================================ action_history table ========================================
 
         # Creating action_history table in database
         try:
@@ -318,6 +353,17 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter action_history table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`action_history` ADD COLUMN `time_created` VARCHAR(45) "
+                                  "NOT NULL AFTER `date_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # ================================================ booking table ===============================================
         # Creating booking table in database
         try:
             self.mycursor = self.db1.cursor()
@@ -342,6 +388,16 @@ class Database:
         # Alter booking table
         try:
             self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` ADD COLUMN `time_created` VARCHAR(45) NOT "
+                                  "NULL AFTER `date_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # Alter booking table
+        try:
+            self.mycursor = self.db1.cursor()
             self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` CHANGE COLUMN `status` `booking_status` "
                                   "VARCHAR(45) NOT NULL , ADD UNIQUE INDEX `tenant_name_UNIQUE` (`tenant_name` ASC) "
                                   "VISIBLE, ADD UNIQUE INDEX `tenant_email_UNIQUE` (`tenant_email` ASC) VISIBLE;;")
@@ -349,6 +405,27 @@ class Database:
         except Exception as e:
             print("alteration failed")
             print(e)
+
+        # Alter booking table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` ADD COLUMN `room_type` VARCHAR(45) NOT NULL "
+                                  "AFTER `booking_status`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # Alter booking table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`booking` DROP COLUMN `status`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # ================================================ notif table =================================================
 
         # Creating notif table in database
         try:
