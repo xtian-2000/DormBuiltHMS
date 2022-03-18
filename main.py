@@ -5,7 +5,7 @@ from tkinter.messagebox import showinfo
 from content_controller import Content_control
 from style import Content
 from tkinter import PhotoImage
-from database_controller import Database
+# from database_controller import Database
 import mysql.connector as mysql
 from random import randint
 from tkinter import Menu
@@ -296,8 +296,7 @@ class Window:
 
         # Boolean
         self.admin_access_bool = False
-        self.basic_user_access_bool = True
-        self.admin_access_validation_bool = False
+        self.basic_user_access_bool = False
 
         # Database
         self.db1 = None
@@ -307,7 +306,7 @@ class Window:
         self.signin_interface()
 
         # Initialize class for database
-        Database()
+        # Database()
 
         # Root window configuration
         self.master.title('DormBuilt HMS')
@@ -3122,7 +3121,7 @@ class Window:
                 self.admin_id_str = str(admin_id)
 
                 self.admin_access_bool = True
-                self.admin_access_validation_bool = False
+                self.basic_user_access_bool = False
 
                 # Instantiate methods
                 self.admin_get_current_user()
@@ -4420,9 +4419,8 @@ class Window:
             self.invalid_input()
         if not self.change_password_e.get():
             self.invalid_input()
-        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
-            print(self.admin_access_validation_bool)
         else:
             self.database_connect()
             self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
@@ -4436,6 +4434,12 @@ class Window:
 
             self.basic_user_status()
 
+            # Turn off admin access
+            if self.basic_user_access_bool:
+                self.admin_access_bool = False
+            else:
+                "Basic User Sign in is = False"
+
     def create_employee_request(self):
         if not self.employee_username_e.get():
             self.invalid_input()
@@ -4448,10 +4452,12 @@ class Window:
         else:
             try:
                 self.database_connect()
-                self.mycursor.execute("INSERT INTO basic_user (admin_id, username, password, role, date_created)"
-                                      "VALUES (%s,%s,%s,%s,%s)", (self.admin_id_str, self.employee_username_e.get(),
-                                                                  self.employee_password_e.get(),
-                                                                  self.employee_role_e.get(), date_str))
+                self.mycursor.execute("INSERT INTO basic_user (admin_id, username, password, role, date_created, "
+                                      "time_created) VALUES (%s,%s,%s,%s,%s,%s)", (self.admin_id_str,
+                                                                                   self.employee_username_e.get(),
+                                                                                   self.employee_password_e.get(),
+                                                                                   self.employee_role_e.get(),
+                                                                                   date_str, time_str))
 
                 self.db1.commit()
                 self.db1.close()
@@ -4461,7 +4467,9 @@ class Window:
 
                 self.dialog_box_top.destroy()
 
+                # Turn off admin access if account is basic user
                 self.basic_user_status()
+
             except Exception as e:
                 self.invalid_input()
                 print(e)
@@ -4473,7 +4481,7 @@ class Window:
             self.invalid_input()
         if not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -4488,6 +4496,9 @@ class Window:
                 self.mycursor.close()
 
                 messagebox.showinfo("Success", "Employee Account is successfully modified")
+
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
 
                 self.dialog_box_top.destroy()
             except Exception as e:
@@ -4525,8 +4536,11 @@ class Window:
             self.mycursor.close()
             self.db1.close()
 
+            # Turn off admin access if account is basic user
+            self.basic_user_status()
+
     def remove_employee_account_request(self):
-        if not self.admin_access_bool or self.admin_access_validation_bool is True:
+        if not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -4547,6 +4561,9 @@ class Window:
                 self.mycursor.close()
 
                 messagebox.showinfo("Success", "Removed account successfully")
+
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
 
                 self.account_settings_content_interface()
             except Exception as e:
@@ -4623,12 +4640,6 @@ class Window:
                 self.mycursor.close()
 
                 messagebox.showinfo("Success", "Removed action successfully")
-
-                # Turn off admin access validation
-                if not self.admin_access_validation_bool:
-                    pass
-                else:
-                    self.admin_access_validation_bool = False
 
             except Exception as e:
                 self.invalid_request()
@@ -4798,7 +4809,6 @@ class Window:
                 messagebox.showerror("Error", "Invalid User Name And Password")
             else:
                 self.admin_access_bool = True
-                self.admin_access_validation_bool = True
                 self.dialog_box_top.destroy()
 
             self.db1.close()
@@ -4894,7 +4904,7 @@ class Window:
         if self.basic_user_access_bool:
             self.admin_access_bool = False
         else:
-            pass
+            "Basic User Sign in is = False"
 
     def tenant_status_transaction_help(self):
         self.dialog_box_top = tk.Toplevel(self.master)
@@ -5169,6 +5179,16 @@ class Window:
         ttk.Label(employee_info_label_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
 
         ttk.Label(employee_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text='Date created: : ', style="small_info.TLabel").grid(column=0, row=3,
+                                                                                                   sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(employee_info_label_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=4,
+                                                                                                 sticky="w")
+
+        ttk.Label(employee_info_label_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
         # Buttons
         tk.Button(self.info_buttons_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
