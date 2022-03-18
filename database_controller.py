@@ -93,6 +93,16 @@ class Database:
             print("Foreign key could not be created")
             print(e)
 
+        # Alter basic_user table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`basic_user` ADD COLUMN `time_created` VARCHAR(45) "
+                                  "NOT NULL AFTER `date_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ room table ==================================================
 
         # Creating room table in database

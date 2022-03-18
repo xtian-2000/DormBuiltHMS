@@ -532,6 +532,7 @@ class Window:
         # Creating help menu
         help_menu = Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="User Manual", command=self.generate_user_manual)
+        help_menu.add_command(label="FAQs", command=self.generate_faqs)
         help_menu.add_command(label="Developer's Information", command=self.developer_information)
         help_menu.add_separator()
         help_menu.add_command(label="User Ratings", command=self.user_ratings)
@@ -1493,7 +1494,7 @@ class Window:
             # Create treeview
             self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview",
                                           yscrollcommand=info_tree_scr.set)
-            self.info_tree["columns"] = ("ID", "Name", "Password", "Role")
+            self.info_tree["columns"] = ("ID", "Name", "Password", "Role", "Date created")
 
             # Create columns
             self.info_tree.column("#0", width=0, stretch=False)
@@ -1501,6 +1502,7 @@ class Window:
             self.info_tree.column("Name", anchor="w", width=120)
             self.info_tree.column("Password", anchor="w", width=120)
             self.info_tree.column("Role", anchor="w", width=120)
+            self.info_tree.column("Date created", anchor="w", width=120)
 
             # Create headings
             self.info_tree.heading("#0", text="", anchor="w")
@@ -1508,6 +1510,7 @@ class Window:
             self.info_tree.heading("Name", text="Name", anchor="w")
             self.info_tree.heading("Password", text="Password", anchor="w")
             self.info_tree.heading("Role", text="Role", anchor="w")
+            self.info_tree.heading("Date created", text="Date created", anchor="w")
 
             self.info_tree.pack(side="top", fill="x")
 
@@ -1716,7 +1719,7 @@ class Window:
                   justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
-        self.room_availability_cb['values'] = ('Available', 'Fully Occupied', 'Maintenance')
+        self.room_availability_cb['values'] = ('Reserved', 'Available', 'Fully Occupied', 'Maintenance')
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
@@ -1807,7 +1810,7 @@ class Window:
                   justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
-        self.room_availability_cb['values'] = ('Available', 'Fully Occupied', 'Maintenance')
+        self.room_availability_cb['values'] = ('Reserved', 'Available', 'Fully Occupied', 'Maintenance')
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
@@ -4496,8 +4499,8 @@ class Window:
             self.admin_access_validation_dialog()
         else:
             self.database_connect()
-            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role "
-                                  "FROM basic_user b WHERE b.admin_id = ' "
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
+                                  "b.time_created FROM basic_user b WHERE b.admin_id = ' "
                                   + str(self.admin_id_str) + "' ORDER BY b.basic_user_id;")
 
             employees = self.mycursor.fetchall()
@@ -4510,10 +4513,12 @@ class Window:
             for record in employees:
                 if count % 2 == 0:
                     self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3]), tags=("oddrow",))
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                          tags=("oddrow",))
                 else:
                     self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3]), tags=("evenrow",))
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                          tags=("evenrow",))
                 count += 1
 
             self.db1.commit()
@@ -5536,9 +5541,9 @@ class Window:
 
         ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
 
-        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=6, sticky="w")
 
-        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=6, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
@@ -5561,7 +5566,11 @@ class Window:
 
     @staticmethod
     def generate_user_manual():
-        webbrowser.open_new(r"https://drive.google.com/file/d/1jHGevZruEFuYLzLiJhKODUiuTCyPD0_s/view?usp=sharing")
+        webbrowser.open_new(r"https://drive.google.com/file/d/1ccYBQGcj2_DGzWNsOd_MgljaN9oLJUSu/view?usp=sharing")
+
+    @staticmethod
+    def generate_faqs():
+        webbrowser.open_new(r"https://drive.google.com/file/d/1sOV-5pio4OOzGihje-nhDksITuQGJFUy/view?usp=sharing")
 
     @staticmethod
     def user_ratings():
