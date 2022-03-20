@@ -33,17 +33,9 @@ date_str = date.strftime('%x')
 time = datetime.now()
 time_str = time.strftime('%X')
 
-date_today = datetime.now()
-date_today_str = date_today.strftime("%d/%m/%Y %H:%M:%S")
-
 # Create variable for first day of the month
 fday_month = datetime.today().replace(day=1)
 fday_month_str = fday_month.strftime('%x')
-
-# Create variable for current day of the month
-currentday_month = datetime.today()
-currentday_month_dependencies = currentday_month.strftime("%d/%m/%Y %H:%M:%S")
-currentday_month_temp = currentday_month.strftime("%d/%m/%Y")
 
 hms_version = "DORv1.32"
 
@@ -71,6 +63,8 @@ class Window:
         self.room_cost_l = ttk.Label
         self.amount_to_be_paid_l = ttk.Label
         self.discount_l = ttk.Label
+        self.application_fee_l = ttk.Label
+        self.amenities_cost_l = ttk.Label
 
         # PhotoImage
         db_logo_im = PhotoImage(file=r"Dormbuilt_logo.png")
@@ -100,6 +94,9 @@ class Window:
 
         available_im = PhotoImage(file=r"available_im.png")
         self.available_im_resized = available_im.subsample(1, 1)
+
+        reserved_im = PhotoImage(file=r"reserved_l.png")
+        self.reserved_im_resized = reserved_im.subsample(1, 1)
 
         full_im = PhotoImage(file=r"full_im.png")
         self.full_im_resized = full_im.subsample(1, 1)
@@ -157,6 +154,9 @@ class Window:
 
         add_basic_im = PhotoImage(file=r"add_basic_b.png")
         self.add_basic_im_resized = add_basic_im.subsample(1, 1)
+
+        add_admin_im = PhotoImage(file=r"add_admin_b.png")
+        self.add_admin_im_resized = add_admin_im.subsample(1, 1)
 
         home_active_im = PhotoImage(file=r"home_active_b.png")
         self.home_active_im_resized = home_active_im.subsample(1, 1)
@@ -705,38 +705,35 @@ class Window:
         Content_control.destroy_content(self.content_lf)
 
         # ================================================ Tenant info ===============================================
-        payment_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        payment_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        payment_info_title_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
-        payment_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(payment_info_title_lf, text='Sales Dashboard',
+        ttk.Label(info_title_lf, text='Sales Dashboard',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(payment_info_title_lf, text='basic',
+        ttk.Label(info_title_lf, text='basic',
                   style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(payment_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456", bg="#FFFFFF", relief="flat",
                   command=self.show_sales_dashboard_module).pack(fill="x")
 
         # Filter
-        self.dashboard_filter_to = DateEntry(payment_info_title_lf, width=20,
-                                             date_pattern="DD/mm/yyyy", borderwidth=2)
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
         self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
 
-        ttk.Label(payment_info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
-                                                                                  anchor="nw", padx=5, pady=5)
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5, pady=5)
 
-        self.dashboard_filter_from = DateEntry(payment_info_title_lf, width=20,
-                                               date_pattern="DD/mm/yyyy", borderwidth=2)
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20, date_pattern="MM/dd/yy", borderwidth=2)
         self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
 
-        ttk.Label(payment_info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
-                                                                                     anchor="nw", padx=5, pady=5)
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5, pady=5)
 
         # Insert values to Date Entry
         self.dashboard_filter_from.delete(0, "end")
@@ -746,7 +743,7 @@ class Window:
         self.dashboard_filter_to.insert(0, date_str)
 
         # ================================================ Room info content ===========================================
-        self.info_content_lf = tk.LabelFrame(payment_info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
@@ -811,6 +808,29 @@ class Window:
 
         ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
                                                                                  anchor="nw", padx=5, pady=5)
+
+        # Filter Date
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                          anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20,
+                                               date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                             anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
+
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
@@ -854,6 +874,28 @@ class Window:
         ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
                                                                                  anchor="nw", padx=5, pady=5)
 
+        # Filter Date
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                          anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20,
+                                               date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                             anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
+
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
@@ -896,6 +938,25 @@ class Window:
 
         ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
                                                                                  anchor="nw", padx=5, pady=5)
+
+        # Filter
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20, date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right", anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
 
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
@@ -1107,8 +1168,8 @@ class Window:
         ttk.Label(title_lf, text='Action History',
                   style="h1.TLabel").pack(side="left", anchor="nw")
 
-        ttk.Label(title_lf, text='basic',
-                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+        ttk.Label(title_lf, text='admin',
+                  style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
         refresh_b_lf = tk.LabelFrame(title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
@@ -1121,7 +1182,7 @@ class Window:
         self.info_content_lf.pack(side="top", fill="both", expand=True)
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
-                  bg="#89CFF0", relief="flat", command=self.show_action_information_module).pack(side="top", fill="x")
+                  bg="#4C8404", relief="flat", command=self.show_action_information_module).pack(side="top", fill="x")
 
     def notif_content_interface(self):
         self.change_button_color()
@@ -1451,7 +1512,7 @@ class Window:
         self.info_tree.column("Discount Code", anchor="w", width=80)
         self.info_tree.column("Discount Amount", anchor="center", width=80)
         self.info_tree.column("Discount Status", anchor="center", width=80)
-        self.info_tree.column("Date created", width=0, stretch=False)
+        self.info_tree.column("Date created", anchor="center", width=80)
 
         # Create headings
         self.info_tree.heading("#0", text="", anchor="w")
@@ -1459,7 +1520,7 @@ class Window:
         self.info_tree.heading("Discount Code", text="Discount Code", anchor="w")
         self.info_tree.heading("Discount Amount", text="Discount Amount (%)", anchor="center")
         self.info_tree.heading("Discount Status", text="Discount Status", anchor="center")
-        self.info_tree.heading("Date created", text="Date created", anchor="w")
+        self.info_tree.heading("Date created", text="Date created", anchor="center")
 
         self.info_tree.pack(side="top", fill="x")
 
@@ -1482,8 +1543,6 @@ class Window:
     def show_employee_information_module(self):
         if not self.admin_access_bool:
             self.admin_access_validation_dialog()
-            print("self.show_employee_information_module")
-            # self.show_employee_information_module()
         else:
             Content_control.destroy_content(self.info_tree_lf)
 
@@ -1529,53 +1588,56 @@ class Window:
 
     # Action History
     def show_action_information_module(self):
-        Content_control.destroy_content(self.info_content_lf)
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            Content_control.destroy_content(self.info_content_lf)
 
-        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
-        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+            self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+            self.info_tree_lf.pack(side="left", fill="both", expand=True)
 
-        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
-        info_tree_scr.pack(side="right", fill="y")
+            info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+            info_tree_scr.pack(side="right", fill="y")
 
-        # Create treeview
-        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
-        self.info_tree["columns"] = (
-            "Action ID", "Action Description", "Admin ID", "Current User", "Privilege Access", "Date Created")
+            # Create treeview
+            self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+            self.info_tree["columns"] = (
+                "Action ID", "Action Description", "Admin ID", "Current User", "Privilege Access", "Date Created")
 
-        # Create columns
-        self.info_tree.column("#0", width=0, stretch=False)
-        self.info_tree.column("Action ID", anchor="center", width=80)
-        self.info_tree.column("Action Description", anchor="w")
-        self.info_tree.column("Admin ID", anchor="c", width=0, stretch=False)
-        self.info_tree.column("Current User", anchor="center", width=80)
-        self.info_tree.column("Privilege Access", anchor="center", width=0, stretch=False)
-        self.info_tree.column("Date Created", anchor="w", width=80)
+            # Create columns
+            self.info_tree.column("#0", width=0, stretch=False)
+            self.info_tree.column("Action ID", anchor="center", width=80)
+            self.info_tree.column("Action Description", anchor="w")
+            self.info_tree.column("Admin ID", anchor="c", width=0, stretch=False)
+            self.info_tree.column("Current User", anchor="center", width=80)
+            self.info_tree.column("Privilege Access", anchor="center", width=0, stretch=False)
+            self.info_tree.column("Date Created", anchor="w", width=80)
 
-        # Create headings
-        self.info_tree.heading("#0", text="", anchor="w")
-        self.info_tree.heading("Action ID", text="Action ID", anchor="center")
-        self.info_tree.heading("Action Description", text="Action Description", anchor="w")
-        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
-        self.info_tree.heading("Current User", text="Current User", anchor="center")
-        self.info_tree.heading("Privilege Access", text="Privilege Access", anchor="center")
-        self.info_tree.heading("Date Created", text="Date Created", anchor="w")
+            # Create headings
+            self.info_tree.heading("#0", text="", anchor="w")
+            self.info_tree.heading("Action ID", text="Action ID", anchor="center")
+            self.info_tree.heading("Action Description", text="Action Description", anchor="w")
+            self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+            self.info_tree.heading("Current User", text="Current User", anchor="center")
+            self.info_tree.heading("Privilege Access", text="Privilege Access", anchor="center")
+            self.info_tree.heading("Date Created", text="Date Created", anchor="w")
 
-        self.info_tree.pack(side="top", fill="x")
+            self.info_tree.pack(side="top", fill="x")
 
-        # Initialize method for inserting items in a list
-        self.action_info_treeview_request()
+            # Initialize method for inserting items in a list
+            self.action_info_treeview_request()
 
-        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
-        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+            self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+            self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
-        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
-                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+            tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                     bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
 
-        ttk.Label(self.info_buttons_lf, text="Click on an action to open this section!",
-                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+            ttk.Label(self.info_buttons_lf, text="Click on an action to open this section!",
+                      style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
 
-        # Bind the treeview to database_view_info method
-        self.info_tree.bind("<ButtonRelease-1>", self.action_info_section)
+            # Bind the treeview to database_view_info method
+            self.info_tree.bind("<ButtonRelease-1>", self.action_info_section)
 
     # Notif
     def show_notif_information_module(self):
@@ -2349,8 +2411,8 @@ class Window:
                   justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
-        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Active', 'Inactive',
-                                           "Delinquent")
+        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Processing',
+                                           "Monthly rental fee", 'Inactive', "Delinquent")
         self.tenant_status_cb.current(0)
         self.tenant_status_cb.grid(column=1, row=3, sticky="w")
 
@@ -2415,8 +2477,8 @@ class Window:
                   justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
         self.tenant_status_cb = ttk.Combobox(forms_lf)
-        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Active', 'Inactive',
-                                           "Delinquent")
+        self.tenant_status_cb['values'] = ("Newly registered", "Application", "Confirmation", 'Processing',
+                                           "Monthly rental fee", 'Inactive', "Delinquent")
         self.tenant_status_cb.current(0)
         self.tenant_status_cb.grid(column=1, row=3, sticky="w")
 
@@ -2736,7 +2798,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
                   command=self.create_discount_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create discount!",
@@ -2859,7 +2922,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Continue", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Continue", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  image=self.add_admin_im_resized, compound="left",
                   command=self.change_username_password_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="The new username and password will\n be saved on your account",
@@ -2918,7 +2982,8 @@ class Window:
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
 
-        tk.Button(buttons_lf, text="Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#4C8404", relief="flat",
+                  image=self.add_admin_im_resized, compound="left",
                   command=self.create_employee_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create an\n employee account!",
@@ -3780,26 +3845,45 @@ class Window:
         self.database_connect()
 
         # Conditions for order by filter
-        if self.order_by_cb.get() in ['Tenant ID', 'Date Created']:
+        if self.order_by_cb.get() == 'Tenant ID':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
                                   "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
-                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_id ASC;")
+                                  "WHERE t.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY t.tenant_id DESC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
                                   "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
-                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
+                                  "WHERE t.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
                                   "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
-                                  "WHERE admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_status ASC;")
+                                  "WHERE t.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY t.tenant_status ASC;")
+        elif self.order_by_cb.get() == 'Date Created':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
+                                  "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
+                                  "WHERE t.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY t.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
                                   "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
-                                  "WHERE admin_id = '" + str(self.admin_id_str) + "';")
+                                  "WHERE t.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '" + self.admin_id_str + "';")
 
         tenants = self.mycursor.fetchall()
 
@@ -3966,34 +4050,50 @@ class Window:
         self.database_connect()
 
         # Conditions for order by filter
-        if self.order_by_cb.get() in ['Payment ID', 'Date Created']:
+        if self.order_by_cb.get() == 'Payment ID':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_id ASC;")
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE p.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY p.payment_id DESC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY t.tenant_name ASC;")
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE p.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Payment Description':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "' ORDER BY p.payment_description ASC;")
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE p.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND p.admin_id = '" +
+                                  self.admin_id_str + "' ORDER BY p.payment_description ASC;")
+        elif self.order_by_cb.get() == 'Date Created':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                                  "p.admin_id, p.basic_user_id, p.discount_code, "
+                                  "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE p.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                                  + self.admin_id_str + "' ORDER BY p.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
                                   "p.admin_id, p.basic_user_id, p.discount_code, "
                                   "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                  "p.admin_id = '" + str(self.admin_id_str) + "';")
+                                  "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE p.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND p.admin_id = '" + self.admin_id_str + "';")
 
         payments = self.mycursor.fetchall()
         print(payments)
@@ -4142,31 +4242,47 @@ class Window:
         self.database_connect()
 
         # Conditions for order by filter
-        if self.order_by_cb.get() in ['Booking ID', 'Date Created']:
+        if self.order_by_cb.get() == 'Booking ID':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
-                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.booking_id ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.booking_id DESC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
-                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.tenant_name ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Tenant Email':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
-                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.tenant_email ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.tenant_email ASC;")
         elif self.order_by_cb.get() == 'Booking Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
-                                  "admin_id = ' " + str(self.admin_id_str) + "' ORDER BY b.booking_status ASC;")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.booking_status ASC;")
+        elif self.order_by_cb.get() == 'Date Created':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT b.booking_id, b.tenant_name, b.tenant_email, "
-                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b where "
-                                  "admin_id = ' " + str(self.admin_id_str) + "';")
+                                  "b.admin_id, b.booking_status, b.date_created, b.time_created FROM booking b WHERE "
+                                  "b.date_created >= '" + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' " + self.admin_id_str + "';")
 
         bookings = self.mycursor.fetchall()
         print(bookings)
@@ -4255,10 +4371,11 @@ class Window:
             try:
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO discount (discount_code, discount_amount, admin_id,"
-                                      " basic_user_id, date_created, discount_status) VALUES (%s,%s,%s,%s,%s,%s)",
-                                      (self.discount_code_e.get(), self.discount_amount_sp.get(),
-                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str,
-                                       self.discount_status_cb.get()))
+                                      " basic_user_id, date_created, time_created, discount_status) VALUES "
+                                      "(%s,%s,%s,%s,%s,%s,%s)", (self.discount_code_e.get(),
+                                                                 self.discount_amount_sp.get(), self.admin_id_str,
+                                                                 self.basic_user_id_str, date_str, time_str,
+                                                                 self.discount_status_cb.get()))
 
                 self.db1.commit()
                 self.db1.close()
@@ -4312,28 +4429,28 @@ class Window:
         if self.order_by_cb.get() in ['Discount ID', 'Date Created']:
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
-                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY d.discount_id ASC;")
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_id ASC;")
         elif self.order_by_cb.get() == 'Discount Code':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
-                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY d.discount_code ASC;")
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_code ASC;")
         elif self.order_by_cb.get() == 'Discount Amount':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
-                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY d.discount_amount ASC;")
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_amount ASC;")
         elif self.order_by_cb.get() == 'Discount Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
-                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY d.discount_status ASC;")
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_status ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
-                                  "d.discount_status, d.date_created FROM discount d WHERE admin_id = ' "
-                                  + str(self.admin_id_str) + "';")
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "';")
 
         discount = self.mycursor.fetchall()
 
@@ -4345,11 +4462,11 @@ class Window:
         for record in discount:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                       tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4]),
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
                                       tags=("evenrow",))
             count += 1
 
@@ -4506,9 +4623,7 @@ class Window:
                 print(e)
 
     def employee_info_treeview_request(self):
-        if not self.admin_access_bool:
-            self.admin_access_validation_dialog()
-        else:
+        try:
             self.database_connect()
             self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
                                   "b.time_created FROM basic_user b WHERE b.admin_id = ' "
@@ -4538,6 +4653,10 @@ class Window:
 
             # Turn off admin access if account is basic user
             self.basic_user_status()
+
+        except Exception as e:
+            self.invalid_request()
+            print(e)
 
     def remove_employee_account_request(self):
         if not self.admin_access_bool:
@@ -4572,33 +4691,41 @@ class Window:
 
     # Action History
     def action_info_treeview_request(self):
-        self.database_connect()
-        self.mycursor.execute("SELECT a.action_id, a.action_description, a.admin_id, a.user_current, "
-                              "a.privilege_access, a.date_created, a.time_created, a.basic_user_id FROM "
-                              "action_history a WHERE admin_id = '" + self.admin_id_str + "';")
+        try:
+            self.database_connect()
+            self.mycursor.execute("SELECT a.action_id, a.action_description, a.admin_id, a.user_current, "
+                                  "a.privilege_access, a.date_created, a.time_created, a.basic_user_id FROM "
+                                  "action_history a WHERE admin_id = '" + self.admin_id_str + "';")
 
-        actions = self.mycursor.fetchall()
-        print(actions)
+            actions = self.mycursor.fetchall()
+            print(actions)
 
-        # Create configure for striped rows
-        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+            # Create configure for striped rows
+            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-        count = 0
-        for record in actions:
-            if count % 2 == 0:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7]), tags=("oddrow",))
-            else:
-                self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                              record[6], record[7]), tags=("evenrow",))
-            count += 1
+            count = 0
+            for record in actions:
+                if count % 2 == 0:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7]), tags=("oddrow",))
+                else:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7]), tags=("evenrow",))
+                count += 1
 
-        self.db1.commit()
-        self.mycursor.close()
-        self.db1.close()
+            self.db1.commit()
+            self.mycursor.close()
+            self.db1.close()
+
+            # Turn off admin access if account is basic user
+            self.basic_user_status()
+
+        except Exception as e:
+            self.invalid_request()
+            print(e)
 
     def action_history_request(self):
         try:
@@ -4641,6 +4768,9 @@ class Window:
 
                 messagebox.showinfo("Success", "Removed action successfully")
 
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
+
             except Exception as e:
                 self.invalid_request()
                 print(e)
@@ -4660,9 +4790,13 @@ class Window:
 
                 messagebox.showinfo("Success", "Cleared action history successfully")
 
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
+
             except Exception as e:
                 self.invalid_request()
                 print(e)
+
         print(event)
 
     # Notif
@@ -5114,6 +5248,9 @@ class Window:
             capacity = "2 or more Tenant Capacity"
 
         # Condition for room availability
+        if values[4] == "Reserved":
+            availability_im = self.reserved_im_resized
+            availability = "Reserved"
         if values[4] == "Available":
             availability_im = self.available_im_resized
             availability = "Available"
@@ -5447,6 +5584,10 @@ class Window:
         ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
 
         ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
 
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")

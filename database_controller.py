@@ -330,6 +330,17 @@ class Database:
             print("discount_status column could not be created successfully")
             print(e)
 
+        # Alter discount table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`discount` ADD COLUMN `time_created` VARCHAR(45) NOT NULL "
+                                  "AFTER `date_created`, CHANGE COLUMN `discount_status` `discount_status` VARCHAR(45) "
+                                  "NOT NULL AFTER `basic_user_id`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ action_history table ========================================
 
         # Creating action_history table in database
