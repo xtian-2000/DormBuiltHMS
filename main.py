@@ -5,7 +5,7 @@ from tkinter.messagebox import showinfo
 from content_controller import Content_control
 from style import Content
 from tkinter import PhotoImage
-# from database_controller import Database
+from database_controller import Database
 import mysql.connector as mysql
 from random import randint
 from tkinter import Menu
@@ -37,7 +37,7 @@ time_str = time.strftime('%X')
 fday_month = datetime.today().replace(day=1)
 fday_month_str = fday_month.strftime('%x')
 
-hms_version = "DORv1.32"
+hms_version = "DORv1.55"
 
 
 class Window:
@@ -63,6 +63,7 @@ class Window:
         self.room_cost_l = ttk.Label
         self.amount_to_be_paid_l = ttk.Label
         self.discount_l = ttk.Label
+        self.payment_description_l = ttk.Label
         self.application_fee_l = ttk.Label
         self.amenities_cost_l = ttk.Label
 
@@ -148,6 +149,9 @@ class Window:
 
         create_im = PhotoImage(file=r"create_b.png")
         self.create_im_resized = create_im.subsample(1, 1)
+
+        assessment_im = PhotoImage(file=r"create_assessment_b.png")
+        self.assessment_im_resized = assessment_im.subsample(1, 1)
 
         empty_im = PhotoImage(file=r"empty_l.png")
         self.empty_im_resized = empty_im.subsample(1, 1)
@@ -307,7 +311,7 @@ class Window:
         self.signin_interface()
 
         # Initialize class for database
-        # Database()
+        Database()
 
         # Root window configuration
         self.master.title('DormBuilt HMS')
@@ -2678,36 +2682,40 @@ class Window:
         ttk.Label(forms1_lf, text='Payment Information',
                   style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
 
-        ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
-                  justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
+        self.payment_description_l = ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
+                                               justify="left")
+        self.payment_description_l.grid(column=0, row=4, padx=2.5, sticky="w")
 
         self.application_fee_l = ttk.Label(forms1_lf, text=500, style="small_info.TLabel", justify="left")
         self.application_fee_l.grid(column=1, row=4, sticky="w")
 
+        ttk.Label(forms1_lf, text='-------------------------',
+                  style="on.TLabel").grid(column=0, row=5, padx=2.5, sticky="w")
+
         ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
-                  justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
-
-        self.room_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
-        self.room_cost_l.grid(column=1, row=5, sticky="w")
-
-        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
 
-        self.amenities_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
-        self.amenities_cost_l.grid(column=1, row=6, sticky="w")
+        self.room_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=6, sticky="w")
 
-        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=7, padx=2.5, sticky="w")
 
+        self.amenities_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.amenities_cost_l.grid(column=1, row=7, sticky="w")
+
+        ttk.Label(forms1_lf, text='Discount (%) ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=8, padx=2.5, sticky="w")
+
         self.discount_l = ttk.Label(forms1_lf, text="None applied", style="small_info.TLabel", justify="left")
-        self.discount_l.grid(column=1, row=7, sticky="w")
+        self.discount_l.grid(column=1, row=8, sticky="w")
 
         ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
-                  justify="left").grid(column=0, row=8, padx=2.5, sticky="w")
+                  justify="left").grid(column=0, row=9, padx=2.5, sticky="w")
 
         self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=500,
                                              style="small_info.TLabel", justify="left")
-        self.amount_to_be_paid_l.grid(column=1, row=8, sticky="w")
+        self.amount_to_be_paid_l.grid(column=1, row=9, sticky="w")
 
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
@@ -2733,6 +2741,104 @@ class Window:
                   command=self.create_tenant_transaction_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create transaction!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+    def create_assessment_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create assessment")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Create assessment',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(title_lf, text=" Assessment info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.payment_transaction_help).pack(side="right", anchor="ne", padx=5, pady=5)
+
+        forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        ttk.Label(forms1_lf, text='Payment Description', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
+        self.payment_description_cb['values'] = ('Application fee', 'Processing fee', 'Monthly rental fee')
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+        self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
+
+        # Payment information section
+        ttk.Label(forms1_lf, text='Assessment Information',
+                  style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
+
+        self.payment_description_l = ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
+                                               justify="left")
+        self.payment_description_l.grid(column=0, row=4, padx=2.5, sticky="w")
+
+        self.application_fee_l = ttk.Label(forms1_lf, text=500, style="small_info.TLabel", justify="left")
+        self.application_fee_l.grid(column=1, row=4, sticky="w")
+
+        ttk.Label(forms1_lf, text='-------------------------',
+                  style="on.TLabel").grid(column=0, row=5, padx=2.5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=6, sticky="w")
+
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=7, padx=2.5, sticky="w")
+
+        self.amenities_cost_l = ttk.Label(forms1_lf, text=0, style="small_info.TLabel", justify="left")
+        self.amenities_cost_l.grid(column=1, row=7, sticky="w")
+
+        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=9, padx=2.5, sticky="w")
+
+        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=500,
+                                             style="small_info.TLabel", justify="left")
+        self.amount_to_be_paid_l.grid(column=1, row=9, sticky="w")
+
+        forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms2_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        ttk.Label(forms2_lf, text=self.tenant_id, style="small_info.TLabel",
+                  justify="left").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+        self.payment_amount_sp.insert(0, 500)
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.create_assessment_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create assessment!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -4163,6 +4269,151 @@ class Window:
                 self.invalid_request()
                 print(e)
 
+    def create_assessment_request(self):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        # Connect to database
+        self.database_connect()
+
+        if not self.payment_amount_sp.get():
+            self.invalid_input()
+
+        elif self.payment_description_cb.get() == "Application fee":
+            try:
+                # Insert values to assessment
+                self.mycursor.execute("INSERT INTO assessment (assessment_amount, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, time_created, assessment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), self.tenant_id,
+                                       self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                       self.payment_description_cb.get()))
+
+                self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                      + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
+                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                # self.room_add_occupant()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+                print("Application")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+        elif self.payment_description_cb.get() == "Processing fee":
+            print(values[3])
+            if values[3] == 'None':
+                messagebox.showerror("Error", "Cannot proceed with the payment. "
+                                              "No Room ID available, please pay Confirmation fee first.")
+            else:
+                self.database_connect()
+
+                # Insert values to assessment
+                self.mycursor.execute("INSERT INTO assessment (assessment_amount, room_id, tenant_id, "
+                                      "admin_id, basic_user_id, date_created, time_created, "
+                                      "assessment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                       self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                       self.payment_description_cb.get()))
+                self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                      + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
+                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Payment is created")
+
+                self.dialog_box_top.destroy()
+        elif self.payment_description_cb.get() == "Monthly rental fee":
+            print(values[3])
+            if values[3] == 'None':
+                messagebox.showerror("Error", "Cannot proceed with the payment. "
+                                              "No Room ID available, please pay Confirmation fee\n"
+                                              "and Processing fee first.")
+            else:
+                if values[4] == 'None':
+                    self.database_connect()
+
+                    # Insert data
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
+                    self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                          + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
+                                          + str(self.tenant_id) + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+
+                    messagebox.showinfo("Success", "Payment is created")
+
+                    self.dialog_box_top.destroy()
+                else:
+                    self.database_connect()
+
+                    # Insert data
+                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                           self.discount_code_e.get(), self.payment_description_cb.get()))
+                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
+                                          + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                          "' WHERE tenant_id = '"
+                                          + str(self.tenant_id) + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+
+                    messagebox.showinfo("Success", "Payment is created")
+
+                    self.dialog_box_top.destroy()
+        else:
+            try:
+                self.database_connect()
+                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
+                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
+                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), self.tenant_id,
+                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Transaction is  created")
+                print("Not application")
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
+
+        # Record action history
+        self.action_description = "Assessment created for tenant id " + str(self.tenant_id) + "."
+        self.action_history_request()
+
     # Payment
     def payment_info_treeview_request(self):
         try:
@@ -5268,8 +5519,14 @@ class Window:
 
         if self.payment_description_cb.get() == "Application fee":
             amount_to_be_paid = 500
+            self.payment_description_l.config(text="Application fee: ")
+            self.application_fee_l.config(text=amount_to_be_paid)
+            self.room_cost_l.config(text=0)
+            self.amenities_cost_l.config(text=0)
         elif self.payment_description_cb.get() == "Confirmation fee":
             amount_to_be_paid = int(values[6]) + int(values[7])
+            self.payment_description_l.config(text="Confirmation fee: ")
+            self.application_fee_l.config(text=amount_to_be_paid)
         elif self.payment_description_cb.get() == "Processing fee":
             try:
                 # Get the value room and amenities price
@@ -5289,7 +5546,8 @@ class Window:
                 amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                 amount_to_be_paid = (((room_price + amenities_price) * 2) + 1500)
 
-                self.application_fee_l.config(text=0)
+                self.payment_description_l.config(text="Processing fee: ")
+                self.application_fee_l.config(text=amount_to_be_paid)
                 self.room_cost_l.config(text=room_price)
                 self.amenities_cost_l.config(text=amenities_price)
             except Exception as e:
@@ -5316,7 +5574,8 @@ class Window:
                 amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                 amount_to_be_paid = room_price + amenities_price
 
-                self.application_fee_l.config(text=0)
+                self.payment_description_l.config(text="Monthly rental fee: ")
+                self.application_fee_l.config(text=amount_to_be_paid)
                 self.room_cost_l.config(text=room_price)
                 self.amenities_cost_l.config(text=amenities_price)
             except Exception as e:
@@ -5695,6 +5954,10 @@ class Window:
         # Buttons
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        tk.Button(buttons_lf, text=" Create assessment", font="OpenSans, 12", fg="#FFFFFF", bg="#082B7D",
+                  relief="flat", image=self.assessment_im_resized, compound="left", justify="left",
+                  command=self.create_assessment_dialog).pack(side="top", pady=5, fill="x")
 
         tk.Button(buttons_lf, text=" Create transaction", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   relief="flat", image=self.create_im_resized, compound="left", justify="left",

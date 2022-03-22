@@ -248,6 +248,16 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter tenant table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` CHANGE COLUMN `tenant_balance` `tenant_balance` "
+                                  "INT NULL DEFAULT 0 ;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ payment table ===============================================
 
         # Creating payment table in database
@@ -480,4 +490,19 @@ class Database:
             print("alteration is added successfully")
         except Exception as e:
             print("alteration failed")
+            print(e)
+
+        # ================================================ assessment table ============================================
+
+        # Creating assessment table in database
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`assessment` (`assessment_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, `assessment_amount` INT NOT NULL, `room_id` INT NULL, `tenant_id` "
+                                  "INT NOT NULL, `admin_id` INT NOT NULL, `basic_user_id` INT NULL, "
+                                  "`assessment_description` VARCHAR(45) NOT NULL, `date_created` VARCHAR(45) NOT NULL, "
+                                  "`time_created` VARCHAR(45) NOT NULL, PRIMARY KEY (`assessment_id`));")
+            print("'assessment' table is created successfully")
+        except Exception as e:
+            print("'notif' table could not be created")
             print(e)
