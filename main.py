@@ -5,7 +5,7 @@ from tkinter.messagebox import showinfo
 from content_controller import Content_control
 from style import Content
 from tkinter import PhotoImage
-from database_controller import Database
+# from database_controller import Database
 import mysql.connector as mysql
 from random import randint
 from tkinter import Menu
@@ -192,6 +192,12 @@ class Window:
         payment_inactive_im = PhotoImage(file=r"payment_inactive_b.png")
         self.payment_inactive_im_resized = payment_inactive_im.subsample(1, 1)
 
+        assessment_active_im = PhotoImage(file=r"assessment_active_b.png")
+        self.assessment_active_im_resized = assessment_active_im.subsample(1, 1)
+
+        assessment_inactive_im = PhotoImage(file=r"assessment_inactive_b.png")
+        self.assessment_inactive_im_resized = assessment_inactive_im.subsample(1, 1)
+
         discount_active_im = PhotoImage(file=r"discount_active_b.png")
         self.discount_active_im_resized = discount_active_im.subsample(1, 1)
 
@@ -224,6 +230,7 @@ class Window:
         self.home_b = tk.Button
         self.dashboard_b = tk.Button
         self.tenants_b = tk.Button
+        self.assessment_b = tk.Button
         self.payments_b = tk.Button
         self.booking_b = tk.Button
         self.discounts_b = tk.Button
@@ -311,7 +318,7 @@ class Window:
         self.signin_interface()
 
         # Initialize class for database
-        Database()
+        # Database()
 
         # Root window configuration
         self.master.title('DormBuilt HMS')
@@ -574,6 +581,11 @@ class Window:
                                    bg="#FFFFFF", relief="flat", image=self.tenant_inactive_im_resized, compound="left",
                                    command=self.tenant_content_interface)
         self.tenants_b.pack(side="top", anchor="w")
+
+        self.assessment_b = tk.Button(left_nav_lf, text=" Assessments", font=("OpenSans", 15), fg='#7c8084',
+                                      bg="#FFFFFF", relief="flat", image=self.assessment_inactive_im_resized,
+                                      compound="left", command=self.assessment_content_interface)
+        self.assessment_b.pack(side="top", anchor="w")
 
         self.payments_b = tk.Button(left_nav_lf, text=" Payments", font=("OpenSans", 15), fg='#7c8084',
                                     bg="#FFFFFF", relief="flat", image=self.payment_inactive_im_resized,
@@ -842,6 +854,80 @@ class Window:
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#89CFF0", relief="flat", command=self.show_tenant_information_module).pack(side="top", fill="x")
+
+    def assessment_content_interface(self):
+        self.change_button_color()
+        self.assessment_b.configure(fg='#395A68', image=self.assessment_active_im_resized)
+
+        # Clean widgets in the master window
+        Content_control.destroy_content(self.content_lf)
+
+        # ================================================ Payment info ===============================================
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
+
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
+
+        ttk.Label(info_title_lf, text='Assessment Information',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+
+        ttk.Label(info_title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
+
+        tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
+                  bg="#FFFFFF", relief="flat", command=self.show_assessment_information_module).pack(fill="x")
+
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Assessment ID', 'Tenant Name', 'Assessment Description', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
+
+        # Filter Date
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                          anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20,
+                                               date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                             anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
+
+        # Filter Tenant ID
+
+        self.tenant_id_filter_sp = ttk.Spinbox(info_title_lf, from_=0, to=99999, wrap=True)
+        self.tenant_id_filter_sp.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Tenant ID: ", style="h2_small.TLabel").pack(side="right",
+                                                                                   anchor="nw", padx=5, pady=5)
+
+        # ================================================ Room info content ===========================================
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="x")
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+                  bg="#89CFF0", relief="flat",
+                  command=self.show_assessment_information_module).pack(side="top", fill="x")
 
     def payment_content_interface(self):
         self.change_button_color()
@@ -1498,6 +1584,65 @@ class Window:
         tk.Button(self.info_content_lf, text="Generate report", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   image=self.report_im_resized, compound="left", relief="flat",
                   command=self.generate_sales_report_request).pack(side="left", padx=10, pady=10)
+
+    # Assessment
+    def show_assessment_information_module(self):
+        Content_control.destroy_content(self.info_content_lf)
+
+        self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_tree_lf.pack(side="left", fill="both", expand=True)
+
+        info_tree_scr = tk.Scrollbar(self.info_tree_lf)
+        info_tree_scr.pack(side="right", fill="y")
+
+        # Create treeview
+        self.info_tree = ttk.Treeview(self.info_tree_lf, style="default.Treeview", yscrollcommand=info_tree_scr.set)
+        self.info_tree["columns"] = ("Assessment ID", "Tenant ID", "Tenant Name", "Assessment Amount", "Room ID",
+                                     "Admin ID", "Basic User ID", "Assessment Description",
+                                     "Date created", "Tenant Email")
+
+        # Create columns
+        self.info_tree.column("#0", width=0, stretch=False)
+        self.info_tree.column("Assessment ID", anchor="center", width=80)
+        self.info_tree.column("Tenant ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Tenant Name", anchor="w", width=80)
+        self.info_tree.column("Assessment Amount", anchor="center", width=80)
+        self.info_tree.column("Room ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Admin ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Basic User ID", anchor="center", width=0, stretch=False)
+        self.info_tree.column("Assessment Description", anchor="w", width=80)
+        self.info_tree.column("Date created", anchor="w", width=80)
+        self.info_tree.column("Tenant Email", anchor="w", width=0, stretch=False)
+
+        # Create headings
+        self.info_tree.heading("#0", text="", anchor="w")
+        self.info_tree.heading("Assessment ID", text="Assessment ID", anchor="center")
+        self.info_tree.heading("Tenant ID", text="Tenant ID", anchor="center")
+        self.info_tree.heading("Tenant Name", text="Tenant Name", anchor="w")
+        self.info_tree.heading("Assessment Amount", text="Assessment Amount", anchor="center")
+        self.info_tree.heading("Room ID", text="Room ID", anchor="center")
+        self.info_tree.heading("Admin ID", text="Admin ID", anchor="center")
+        self.info_tree.heading("Basic User ID", text="Basic User ID", anchor="center")
+        self.info_tree.heading("Assessment Description", text="Assessment Description", anchor="w")
+        self.info_tree.heading("Date created", text="Date created", anchor="w")
+        self.info_tree.heading("Tenant Email", text="Tenant Email", anchor="w")
+
+        self.info_tree.pack(side="top", fill="x")
+
+        # Initialize method for inserting items in a list
+        self.assessment_info_treeview_request()
+
+        self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
+
+        tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
+                 bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
+
+        ttk.Label(self.info_buttons_lf, text="Click on an assessment to open this section!",
+                  style="h2_small.TLabel").pack(side="top", pady=5, padx=10, anchor="center")
+
+        # Bind the treeview to database_view_info method
+        self.info_tree.bind("<ButtonRelease-1>", self.assessment_info_section)
 
     # Payment
     def show_payment_information_module(self):
@@ -2481,6 +2626,104 @@ class Window:
                   command=self.create_room_transaction_request).pack(side="left")
 
         ttk.Label(buttons_lf, text="Click here to create transaction!",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
+    def create_room_assessment_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Create Assessment")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        amount_to_be_paid = int(values[6]) + int(values[7])
+
+        # ================================================ Widgets for resetting password ==========================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x")
+
+        ttk.Label(title_lf, text='Create Assessment',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms1_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms1_lf.pack(side="top", fill="both", pady=15, expand=True)
+
+        ttk.Label(forms1_lf, text='Payment Description', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
+        self.payment_description_cb['values'] = ('Confirmation fee',)
+        self.payment_description_cb['state'] = 'readonly'
+        self.payment_description_cb.current(0)
+        self.payment_description_cb.grid(column=1, row=0, sticky="w")
+        self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
+
+        tk.Button(forms1_lf, text=" Transaction info", font=("OpenSans", 10), fg='#585456', bg="#FFFFFF", relief="flat",
+                  image=self.exclamation_im_resized, compound="left",
+                  command=self.payment_transaction_help).grid(column=2, row=0, sticky="w")
+
+        # Payment information section
+        ttk.Label(forms1_lf, text='Payment Information',
+                  style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=4, sticky="w")
+
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[7], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=5, sticky="w")
+
+        ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+
+        self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=amount_to_be_paid,
+                                             style="small_info.TLabel", justify="left")
+        self.amount_to_be_paid_l.grid(column=1, row=6, sticky="w")
+
+        forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms2_lf.pack(side="top", fill="both", expand=True)
+
+        ttk.Label(forms2_lf, text='Tenant ID', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_id_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.tenant_id_sp.grid(column=1, row=0, sticky="w")
+        self.tenant_id_sp.focus()
+
+        ttk.Label(forms2_lf, text='Payment Amount', style="h2.TLabel",
+                  justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
+
+        self.payment_amount_sp = ttk.Spinbox(forms2_lf, from_=0, to=99999, wrap=True)
+        self.payment_amount_sp.grid(column=1, row=1, sticky="w")
+        self.payment_amount_sp.insert(0, amount_to_be_paid)
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text=" Create", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.create_room_assessment_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to create assessment!",
                   style="small_info.TLabel").pack(side="left", padx=10)
 
         # Disables underlying window
@@ -4281,7 +4524,6 @@ class Window:
 
         if not self.payment_amount_sp.get():
             self.invalid_input()
-
         elif self.payment_description_cb.get() == "Application fee":
             try:
                 # Insert values to assessment
@@ -4303,7 +4545,7 @@ class Window:
 
                 # self.room_add_occupant()
 
-                messagebox.showinfo("Success", "Transaction is  created")
+                messagebox.showinfo("Success", "Assessment is  created")
                 print("Application")
 
                 self.dialog_box_top.destroy()
@@ -4312,10 +4554,36 @@ class Window:
                 self.invalid_request()
                 print(e)
         elif self.payment_description_cb.get() == "Processing fee":
-            print(values[3])
             if values[3] == 'None':
                 messagebox.showerror("Error", "Cannot proceed with the payment. "
                                               "No Room ID available, please pay Confirmation fee first.")
+            else:
+                self.database_connect()
+                # Insert values to assessment
+                self.mycursor.execute("INSERT INTO assessment (assessment_amount, room_id, tenant_id, "
+                                      "admin_id, basic_user_id, date_created, time_created, "
+                                      "assessment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                       self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                       self.payment_description_cb.get()))
+
+                # Update balance
+                self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                      + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                      "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Assessment is created")
+
+                self.dialog_box_top.destroy()
+        elif self.payment_description_cb.get() == "Monthly rental fee":
+            if values[3] == 'None':
+                messagebox.showerror("Error", "Cannot proceed with the payment. "
+                                              "No Room ID available, please pay Confirmation fee\n"
+                                              "and Processing fee first.")
             else:
                 self.database_connect()
 
@@ -4326,93 +4594,198 @@ class Window:
                                       (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
                                        self.admin_id_str, self.basic_user_id_str, date_str, time_str,
                                        self.payment_description_cb.get()))
+                # Update balance
                 self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                      + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
-                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                      "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
                                       + self.admin_id_str + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
 
-                messagebox.showinfo("Success", "Payment is created")
+                messagebox.showinfo("Success", "Assessment is created")
 
                 self.dialog_box_top.destroy()
-        elif self.payment_description_cb.get() == "Monthly rental fee":
-            print(values[3])
-            if values[3] == 'None':
-                messagebox.showerror("Error", "Cannot proceed with the payment. "
-                                              "No Room ID available, please pay Confirmation fee\n"
-                                              "and Processing fee first.")
-            else:
-                if values[4] == 'None':
-                    self.database_connect()
-
-                    # Insert data
-                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
-                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
-                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
-                                           self.discount_code_e.get(), self.payment_description_cb.get()))
-                    self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                          + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
-                                          + str(self.tenant_id) + "' AND admin_id = '"
-                                          + self.admin_id_str + "';")
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
-
-                    messagebox.showinfo("Success", "Payment is created")
-
-                    self.dialog_box_top.destroy()
-                else:
-                    self.database_connect()
-
-                    # Insert data
-                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
-                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
-                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
-                                           self.discount_code_e.get(), self.payment_description_cb.get()))
-                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
-                                          + str(int(values[4]) + int(self.payment_amount_sp.get())) +
-                                          "' WHERE tenant_id = '"
-                                          + str(self.tenant_id) + "' AND admin_id = '"
-                                          + self.admin_id_str + "';")
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
-
-                    messagebox.showinfo("Success", "Payment is created")
-
-                    self.dialog_box_top.destroy()
         else:
-            try:
-                self.database_connect()
-                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), self.tenant_id,
-                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+            self.database_connect()
+            # Insert values to assessment
+            self.mycursor.execute("INSERT INTO assessment (assessment_amount, room_id, tenant_id, "
+                                  "admin_id, basic_user_id, date_created, time_created, "
+                                  "assessment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                   self.payment_description_cb.get()))
 
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+            # Update balance
+            self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                  + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                  "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
 
-                messagebox.showinfo("Success", "Transaction is  created")
-                print("Not application")
+            messagebox.showinfo("Success", "Assessment is created")
 
-                self.dialog_box_top.destroy()
-
-            except Exception as e:
-                self.invalid_request()
-                print(e)
+            self.dialog_box_top.destroy()
 
         # Record action history
         self.action_description = "Assessment created for tenant id " + str(self.tenant_id) + "."
         self.action_history_request()
+
+    # Assessment
+    def assessment_info_treeview_request(self):
+        try:
+            # Connect to database
+            self.database_connect()
+
+            # Conditions for tenant ID
+            if not self.tenant_id_filter_sp.get():
+                print("tenant id filter empty")
+                # Conditions for order by filter
+                if self.order_by_cb.get() == 'Assessment ID':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' ORDER BY a.assessment_id DESC;")
+                elif self.order_by_cb.get() == 'Tenant Name':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
+                elif self.order_by_cb.get() == 'Assessment Description':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' ORDER BY a.assessment_description ASC;")
+                elif self.order_by_cb.get() == 'Date Created':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' ORDER BY a.date_created ASC;")
+                else:
+                    print('Safety condition')
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "';")
+            else:
+                print("tenant id filter not empty")
+                # Conditions for order by filter
+                if self.order_by_cb.get() == 'Assessment ID':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' AND a.tenant_id = '"
+                                          + self.tenant_id_filter_sp.get() + "' ORDER BY a.assessment_id DESC;")
+                elif self.order_by_cb.get() == 'Tenant Name':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' AND a.tenant_id = '"
+                                          + self.tenant_id_filter_sp.get() + "' ORDER BY t.tenant_name ASC;")
+                elif self.order_by_cb.get() == 'Assessment Description':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' AND a.tenant_id = '"
+                                          + self.tenant_id_filter_sp.get() + "' ORDER BY a.assessment_description ASC;")
+                elif self.order_by_cb.get() == 'Date Created':
+                    print(self.order_by_cb.get())
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' AND a.tenant_id = '"
+                                          + self.tenant_id_filter_sp.get() + "' ORDER BY a.date_created ASC;")
+                else:
+                    print('Safety condition')
+                    self.mycursor.execute("SELECT a.assessment_id, a.tenant_id, t.tenant_name, a.assessment_amount, "
+                                          "a.room_id, a.admin_id, a.basic_user_id, "
+                                          "a.assessment_description, a.date_created, a.time_created, "
+                                          "t.tenant_email FROM assessment a INNER JOIN tenant t ON "
+                                          "a.tenant_id = t.tenant_id WHERE a.date_created >= '"
+                                          + self.dashboard_filter_from.get() + "' AND a.date_created <= '"
+                                          + self.dashboard_filter_to.get() + "' AND a.admin_id = '"
+                                          + self.admin_id_str + "' AND a.tenant_id = '"
+                                          + self.tenant_id_filter_sp.get() + "';")
+
+            assessments = self.mycursor.fetchall()
+            print(assessments)
+
+            # Create configure for striped rows
+            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+
+            count = 0
+            for record in assessments:
+                if count % 2 == 0:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7], record[8], record[9], record[10]),
+                                          tags=("oddrow",))
+                else:
+                    self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                                  record[6], record[7], record[8], record[9], record[10]),
+                                          tags=("evenrow",))
+                count += 1
+
+            if count <= 0:
+                messagebox.showerror("Error", "Database request unsuccessful! \n Please check your internet connection"
+                                              "\nor check for invalid input.")
+            else:
+                pass
+
+            self.db1.commit()
+            self.mycursor.close()
+            self.db1.close()
+        except Exception as e:
+            messagebox.showerror("Error", "Database request unsuccessful! \n Please check your internet connection \n"
+                                          "or check for invalid input.")
+            print(e)
 
     # Payment
     def payment_info_treeview_request(self):
@@ -4426,8 +4799,8 @@ class Window:
                 # Conditions for order by filter
                 if self.order_by_cb.get() == 'Payment ID':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
+                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, "
+                                          "p.room_id, p.admin_id, p.basic_user_id, p.discount_code, "
                                           "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
                                           "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
                                           "WHERE p.date_created >= '"
@@ -5502,6 +5875,7 @@ class Window:
         self.home_b.configure(fg='#7c8084', image=self.home_inactive_im_resized)
         self.dashboard_b.configure(fg='#7c8084', image=self.dashboard_inactive_im_resized)
         self.tenants_b.configure(fg='#7c8084', image=self.tenant_inactive_im_resized)
+        self.assessment_b.configure(fg='#7c8084', image=self.assessment_inactive_im_resized)
         self.payments_b.configure(fg='#7c8084', image=self.payment_inactive_im_resized)
         self.booking_b.configure(fg='#7c8084', image=self.booking_inactive_im_resized)
         self.discounts_b.configure(fg='#7c8084', image=self.discount_inactive_im_resized)
@@ -5525,8 +5899,6 @@ class Window:
             self.amenities_cost_l.config(text=0)
         elif self.payment_description_cb.get() == "Confirmation fee":
             amount_to_be_paid = int(values[6]) + int(values[7])
-            self.payment_description_l.config(text="Confirmation fee: ")
-            self.application_fee_l.config(text=amount_to_be_paid)
         elif self.payment_description_cb.get() == "Processing fee":
             try:
                 # Get the value room and amenities price
@@ -5771,6 +6143,10 @@ class Window:
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
+        tk.Button(buttons_lf, text=" Create assessment", font="OpenSans, 12", fg="#FFFFFF", bg="#082B7D",
+                  relief="flat", image=self.assessment_im_resized, compound="left", justify="left",
+                  command=self.create_room_assessment_dialog).pack(side="top", pady=5, fill="x")
+
         tk.Button(buttons_lf, text=" Create transaction", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   relief="flat", image=self.create_im_resized, compound="left", justify="left",
                   command=self.create_room_transaction_dialog).pack(side="top", pady=5, fill="x")
@@ -5973,6 +6349,79 @@ class Window:
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
                   command=self.remove_tenant_account_request).pack(side="top", pady=5, fill="x")
+
+        print(event)
+
+    def assessment_info_section(self, event):
+        Content_control.destroy_content(self.info_buttons_lf)
+
+        ttk.Label(self.info_buttons_lf, text='Assessment Information',
+                  style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(info_lf, text='Assessment ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant ID: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant Name: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Tenant Email: ', style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=values[10], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+
+        ttk.Label(info_lf, text='Assessment amount: ', style="small_info.TLabel").grid(column=0, row=4, sticky="w")
+
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        ttk.Label(info_lf, text='Room ID: ', style="small_info.TLabel").grid(column=0, row=5, sticky="w")
+
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=5, sticky="w")
+
+        ttk.Label(info_lf, text='Date created: ', style="small_info.TLabel").grid(column=0, row=7, sticky="w")
+
+        ttk.Label(info_lf, text=values[8], style="small_info.TLabel").grid(column=1, row=7, sticky="w")
+
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=8, sticky="w")
+
+        ttk.Label(info_lf, text=values[9], style="small_info.TLabel").grid(column=1, row=8, sticky="w")
+
+        ttk.Label(info_lf, text='Assessment description: ', style="small_info.TLabel").grid(column=0, row=9, sticky="w")
+
+        ttk.Label(info_lf, text=values[7], style="small_info.TLabel").grid(column=1, row=9, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+
+        tk.Button(buttons_lf, text=" Send receipt", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+                  relief="flat", image=self.receipt_im_resized, compound="left",
+                  command=self.send_receipt_dialog).pack(side="top", pady=5, fill="x")
+
+        download_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
+        download_lf.pack(side="top", pady=5, fill="x")
+
+        tk.Button(download_lf, text=" Save receipt", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.download_im_resized, compound="left",
+                  justify="left", command=self.download_receipt_request).pack(fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
+                  relief="flat", image=self.remove_im_resized, compound="left",
+                  command=self.remove_payment_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
