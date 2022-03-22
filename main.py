@@ -1034,6 +1034,29 @@ class Window:
 
         ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
                                                                                  anchor="nw", padx=5, pady=5)
+
+        # Filter Date
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                          anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20,
+                                               date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                             anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
+
         # ================================================ Room info content ===========================================
         self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
         self.info_content_lf.pack(side="top", fill="x")
@@ -1112,28 +1135,60 @@ class Window:
         create_employee_l.bind("<Button-1>", self.create_employee_dialog)
 
         # ================================================ Employee info ===============================================
-        employee_info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
-        employee_info_lf.pack(side="top", fill="x")
+        info_lf = tk.LabelFrame(self.content_lf, bg="#FFFFFF")
+        info_lf.pack(side="top", fill="x")
 
-        employee_info_title_lf = tk.LabelFrame(employee_info_lf, bg="#FFFFFF", relief="flat")
-        employee_info_title_lf.pack(side="top", fill="x")
+        info_title_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        info_title_lf.pack(side="top", fill="x")
 
-        ttk.Label(employee_info_title_lf, text='Employee Information',
+        ttk.Label(info_title_lf, text='Employee Information',
                   style="h1.TLabel").pack(side="left", anchor="nw")
-        ttk.Label(employee_info_title_lf, text='admin',
+        ttk.Label(info_title_lf, text='admin',
                   style="small.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
 
-        refresh_b_lf = tk.LabelFrame(employee_info_title_lf, bd=1, bg="#585456", relief="flat")
+        refresh_b_lf = tk.LabelFrame(info_title_lf, bd=1, bg="#585456", relief="flat")
         refresh_b_lf.pack(side="left", anchor="nw", padx=5, pady=5)
 
         tk.Button(refresh_b_lf, text="Refresh", font="OpenSans, 10", fg="#585456",
                   bg="#FFFFFF", relief="flat", command=self.show_employee_information_module).pack(fill="x")
 
-        # ================================================ Show more info ==============================================
-        self.info_tree_lf = tk.LabelFrame(employee_info_lf, bg="#FFFFFF", relief="flat")
-        self.info_tree_lf.pack(side="top", fill="both")
+        # Filter Order By
+        self.order_by_cb = ttk.Combobox(info_title_lf)
+        self.order_by_cb['values'] = ('Employee ID', 'Employee Name', 'Role', 'Date Created')
+        self.order_by_cb['state'] = 'readonly'
+        self.order_by_cb.current(0)
+        self.order_by_cb.pack(side="right", anchor="nw", padx=5, pady=5)
 
-        tk.Button(self.info_tree_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
+        ttk.Label(info_title_lf, text="Order by:", style="h2_small.TLabel").pack(side="right",
+                                                                                 anchor="nw", padx=5, pady=5)
+
+        # Filter Date
+        self.dashboard_filter_to = DateEntry(info_title_lf, width=20,
+                                             date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_to.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="to", style="h2_small.TLabel").pack(side="right",
+                                                                          anchor="nw", padx=5, pady=5)
+
+        self.dashboard_filter_from = DateEntry(info_title_lf, width=20,
+                                               date_pattern="MM/dd/yy", borderwidth=2)
+        self.dashboard_filter_from.pack(side="right", anchor="nw", padx=5, pady=5)
+
+        ttk.Label(info_title_lf, text="Date:", style="h2_small.TLabel").pack(side="right",
+                                                                             anchor="nw", padx=5, pady=5)
+
+        # Insert values to Date Entry
+        self.dashboard_filter_from.delete(0, "end")
+        self.dashboard_filter_from.insert(0, fday_month_str)
+
+        self.dashboard_filter_to.delete(0, "end")
+        self.dashboard_filter_to.insert(0, date_str)
+
+        # ================================================ Show more info ==============================================
+        self.info_content_lf = tk.LabelFrame(info_lf, bg="#FFFFFF", relief="flat")
+        self.info_content_lf.pack(side="top", fill="both")
+
+        tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#4C8404", relief="flat", command=self.show_employee_information_module).pack(side="top", fill="x")
 
     def action_history_interface(self):
@@ -1289,8 +1344,6 @@ class Window:
 
         tk.Button(self.info_content_lf, text="Show more", font="OpenSans, 10", fg="#FFFFFF",
                   bg="#89CFF0", relief="flat", command=self.show_notif_information_module).pack(side="top", fill="x")
-
-    # ================================================ Modularized Interface ===========================================
 
     # Home
     def show_room_information_module(self):
@@ -1607,7 +1660,10 @@ class Window:
         if not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
-            Content_control.destroy_content(self.info_tree_lf)
+            Content_control.destroy_content(self.info_content_lf)
+
+            self.info_tree_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+            self.info_tree_lf.pack(side="left", fill="both", expand=True)
 
             info_tree_scr = tk.Scrollbar(self.info_tree_lf)
             info_tree_scr.pack(side="right", fill="y")
@@ -1638,8 +1694,8 @@ class Window:
             # Initialize method for inserting items in a list
             self.employee_info_treeview_request()
 
-            self.info_buttons_lf = tk.LabelFrame(self.info_tree_lf, bg="#FFFFFF", relief="flat")
-            self.info_buttons_lf.pack(side="top", pady=5, padx=10, anchor="w")
+            self.info_buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+            self.info_buttons_lf.pack(side="left", pady=5, padx=10, anchor="e")
 
             tk.Label(self.info_buttons_lf, image=self.empty_im_resized,
                      bg="#FFFFFF").pack(side="top", pady=5, padx=10, anchor="center")
@@ -4556,31 +4612,54 @@ class Window:
         self.database_connect()
 
         # Conditions for order by filter
-        if self.order_by_cb.get() in ['Discount ID', 'Date Created']:
+        if self.order_by_cb.get() == 'Discount ID':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created, d.time_created FROM discount d "
-                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_id ASC;")
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY d.discount_id DESC;")
         elif self.order_by_cb.get() == 'Discount Code':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created, d.time_created FROM discount d "
-                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_code ASC;")
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY d.discount_code ASC;")
         elif self.order_by_cb.get() == 'Discount Amount':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created, d.time_created FROM discount d "
-                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_amount ASC;")
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY d.discount_amount ASC;")
         elif self.order_by_cb.get() == 'Discount Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created, d.time_created FROM discount d "
-                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "' ORDER BY d.discount_status ASC;")
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY d.discount_status ASC;")
+        elif self.order_by_cb.get() == 'Date Created':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
+                                  "d.discount_status, d.date_created, d.time_created FROM discount d "
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY d.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT d.discount_id, d.discount_code, d.discount_amount, "
                                   "d.discount_status, d.date_created, d.time_created FROM discount d "
-                                  "WHERE admin_id = ' " + str(self.admin_id_str) + "';")
+                                  "WHERE d.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND d.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = ' "
+                                  + self.admin_id_str + "';")
 
         discount = self.mycursor.fetchall()
 
@@ -4753,40 +4832,69 @@ class Window:
                 print(e)
 
     def employee_info_treeview_request(self):
-        try:
-            self.database_connect()
+        self.database_connect()
+
+        # Conditions for order by filter
+        if self.order_by_cb.get() == 'Employee ID':
+            print(self.order_by_cb.get())
             self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
-                                  "b.time_created FROM basic_user b WHERE b.admin_id = ' "
-                                  + str(self.admin_id_str) + "' ORDER BY b.basic_user_id;")
+                                  "b.time_created FROM basic_user b WHERE b.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND b.admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.basic_user_id DESC;")
+        elif self.order_by_cb.get() == 'Employee Name':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
+                                  "b.time_created FROM basic_user b WHERE b.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND b.admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.username ASC;")
+        elif self.order_by_cb.get() == 'Role':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
+                                  "b.time_created FROM basic_user b WHERE b.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND b.admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.role ASC;")
+        elif self.order_by_cb.get() == 'Date Created':
+            print(self.order_by_cb.get())
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
+                                  "b.time_created FROM basic_user b WHERE b.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND b.admin_id = ' "
+                                  + self.admin_id_str + "' ORDER BY b.date_created ASC;")
+        else:
+            print("Safety Condition")
+            self.mycursor.execute("SELECT b.basic_user_id, b.username, b.password, b.role, b.date_created, "
+                                  "b.time_created FROM basic_user b WHERE b.date_created >= '"
+                                  + self.dashboard_filter_from.get() + "' AND b.date_created <= '"
+                                  + self.dashboard_filter_to.get() + "' AND b.admin_id = ' "
+                                  + self.admin_id_str + "';")
 
-            employees = self.mycursor.fetchall()
+        employees = self.mycursor.fetchall()
 
-            # Create configure for striped rows
-            self.info_tree.tag_configure("oddrow", background="#FFFFFF")
-            self.info_tree.tag_configure("evenrow", background="#FAFAFA")
+        # Create configure for striped rows
+        self.info_tree.tag_configure("oddrow", background="#FFFFFF")
+        self.info_tree.tag_configure("evenrow", background="#FAFAFA")
 
-            count = 0
-            for record in employees:
-                if count % 2 == 0:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                          tags=("oddrow",))
-                else:
-                    self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5]),
-                                          tags=("evenrow",))
-                count += 1
+        count = 0
+        for record in employees:
+            if count % 2 == 0:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("oddrow",))
+            else:
+                self.info_tree.insert(parent="", index="end", iid=count, text="",
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5]),
+                                      tags=("evenrow",))
+            count += 1
 
-            self.db1.commit()
-            self.mycursor.close()
-            self.db1.close()
+        self.db1.commit()
+        self.mycursor.close()
+        self.db1.close()
 
-            # Turn off admin access if account is basic user
-            self.basic_user_status()
-
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+        # Turn off admin access if account is basic user
+        self.basic_user_status()
 
     def remove_employee_account_request(self):
         if not self.admin_access_bool:
@@ -5468,8 +5576,8 @@ class Window:
         ttk.Label(self.info_buttons_lf, text='Employee Information',
                   style="on.TLabel").pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
-        employee_info_label_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
-        employee_info_label_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
+        info_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
         # Grab record number
         selected = self.info_tree.focus()
@@ -5479,41 +5587,47 @@ class Window:
 
         self.employee_id = values[0]
 
-        ttk.Label(employee_info_label_lf, text='ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
+        ttk.Label(info_lf, text='ID: ', style="small_info.TLabel").grid(column=0, row=0, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
+        ttk.Label(info_lf, text=values[0], style="small_info.TLabel").grid(column=1, row=0, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text='Name: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
+        ttk.Label(info_lf, text='Name: ', style="small_info.TLabel").grid(column=0, row=1, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+        ttk.Label(info_lf, text=values[1], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text='Password: ',
+        ttk.Label(info_lf, text='Password: ',
                   style="small_info.TLabel").grid(column=0, row=1, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
+        ttk.Label(info_lf, text=values[2], style="small_info.TLabel").grid(column=1, row=1, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+        ttk.Label(info_lf, text='Role: ', style="small_info.TLabel").grid(column=0, row=2, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
+        ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text='Date created: : ', style="small_info.TLabel").grid(column=0, row=3,
+        ttk.Label(info_lf, text='Date created: : ', style="small_info.TLabel").grid(column=0, row=3,
                                                                                                    sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
+        ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
-        ttk.Label(employee_info_label_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=4,
+        ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=4,
                                                                                                  sticky="w")
 
-        ttk.Label(employee_info_label_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+        ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
+
+        buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
         # Buttons
-        tk.Button(self.info_buttons_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
-                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left",
-                  justify="left", command=self.modify_employee_dialog).pack(side="left", pady=5, padx=10, anchor="w")
+        modify_b_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
+        modify_b_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(self.info_buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+        tk.Button(modify_b_lf, text=" Edit file", font="OpenSans, 12", fg="#7C8084",
+                  bg="#FFFFFF", relief="flat", image=self.edit_im_resized, compound="left",
+                  justify="left", command=self.modify_employee_dialog).pack(side="top", fill="x")
+
+        tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
                   image=self.remove_im_resized, compound="left",
-                  command=self.remove_employee_account_request).pack(side="left", pady=5, padx=10, anchor="w")
+                  command=self.remove_employee_account_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
