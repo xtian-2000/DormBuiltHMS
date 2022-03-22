@@ -4054,20 +4054,30 @@ class Window:
             if capacity <= current_occupant:
                 messagebox.showerror("Error", "The room is currently fully occupied.")
             else:
+                self.database_connect()
+
+                self.mycursor.execute(
+                    "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '"
+                    + self.admin_id_str + "' AND tenant_id = '" + self.tenant_id_sp.get() + "';")
+
+                # Converts the tuple into integer
+                balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
                 if capacity > current_occupant + 1:
                     # Room will not be fully occupied
-                    self.database_connect()
 
-                    # Insert data
+                    # Insert values to payment
                     self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
                                           "basic_user_id, date_created, time_created, discount_code, "
                                           "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                           (self.payment_amount_sp.get(), self.room_id, self.tenant_id_sp.get(),
-                                           str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
+                                           self.admin_id_str, self.basic_user_id_str, date_str, time_str,
                                            self.discount_code_e.get(), self.payment_description_cb.get()))
 
                     # Update tenant_status to confirmation
-                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
+                    self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                          + str(balance - int(self.payment_amount_sp.get())) +
+                                          "', tenant_status = 'Confirmation', room_id = '"
                                           + self.room_id + "' WHERE tenant_id = '"
                                           + self.tenant_id_sp.get() + "' AND admin_id = '"
                                           + self.admin_id_str + "';")
@@ -4086,9 +4096,8 @@ class Window:
                     self.dialog_box_top.destroy()
                 else:
                     # Room will be fully occupied
-                    self.database_connect()
 
-                    # Insert data
+                    # Insert values to payment
                     self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, admin_id, "
                                           "basic_user_id, date_created, time_created, discount_code, "
                                           "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -4104,7 +4113,9 @@ class Window:
                                           + self.room_id + "' AND admin_id = '" + self.admin_id_str + "';")
 
                     # Update tenant to confirmation
-                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Confirmation', room_id = '"
+                    self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                          + str(balance - int(self.payment_amount_sp.get())) +
+                                          "', tenant_status = 'Confirmation', room_id = '"
                                           + self.room_id + "' WHERE tenant_id = '"
                                           + self.tenant_id_sp.get() + "' AND admin_id = '"
                                           + self.admin_id_str + "';")
@@ -4165,6 +4176,53 @@ class Window:
         except Exception as e:
             self.invalid_input()
             print(e)
+
+    def create_room_assessment_request(self):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        # Connect to database
+        self.database_connect()
+
+        self.mycursor.execute(
+            "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '" + self.admin_id_str + "' AND tenant_id = '"
+            + self.tenant_id_sp.get() + "';")
+
+        # Converts the tuple into integer
+        balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+        if not self.payment_amount_sp.get():
+            self.invalid_input()
+        elif self.payment_description_cb.get() == "Confirmation fee":
+            # Insert values to assessment
+            self.mycursor.execute("INSERT INTO assessment (assessment_amount, room_id, tenant_id, admin_id, "
+                                  "basic_user_id, date_created, time_created, assessment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.payment_amount_sp.get(), values[0], self.tenant_id_sp.get(),
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                   self.payment_description_cb.get()))
+
+            self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                  + str(balance + int(self.payment_amount_sp.get())) + "' WHERE tenant_id = '"
+                                  + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
+
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            messagebox.showinfo("Success", "Assessment is  created")
+
+            self.dialog_box_top.destroy()
+        else:
+            pass
+
+        # Record action history
+        self.action_description = "Assessment created for tenant id " + str(self.tenant_id_sp.get()) + "."
+        self.action_history_request()
 
     # Dashboard
     def generate_sales_report_request(self):
@@ -4389,31 +4447,29 @@ class Window:
             self.invalid_input()
 
         elif self.payment_description_cb.get() == "Application fee":
-            try:
+            self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
+                                  "basic_user_id, date_created, time_created, discount_code, payment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.payment_amount_sp.get(), self.tenant_id,
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                   self.discount_code_e.get(), self.payment_description_cb.get()))
 
-                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), self.tenant_id,
-                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+            # Update balance
+            self.mycursor.execute("UPDATE tenant SET tenant_status = 'Application', tenant_balance = '"
+                                  + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                  "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
 
-                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Application' WHERE tenant_id = '"
-                                      + self.tenant_id + "' AND admin_id = '" + self.admin_id_str + "';")
-                self.db1.commit()
-                self.db1.close()
-                self.mycursor.close()
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
 
-                # self.room_add_occupant()
+            # self.room_add_occupant()
 
-                messagebox.showinfo("Success", "Transaction is  created")
-                print("Application")
+            messagebox.showinfo("Success", "Transaction is  created")
+            print("Application")
 
-                self.dialog_box_top.destroy()
-
-            except Exception as e:
-                self.invalid_request()
-                print(e)
+            self.dialog_box_top.destroy()
         elif self.payment_description_cb.get() == "Processing fee":
             print(values[3])
             if values[3] == 'None':
@@ -4542,8 +4598,6 @@ class Window:
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
-
-                # self.room_add_occupant()
 
                 messagebox.showinfo("Success", "Assessment is  created")
                 print("Application")
