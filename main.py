@@ -4349,21 +4349,31 @@ class Window:
                     print(e)
 
     def remove_tenant_account_request(self):
-        try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                          "value?\nDeletion of this value might "
+                                                                          "delete values that are tethered to it.")
+                if confirmation:
+                    self.database_connect()
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-            self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                    self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-            messagebox.showinfo("Success", "Removed tenant account successfully")
+                    messagebox.showinfo("Success", "Removed tenant account successfully")
 
-        except Exception as e:
-            messagebox.showinfo("Error", "Unsuccessful in removing account")
-            print(e)
+                    # Turn off admin access if account is basic user
+                    self.basic_user_status()
+
+            except Exception as e:
+                messagebox.showinfo("Error", "Unsuccessful in removing account")
+                print(e)
 
     def tenant_info_treeview_request(self):
         Content_control.clear_treeview(self.info_tree)
@@ -4485,7 +4495,10 @@ class Window:
                                       (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
                                        self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
-                self.mycursor.execute("UPDATE tenant SET tenant_status = 'Processing' WHERE tenant_id = '"
+                # Update balance
+                self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                      + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                      "', tenant_status = 'Processing' WHERE tenant_id = '"
                                       + str(self.tenant_id) + "' AND admin_id = '"
                                       + self.admin_id_str + "';")
                 self.db1.commit()
@@ -4502,71 +4515,48 @@ class Window:
                                               "No Room ID available, please pay Confirmation fee\n"
                                               "and Processing fee first.")
             else:
-                if values[4] == 'None':
-                    self.database_connect()
-
-                    # Insert data
-                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
-                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
-                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
-                                           self.discount_code_e.get(), self.payment_description_cb.get()))
-                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
-                                          + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
-                                          + str(self.tenant_id) + "' AND admin_id = '"
-                                          + self.admin_id_str + "';")
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
-
-                    messagebox.showinfo("Success", "Payment is created")
-
-                    self.dialog_box_top.destroy()
-                else:
-                    self.database_connect()
-
-                    # Insert data
-                    self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
-                                          "admin_id, basic_user_id, date_created, time_created, discount_code, "
-                                          "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                                          (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
-                                           self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
-                                           self.discount_code_e.get(), self.payment_description_cb.get()))
-                    self.mycursor.execute("UPDATE tenant SET tenant_status = 'Monthly rental fee',  tenant_balance = '"
-                                          + str(int(values[4]) + int(self.payment_amount_sp.get())) +
-                                          "' WHERE tenant_id = '"
-                                          + str(self.tenant_id) + "' AND admin_id = '"
-                                          + self.admin_id_str + "';")
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
-
-                    messagebox.showinfo("Success", "Payment is created")
-
-                    self.dialog_box_top.destroy()
-        else:
-            try:
                 self.database_connect()
-                self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
-                                      "basic_user_id, date_created, time_created, discount_code, payment_description) "
-                                      "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                      (self.payment_amount_sp.get(), self.tenant_id,
-                                       str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
-                                       self.discount_code_e.get(), self.payment_description_cb.get()))
 
+                # Insert data
+                self.mycursor.execute("INSERT INTO payment (payment_amount, room_id, tenant_id, "
+                                      "admin_id, basic_user_id, date_created, time_created, discount_code, "
+                                      "payment_description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                      (self.payment_amount_sp.get(), values[3], str(self.tenant_id),
+                                       self.admin_id_str, str(self.basic_user_id_str), date_str, time_str,
+                                       self.discount_code_e.get(), self.payment_description_cb.get()))
+                # Update balance
+                self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                      + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                      "', tenant_status = 'Monthly rental fee' WHERE tenant_id = '"
+                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + self.admin_id_str + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
 
-                messagebox.showinfo("Success", "Transaction is  created")
-                print("Not application")
+                messagebox.showinfo("Success", "Payment is created")
 
                 self.dialog_box_top.destroy()
+        else:
+            self.database_connect()
+            self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
+                                  "basic_user_id, date_created, time_created, discount_code, payment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.payment_amount_sp.get(), self.tenant_id,
+                                   str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
+                                   self.discount_code_e.get(), self.payment_description_cb.get()))
+            # Update balance
+            self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                  + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                  "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
 
-            except Exception as e:
-                self.invalid_request()
-                print(e)
+            messagebox.showinfo("Success", "Transaction is  created")
+
+            self.dialog_box_top.destroy()
 
     def create_assessment_request(self):
         # Grab record number
@@ -4841,6 +4831,40 @@ class Window:
                                           "or check for invalid input.")
             print(e)
 
+    def remove_assessment_request(self):
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                          "value?\nDeletion of this value might "
+                                                                          "delete values that are tethered to it.")
+                if confirmation:
+                    self.database_connect()
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+
+                    # Grab record number
+                    selected = self.info_tree.focus()
+
+                    # Grab record values
+                    values = self.info_tree.item(selected, "values")
+
+                    self.mycursor.execute("DELETE FROM assessment WHERE assessment_id = '"
+                                          + values[0] + "' AND admin_id = '" + self.admin_id_str + "';")
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
+
+                    messagebox.showinfo("Success", "Removed payment successfully")
+
+                    # Turn off admin access if account is basic user
+                    self.basic_user_status()
+
+            except Exception as e:
+                self.invalid_input()
+                print(e)
+
     # Payment
     def payment_info_treeview_request(self):
         try:
@@ -4863,102 +4887,111 @@ class Window:
                                           + self.admin_id_str + "' ORDER BY p.payment_id DESC;")
                 elif self.order_by_cb.get() == 'Tenant Name':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
                 elif self.order_by_cb.get() == 'Payment Description':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '" +
-                                          self.admin_id_str + "' ORDER BY p.payment_description ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '" +
+                        self.admin_id_str + "' ORDER BY p.payment_description ASC;")
                 elif self.order_by_cb.get() == 'Date Created':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' ORDER BY p.date_created ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' ORDER BY p.date_created ASC;")
                 else:
                     print('Safety condition')
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "';")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "';")
             else:
                 print("tenant id filter not empty")
                 # Conditions for order by filter
                 if self.order_by_cb.get() == 'Payment ID':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' AND p.tenant_id = '"
-                                          + self.tenant_id_filter_sp.get() + "' ORDER BY p.payment_id DESC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' AND p.tenant_id = '"
+                        + self.tenant_id_filter_sp.get() + "' ORDER BY p.payment_id DESC;")
                 elif self.order_by_cb.get() == 'Tenant Name':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' AND p.tenant_id = '"
-                                          + self.tenant_id_filter_sp.get() + "' ORDER BY t.tenant_name ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' AND p.tenant_id = '"
+                        + self.tenant_id_filter_sp.get() + "' ORDER BY t.tenant_name ASC;")
                 elif self.order_by_cb.get() == 'Payment Description':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '" +
-                                          self.admin_id_str + "' AND p.tenant_id = '"
-                                          + self.tenant_id_filter_sp.get() + "' ORDER BY p.payment_description ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '" +
+                        self.admin_id_str + "' AND p.tenant_id = '"
+                        + self.tenant_id_filter_sp.get() + "' ORDER BY p.payment_description ASC;")
                 elif self.order_by_cb.get() == 'Date Created':
                     print(self.order_by_cb.get())
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
-                                          "WHERE p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' AND p.tenant_id = '"
-                                          + self.tenant_id_filter_sp.get() + "' ORDER BY p.date_created ASC;")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id "
+                        "WHERE p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' AND p.tenant_id = '"
+                        + self.tenant_id_filter_sp.get() + "' ORDER BY p.date_created ASC;")
                 else:
                     print('Safety condition')
-                    self.mycursor.execute("SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
-                                          "p.admin_id, p.basic_user_id, p.discount_code, "
-                                          "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
-                                          "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
-                                          "p.date_created >= '"
-                                          + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
-                                          + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
-                                          + self.admin_id_str + "' AND p.tenant_id = '"
-                                          + self.tenant_id_filter_sp.get() + "';")
+                    self.mycursor.execute(
+                        "SELECT p.payment_id, p.tenant_id, t.tenant_name, p.payment_amount, p.room_id, "
+                        "p.admin_id, p.basic_user_id, p.discount_code, "
+                        "p.payment_description, p.date_created, p.time_created, t.tenant_email FROM "
+                        "payment p INNER JOIN tenant t ON p.tenant_id = t.tenant_id WHERE "
+                        "p.date_created >= '"
+                        + self.dashboard_filter_from.get() + "' AND p.date_created <= '"
+                        + self.dashboard_filter_to.get() + "' AND p.admin_id = '"
+                        + self.admin_id_str + "' AND p.tenant_id = '"
+                        + self.tenant_id_filter_sp.get() + "';")
 
             payments = self.mycursor.fetchall()
             print(payments)
@@ -4996,27 +5029,38 @@ class Window:
             print(e)
 
     def remove_payment_request(self):
-        try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                          "value?\nDeletion of this value might "
+                                                                          "delete values that are tethered to it.")
+                if confirmation:
+                    self.database_connect()
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-            # Grab record number
-            selected = self.info_tree.focus()
+                    # Grab record number
+                    selected = self.info_tree.focus()
 
-            # Grab record values
-            values = self.info_tree.item(selected, "values")
+                    # Grab record values
+                    values = self.info_tree.item(selected, "values")
 
-            self.mycursor.execute("DELETE FROM payment WHERE payment_id = '" + values[0] + "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                    self.mycursor.execute("DELETE FROM payment WHERE payment_id = '" + values[0] + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
+                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+                    self.db1.commit()
+                    self.db1.close()
+                    self.mycursor.close()
 
-            messagebox.showinfo("Success", "Removed payment successfully")
+                    messagebox.showinfo("Success", "Removed payment successfully")
 
-        except Exception as e:
-            self.invalid_input()
-            print(e)
+                    # Turn off admin access if account is basic user
+                    self.basic_user_status()
+
+            except Exception as e:
+                self.invalid_input()
+                print(e)
 
     def download_receipt_request(self):
         # Grab record number
@@ -5673,12 +5717,12 @@ class Window:
         for record in actions:
             if count % 2 == 0:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                                  record[6], record[7]), tags=("oddrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7]), tags=("oddrow",))
             else:
                 self.info_tree.insert(parent="", index="end", iid=count, text="",
-                                          values=(record[0], record[1], record[2], record[3], record[4], record[5],
-                                                  record[6], record[7]), tags=("evenrow",))
+                                      values=(record[0], record[1], record[2], record[3], record[4], record[5],
+                                              record[6], record[7]), tags=("evenrow",))
             count += 1
 
         self.db1.commit()
@@ -6305,12 +6349,12 @@ class Window:
         ttk.Label(info_lf, text=values[3], style="small_info.TLabel").grid(column=1, row=2, sticky="w")
 
         ttk.Label(info_lf, text='Date created: : ', style="small_info.TLabel").grid(column=0, row=3,
-                                                                                                   sticky="w")
+                                                                                    sticky="w")
 
         ttk.Label(info_lf, text=values[4], style="small_info.TLabel").grid(column=1, row=3, sticky="w")
 
         ttk.Label(info_lf, text='Time created: ', style="small_info.TLabel").grid(column=0, row=4,
-                                                                                                 sticky="w")
+                                                                                  sticky="w")
 
         ttk.Label(info_lf, text=values[5], style="small_info.TLabel").grid(column=1, row=4, sticky="w")
 
@@ -6475,7 +6519,7 @@ class Window:
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
-                  command=self.remove_payment_request).pack(side="top", pady=5, fill="x")
+                  command=self.remove_assessment_request).pack(side="top", pady=5, fill="x")
 
         print(event)
 
