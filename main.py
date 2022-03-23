@@ -5106,7 +5106,7 @@ class Window:
                                               + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
                         self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
                                               "room_availability = 'Available' WHERE room_id = '"
-                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+                                              + values[4] + "' AND admin_id = '" + self.admin_id_str + "';")
                     elif values[8] == 'Processing fee':
                         self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
                                               + str(balance + int(values[3])) +
@@ -5116,7 +5116,7 @@ class Window:
                         self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
                                               + str(balance + int(values[3])) + "' WHERE tenant_id = '"
                                               + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
-
+                    print(values[8])
                     self.db1.commit()
                     self.db1.close()
                     self.mycursor.close()
