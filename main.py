@@ -4290,16 +4290,17 @@ class Window:
             print(values)
             print("inactive")
 
-            if self.tenant_status_cb.get() == 'Inactive' and values[2] == 'Active':
+            if self.tenant_status_cb.get() == 'Inactive':
                 try:
                     self.database_connect()
-                    self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1 WHERE room_id = '"
+                    self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
+                                          "room_availability = 'Available' WHERE room_id = '"
                                           + values[3] + "' AND admin_id = '" + self.admin_id_str + "';")
 
                     self.mycursor.execute("UPDATE tenant SET tenant_name = '"
                                           + self.tenant_name_e.get() + "', tenant_email= '"
                                           + self.tenant_email_e.get() + "', tenant_status = '"
-                                          + self.tenant_status_cb.get() + "', room_id = '0'  WHERE tenant_id = '"
+                                          + self.tenant_status_cb.get() + "', room_id = 'None'  WHERE tenant_id = '"
                                           + self.tenant_id + "';")
 
                     self.mycursor.execute("INSERT INTO notif (notif_subject, notif_description, "
@@ -4581,8 +4582,8 @@ class Window:
                                        self.payment_description_cb.get()))
 
                 self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                      + self.payment_amount_sp.get() + "' WHERE tenant_id = '"
-                                      + str(self.tenant_id) + "' AND admin_id = '"
+                                      + str(int(values[4]) + int(self.payment_amount_sp.get())) +
+                                      "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
                                       + self.admin_id_str + "';")
 
                 self.db1.commit()
@@ -4837,11 +4838,13 @@ class Window:
         else:
             try:
                 confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
-                                                                          "value?\nDeletion of this value might "
-                                                                          "delete values that are tethered to it.")
+                                                                          "value?\n\nDeletion of this value might "
+                                                                          "delete values that are tethered to it.\n\n"
+                                                                          "- Deletion of this assessment will result "
+                                                                          "to deduction of balance incurred during "
+                                                                          "this assessment")
                 if confirmation:
                     self.database_connect()
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
                     # Grab record number
                     selected = self.info_tree.focus()
@@ -4849,14 +4852,26 @@ class Window:
                     # Grab record values
                     values = self.info_tree.item(selected, "values")
 
+                    self.mycursor.execute(
+                        "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '" + self.admin_id_str +
+                        "' AND tenant_id = '" + values[1] + "';")
+
+                    # Converts the tuple into integer
+                    balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
                     self.mycursor.execute("DELETE FROM assessment WHERE assessment_id = '"
                                           + values[0] + "' AND admin_id = '" + self.admin_id_str + "';")
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+
+                    # Update balance
+                    self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                          + str(balance - int(values[3])) +
+                                          "' WHERE tenant_id = '" + values[1] + "' AND admin_id = '"
+                                          + self.admin_id_str + "';")
                     self.db1.commit()
                     self.db1.close()
                     self.mycursor.close()
 
-                    messagebox.showinfo("Success", "Removed payment successfully")
+                    messagebox.showinfo("Success", "Removed assessment successfully")
 
                     # Turn off admin access if account is basic user
                     self.basic_user_status()
@@ -5034,11 +5049,13 @@ class Window:
         else:
             try:
                 confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
-                                                                          "value?\nDeletion of this value might "
-                                                                          "delete values that are tethered to it.")
+                                                                          "value?\n\nDeletion of this value might "
+                                                                          "delete values that are tethered to it.\n\n"
+                                                                          "- Deletion of this assessment will result "
+                                                                          "to addition of balance incurred during\n\n"
+                                                                          "this payment")
                 if confirmation:
                     self.database_connect()
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
                     # Grab record number
                     selected = self.info_tree.focus()
@@ -5046,9 +5063,37 @@ class Window:
                     # Grab record values
                     values = self.info_tree.item(selected, "values")
 
+                    self.mycursor.execute(
+                        "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '" + self.admin_id_str +
+                        "' AND tenant_id = '" + values[1] + "';")
+
+                    # Converts the tuple into integer
+                    balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
                     self.mycursor.execute("DELETE FROM payment WHERE payment_id = '" + values[0] + "' AND admin_id = '"
                                           + self.admin_id_str + "';")
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+
+                    # Change balance and tenant status according to payment
+                    if values[8] == 'Application fee':
+                        self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                              + str(balance + int(values[3])) +
+                                              "', tenant_status = 'Newly registered' WHERE tenant_id = '"
+                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+                    elif values[8] == 'Confirmation fee':
+                        self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                              + str(balance + int(values[3])) +
+                                              "', tenant_status = 'Application' WHERE tenant_id = '"
+                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+                    elif values[8] == 'Processing fee':
+                        self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                              + str(balance + int(values[3])) +
+                                              "', tenant_status = 'Confirmation' WHERE tenant_id = '"
+                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+                    else:
+                        self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                              + str(balance + int(values[3])) + "' WHERE tenant_id = '"
+                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+
                     self.db1.commit()
                     self.db1.close()
                     self.mycursor.close()
