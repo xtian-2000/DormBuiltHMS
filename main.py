@@ -4166,7 +4166,7 @@ class Window:
             values = self.info_tree.item(selected, "values")
 
             self.mycursor.execute("DELETE FROM room WHERE room_id = '" + values[0] + "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
+
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
@@ -4358,19 +4358,39 @@ class Window:
                                                                           "value?\nDeletion of this value might "
                                                                           "delete values that are tethered to it.")
                 if confirmation:
+
+                    # Grab record number
+                    selected = self.info_tree.focus()
+
+                    # Grab record values
+                    values = self.info_tree.item(selected, "values")
+
                     self.database_connect()
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-                    self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
-                    # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-                    self.db1.commit()
-                    self.db1.close()
-                    self.mycursor.close()
+                    if values[3] == 'None':
 
-                    messagebox.showinfo("Success", "Removed tenant account successfully")
+                        self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
 
-                    # Turn off admin access if account is basic user
-                    self.basic_user_status()
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Removed tenant account successfully")
+                    else:
+                        self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
+
+                        self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
+                                              "room_availability = 'Available' WHERE room_id = '"
+                                              + values[3] + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Removed tenant account successfully")
+
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
 
             except Exception as e:
                 messagebox.showinfo("Error", "Unsuccessful in removing account")
@@ -5082,7 +5102,10 @@ class Window:
                     elif values[8] == 'Confirmation fee':
                         self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
                                               + str(balance + int(values[3])) +
-                                              "', tenant_status = 'Application' WHERE tenant_id = '"
+                                              "', tenant_status = 'Application', room_id = 'None' WHERE tenant_id = '"
+                                              + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
+                        self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
+                                              "room_availability = 'Available' WHERE room_id = '"
                                               + values[1] + "' AND admin_id = '" + self.admin_id_str + "';")
                     elif values[8] == 'Processing fee':
                         self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
