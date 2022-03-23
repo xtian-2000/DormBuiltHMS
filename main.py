@@ -4606,6 +4606,7 @@ class Window:
 
         # ================================ Discount applied ============================================================
         if self.discount_applied_bool:
+            print(self.discount_applied_bool)
             self.database_connect()
 
             self.mycursor.execute(
@@ -4956,6 +4957,41 @@ class Window:
             except Exception as e:
                 self.invalid_input()
                 print(e)
+
+    # def download_receipt_request(self):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        self.save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
+                                                         defaultextension='.pdf',
+                                                         title="Save file")
+        print(type(self.save_file_dialog))
+        receipt_pdf = FPDF()
+        receipt_pdf.set_font('helvetica', '', 10)
+        receipt_pdf.add_page()
+
+        # create a cell
+        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", border=1, ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DormBuilt, Inc.", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="Congressional Ave., Dasmarinas, Cavite", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt=" ", ln=1, align='C')
+        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[9]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Payment ID: " + values[0]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Email: " + values[11]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Discount Code: " + values[7]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Amount of Payment: P" + values[3]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[8]), ln=1, align='L')
+
+        # save the pdf with name .pdf
+        receipt_pdf.output(dest='F', name=self.save_file_dialog.name)
 
     # Payment
     def payment_info_treeview_request(self):
