@@ -306,9 +306,12 @@ class Window:
         self.employee_id = int
         self.booking_id = int
 
+        self.discount_reduction = None
+
         # Boolean
         self.admin_access_bool = False
         self.basic_user_access_bool = False
+        self.discount_applied_bool = False
 
         # Database
         self.db1 = None
@@ -4076,7 +4079,7 @@ class Window:
 
                     # Update tenant_status to confirmation
                     self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                          + str(balance - int(self.payment_amount_sp.get())) +
+                                          + str(float(balance) - float(self.payment_amount_sp.get())) +
                                           "', tenant_status = 'Confirmation', room_id = '"
                                           + self.room_id + "' WHERE tenant_id = '"
                                           + self.tenant_id_sp.get() + "' AND admin_id = '"
@@ -4093,7 +4096,6 @@ class Window:
 
                     messagebox.showinfo("Success", "Payment is created")
 
-                    self.dialog_box_top.destroy()
                 else:
                     # Room will be fully occupied
 
@@ -4114,7 +4116,7 @@ class Window:
 
                     # Update tenant to confirmation
                     self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                          + str(balance - int(self.payment_amount_sp.get())) +
+                                          + str(float(balance) - float(self.payment_amount_sp.get())) +
                                           "', tenant_status = 'Confirmation', room_id = '"
                                           + self.room_id + "' WHERE tenant_id = '"
                                           + self.tenant_id_sp.get() + "' AND admin_id = '"
@@ -4132,7 +4134,37 @@ class Window:
 
                     messagebox.showinfo("Success", "Payment is created")
 
-                    self.dialog_box_top.destroy()
+        # ================================ Discount applied ============================================================
+        if self.discount_applied_bool:
+            self.database_connect()
+
+            self.mycursor.execute(
+                "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '"
+                + self.admin_id_str + "' AND tenant_id = '" + self.tenant_id_sp.get() + "';")
+
+            # Converts the tuple into integer
+            balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+            self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, basic_user_id, "
+                                  "date_created, time_created, discount_code, payment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.discount_reduction, self.tenant_id_sp.get(),
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                   self.discount_code_e.get(), "Discount applied"))
+            # Update balance
+            self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                  + str(float(balance) - float(self.discount_reduction)) +
+                                  "' WHERE tenant_id = '" + self.tenant_id_sp.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            print("Discount is applied.")
+        else:
+            print("Discount is not applied.")
+
+        self.dialog_box_top.destroy()
 
     def room_add_occupant(self):
         remaining_balance = (int(self.room_cost_l.cget("text")) - int(self.payment_amount_sp.get()))
@@ -4206,7 +4238,7 @@ class Window:
                                    self.payment_description_cb.get()))
 
             self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                  + str(balance + int(self.payment_amount_sp.get())) + "' WHERE tenant_id = '"
+                                  + str(float(balance) + float(self.payment_amount_sp.get())) + "' WHERE tenant_id = '"
                                   + self.tenant_id_sp.get() + "' AND admin_id = '"
                                   + self.admin_id_str + "';")
 
@@ -4487,7 +4519,7 @@ class Window:
 
             # Update balance
             self.mycursor.execute("UPDATE tenant SET tenant_status = 'Application', tenant_balance = '"
-                                  + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                  + str(float(values[4]) - float(self.payment_amount_sp.get())) +
                                   "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
                                   + self.admin_id_str + "';")
 
@@ -4495,12 +4527,9 @@ class Window:
             self.db1.close()
             self.mycursor.close()
 
-            # self.room_add_occupant()
-
             messagebox.showinfo("Success", "Transaction is  created")
             print("Application")
 
-            self.dialog_box_top.destroy()
         elif self.payment_description_cb.get() == "Processing fee":
             print(values[3])
             if values[3] == 'None':
@@ -4518,7 +4547,7 @@ class Window:
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
                 # Update balance
                 self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                      + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                      + str(float(values[4]) - float(self.payment_amount_sp.get())) +
                                       "', tenant_status = 'Processing' WHERE tenant_id = '"
                                       + str(self.tenant_id) + "' AND admin_id = '"
                                       + self.admin_id_str + "';")
@@ -4528,7 +4557,6 @@ class Window:
 
                 messagebox.showinfo("Success", "Payment is created")
 
-                self.dialog_box_top.destroy()
         elif self.payment_description_cb.get() == "Monthly rental fee":
             print(values[3])
             if values[3] == 'None':
@@ -4547,7 +4575,7 @@ class Window:
                                        self.discount_code_e.get(), self.payment_description_cb.get()))
                 # Update balance
                 self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                      + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                      + str(float(values[4]) - float(self.payment_amount_sp.get())) +
                                       "', tenant_status = 'Monthly rental fee' WHERE tenant_id = '"
                                       + str(self.tenant_id) + "' AND admin_id = '"
                                       + self.admin_id_str + "';")
@@ -4557,18 +4585,17 @@ class Window:
 
                 messagebox.showinfo("Success", "Payment is created")
 
-                self.dialog_box_top.destroy()
         else:
             self.database_connect()
             self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, "
                                   "basic_user_id, date_created, time_created, discount_code, payment_description) "
                                   "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                                   (self.payment_amount_sp.get(), self.tenant_id,
-                                   str(self.admin_id_str), str(self.basic_user_id_str), date_str, time_str,
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
                                    self.discount_code_e.get(), self.payment_description_cb.get()))
             # Update balance
             self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
-                                  + str(int(values[4]) - int(self.payment_amount_sp.get())) +
+                                  + str(float(values[4]) - float(self.payment_amount_sp.get())) +
                                   "' WHERE tenant_id = '" + str(self.tenant_id) + "' AND admin_id = '"
                                   + self.admin_id_str + "';")
             self.db1.commit()
@@ -4577,7 +4604,37 @@ class Window:
 
             messagebox.showinfo("Success", "Transaction is  created")
 
-            self.dialog_box_top.destroy()
+        # ================================ Discount applied ============================================================
+        if self.discount_applied_bool:
+            self.database_connect()
+
+            self.mycursor.execute(
+                "SELECT DISTINCT tenant_balance FROM tenant where admin_id = '" + self.admin_id_str +
+                "' AND tenant_id = '" + self.tenant_id + "';")
+
+            # Converts the tuple into integer
+            balance = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+            self.mycursor.execute("INSERT INTO payment (payment_amount, tenant_id, admin_id, basic_user_id, "
+                                  "date_created, time_created, discount_code, payment_description) "
+                                  "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                  (self.discount_reduction, self.tenant_id,
+                                   self.admin_id_str, self.basic_user_id_str, date_str, time_str,
+                                   self.discount_code_e.get(), "Discount applied"))
+            # Update balance
+            self.mycursor.execute("UPDATE tenant SET tenant_balance = '"
+                                  + str(float(balance) - float(self.discount_reduction)) +
+                                  "' WHERE tenant_id = '" + self.tenant_id + "' AND admin_id = '"
+                                  + self.admin_id_str + "';")
+            self.db1.commit()
+            self.db1.close()
+            self.mycursor.close()
+
+            print("Discount is applied.")
+        else:
+            print("Discount is not applied.")
+
+        self.dialog_box_top.destroy()
 
     def create_assessment_request(self):
         # Grab record number
@@ -5518,6 +5575,7 @@ class Window:
                     "' and admin_id = '" + str(self.admin_id_str) + "';")
                 myresult = self.mycursor.fetchone()
                 if myresult is None:
+                    self.discount_applied_bool = False
                     tk.messagebox.showerror("Error", "Invalid Discount Code")
                 else:
                     self.mycursor.execute(
@@ -5528,10 +5586,15 @@ class Window:
                     discount_amount = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
                     discounted_price = (int(self.amount_to_be_paid_l.cget("text")) -
                                         (int(self.amount_to_be_paid_l.cget("text")) * discount_amount / 100))
+
+                    self.discount_reduction = (int(self.amount_to_be_paid_l.cget("text")) * discount_amount/100)
+
                     self.amount_to_be_paid_l.config(text=discounted_price)
                     self.discount_l.config(text=discount_amount)
                     self.payment_amount_sp.delete(0, "end")
                     self.payment_amount_sp.insert(0, discounted_price)
+
+                    self.discount_applied_bool = True
 
                 self.db1.close()
                 self.mycursor.close()
