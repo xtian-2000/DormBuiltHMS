@@ -30,6 +30,7 @@ password = "44966874"
 date = datetime.now()
 date_str = date.strftime('%x')
 
+print(date_str)
 time = datetime.now()
 time_str = time.strftime('%X')
 
@@ -3092,6 +3093,56 @@ class Window:
 
         self.dialog_box_top.mainloop()
 
+    def send_assessment_dialog(self):
+        self.dialog_box_top = tk.Toplevel(self.master)
+        self.dialog_box_top.title("Send digital assessment")
+        self.dialog_box_top.configure(bg="#FFFFFF")
+        self.dialog_box_top.resizable(False, False)
+
+        # ================================================ Main interface ==============================================
+        main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
+        main_lf.pack(padx=15, pady=15, fill="both", expand=True)
+
+        title_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        title_lf.pack(side="top", fill="x", pady=10)
+
+        ttk.Label(title_lf, text='Send digital assessment',
+                  style="h1.TLabel").pack(side="left", anchor="nw")
+        ttk.Label(title_lf, text='basic',
+                  style="small_basic.TLabel").pack(side="left", anchor="nw", padx=5, pady=5)
+
+        forms_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
+        forms_lf.pack(side="top", fill="both", expand=True)
+
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        ttk.Label(forms_lf, text='Tenant Email', style="h2.TLabel",
+                  justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
+
+        self.tenant_email_e = ttk.Entry(forms_lf, width=30)
+        self.tenant_email_e.grid(column=1, row=0)
+        self.tenant_email_e.insert(0, values[10])
+
+        buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="both", expand=True)
+
+        tk.Button(buttons_lf, text="Send receipt", font="OpenSans, 10", fg="#FFFFFF", bg="#89CFF0", relief="flat",
+                  image=self.add_basic_im_resized, compound="left",
+                  command=self.send_assessment_email_request).pack(side="left")
+
+        ttk.Label(buttons_lf, text="Click here to send assessment via email",
+                  style="small_info.TLabel").pack(side="left", padx=10)
+
+        # Disables underlying window
+        self.dialog_box_top.grab_set()
+
+        self.dialog_box_top.mainloop()
+
     # Payment
     def send_receipt_dialog(self):
         self.dialog_box_top = tk.Toplevel(self.master)
@@ -4993,6 +5044,106 @@ class Window:
         # save the pdf with name .pdf
         receipt_pdf.output(dest='F', name=self.save_file_dialog.name)
 
+    def download_assessment_request(self):
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+        print(values)
+
+        self.save_file_dialog = filedialog.asksaveasfile(filetypes=(("PDF Files", "*.pdf"), ("All Files", "*.*")),
+                                                         defaultextension='.pdf',
+                                                         title="Save file")
+        print(type(self.save_file_dialog))
+        receipt_pdf = FPDF()
+        receipt_pdf.set_font('helvetica', '', 10)
+        receipt_pdf.add_page()
+
+        # create a cell
+        receipt_pdf.cell(200, 10, txt="Digital copy of receipt", border=1, ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DormBuilt, Inc.", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="DLSU-HSC Dormbuilt Ladies Dormitory", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt="Congressional Ave., Dasmarinas, Cavite", ln=1, align='C')
+        receipt_pdf.cell(200, 8, txt=" ", ln=1, align='C')
+        receipt_pdf.cell(200, 10, txt=("Received from: " + self.current_user), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Transaction Date: " + values[8]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Assessment ID: " + values[0]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant ID: " + values[1]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Name: " + values[2]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Tenant Email: " + values[10]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Assessment amount: P" + values[3]), ln=1, align='L')
+        receipt_pdf.cell(200, 10, txt=("Payment Description: " + values[7]), ln=1, align='L')
+
+        # save the pdf with name .pdf
+        receipt_pdf.output(dest='F', name=self.save_file_dialog.name)
+
+    def send_assessment_email_request(self):
+        if not self.tenant_email_e.get():
+            self.invalid_input()
+        if self.tenant_email_e.get() == "None":
+            self.invalid_input()
+        else:
+            try:
+                self.download_assessment_request()
+
+                body = '''Good Day! Below is an attachment for the digital copy of 
+                your payment for Dormbuilt, Inc. Thank you!
+                
+                This email is an automated message, please don't reply.
+                '''
+
+                sender = 'pongodev0914@gmail.com'
+                pwd = 'Bin@1110010010'
+                # put the email of the receiver here
+                receiver = self.tenant_email_e.get()
+
+                # Set up the MIME
+                message = MIMEMultipart()
+                message['From'] = sender
+                message['To'] = receiver
+                message['Subject'] = 'This email has an attachment, a pdf file'
+
+                message.attach(MIMEText(body, 'plain'))
+
+                pdfname = self.save_file_dialog.name
+
+                # open the file in binary
+                binary_pdf = open(pdfname, 'rb')
+
+                payload = MIMEBase('application', 'octate-stream', Name=pdfname)
+                # payload = MIMEBase('application', 'pdf', Name=pdfname)
+                payload.set_payload(binary_pdf.read())
+
+                # encoding the binary into base64
+                encoders.encode_base64(payload)
+
+                # add header with pdf name
+                payload.add_header('Content-Decomposition', 'attachment', filename=pdfname)
+                message.attach(payload)
+
+                # use gmail with port
+                session = smtplib.SMTP('smtp.gmail.com', 587)
+
+                # enable security
+                session.starttls()
+
+                # login with mail_id and password
+                session.login(sender, pwd)
+
+                text = message.as_string()
+                session.sendmail(sender, receiver, text)
+                session.quit()
+                print('Mail Sent')
+
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                messagebox.showerror("Error", "Please check your internet connection or Authentication error\nis "
+                                              "detected, please contact the system administrator to allow\naccess"
+                                              "of email to new devices.")
+                print(e)
+
     # Payment
     def payment_info_treeview_request(self):
         try:
@@ -5264,56 +5415,65 @@ class Window:
         if self.tenant_email_e.get() == "None":
             self.invalid_input()
         else:
-            self.download_receipt_request()
+            try:
+                self.download_receipt_request()
 
-            body = '''Good Day! Below is an attachment for the digital copy of 
-            your payment for Dormbuilt, Inc. Thank you!
-            '''
+                body = '''Good Day! Below is an attachment for the digital copy of 
+                your payment for Dormbuilt, Inc. Thank you!
+                
+                This email is an automated message, please don't reply.
+                '''
 
-            sender = 'pongodev0914@gmail.com'
-            pwd = 'Bin@1110010010'
-            # put the email of the receiver here
-            receiver = self.tenant_email_e.get()
+                sender = 'pongodev0914@gmail.com'
+                pwd = 'Bin@1110010010'
+                # put the email of the receiver here
+                receiver = self.tenant_email_e.get()
 
-            # Set up the MIME
-            message = MIMEMultipart()
-            message['From'] = sender
-            message['To'] = receiver
-            message['Subject'] = 'This email has an attachment, a pdf file'
+                # Set up the MIME
+                message = MIMEMultipart()
+                message['From'] = sender
+                message['To'] = receiver
+                message['Subject'] = 'This email has an attachment, a pdf file'
 
-            message.attach(MIMEText(body, 'plain'))
+                message.attach(MIMEText(body, 'plain'))
 
-            pdfname = self.save_file_dialog.name
+                pdfname = self.save_file_dialog.name
 
-            # open the file in binary
-            binary_pdf = open(pdfname, 'rb')
+                # open the file in binary
+                binary_pdf = open(pdfname, 'rb')
 
-            payload = MIMEBase('application', 'octate-stream', Name=pdfname)
-            # payload = MIMEBase('application', 'pdf', Name=pdfname)
-            payload.set_payload(binary_pdf.read())
+                payload = MIMEBase('application', 'octate-stream', Name=pdfname)
+                # payload = MIMEBase('application', 'pdf', Name=pdfname)
+                payload.set_payload(binary_pdf.read())
 
-            # encoding the binary into base64
-            encoders.encode_base64(payload)
+                # encoding the binary into base64
+                encoders.encode_base64(payload)
 
-            # add header with pdf name
-            payload.add_header('Content-Decomposition', 'attachment', filename=pdfname)
-            message.attach(payload)
+                # add header with pdf name
+                payload.add_header('Content-Decomposition', 'attachment', filename=pdfname)
+                message.attach(payload)
 
-            # use gmail with port
-            session = smtplib.SMTP('smtp.gmail.com', 587)
+                # use gmail with port
+                session = smtplib.SMTP('smtp.gmail.com', 587)
 
-            # enable security
-            session.starttls()
+                # enable security
+                session.starttls()
 
-            # login with mail_id and password
-            session.login(sender, pwd)
+                # login with mail_id and password
+                session.login(sender, pwd)
 
-            text = message.as_string()
-            session.sendmail(sender, receiver, text)
-            session.quit()
-            print('Mail Sent')
+                text = message.as_string()
+                session.sendmail(sender, receiver, text)
+                session.quit()
+                print('Mail Sent')
 
-            self.dialog_box_top.destroy()
+                self.dialog_box_top.destroy()
+
+            except Exception as e:
+                messagebox.showerror("Error", "Please check your internet connection or Authentication error\nis "
+                                              "detected, please contact the system administrator to allow\naccess"
+                                              "of email to new devices.")
+                print(e)
 
     # Booking
     def booking_info_treeview_request(self):
@@ -6673,16 +6833,16 @@ class Window:
         buttons_lf = tk.LabelFrame(self.info_buttons_lf, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", pady=5, padx=10, anchor="nw", fill="x")
 
-        tk.Button(buttons_lf, text=" Send receipt", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+        tk.Button(buttons_lf, text=" Send assessment", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   relief="flat", image=self.receipt_im_resized, compound="left",
-                  command=self.send_receipt_dialog).pack(side="top", pady=5, fill="x")
+                  command=self.send_assessment_dialog).pack(side="top", pady=5, fill="x")
 
         download_lf = tk.LabelFrame(buttons_lf, bd=1, bg="#585456", relief="flat")
         download_lf.pack(side="top", pady=5, fill="x")
 
-        tk.Button(download_lf, text=" Save receipt", font="OpenSans, 12", fg="#7C8084",
+        tk.Button(download_lf, text=" Save assessment", font="OpenSans, 12", fg="#7C8084",
                   bg="#FFFFFF", relief="flat", image=self.download_im_resized, compound="left",
-                  justify="left", command=self.download_receipt_request).pack(fill="x")
+                  justify="left", command=self.download_assessment_request).pack(fill="x")
 
         tk.Button(buttons_lf, text=" Remove", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51",
                   relief="flat", image=self.remove_im_resized, compound="left",
