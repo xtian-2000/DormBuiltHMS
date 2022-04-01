@@ -170,6 +170,15 @@ class Database:
             print("alteration could not be created successfully")
             print(e)
 
+        # Alter room table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` DROP INDEX `room_number_UNIQUE` ;;")
+            print("Alteration is added successfully")
+        except Exception as e:
+            print("Alteration is not added successfully")
+            print(e)
+
         # ================================================ tenant table ================================================
 
         # Creating tenant's table in database
@@ -253,6 +262,16 @@ class Database:
             self.mycursor = self.db1.cursor()
             self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` CHANGE COLUMN `tenant_balance` `tenant_balance` "
                                   "INT NULL DEFAULT 0 ;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
+        # Alter tenant table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`tenant` ADD COLUMN `deleted` VARCHAR(45) NOT NULL "
+                                  "DEFAULT 'False' AFTER `room_id`;")
             print("alteration is added successfully")
         except Exception as e:
             print("alteration failed")

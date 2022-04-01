@@ -23,6 +23,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import DateEntry
 import webbrowser
 
+# Import needed for compilation
+import babel.numbers
+
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
 password = "44966874"
@@ -1585,7 +1588,28 @@ class Window:
         canvas.draw()
         canvas.get_tk_widget().pack(side="top", padx=10, pady=10, fill="both", expand=True)
 
-        tk.Button(self.info_content_lf, text="Generate report", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
+        # Info section
+        info_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        info_lf.pack(side="top", fill="x", expand=True)
+
+        ttk.Label(info_lf, text='Payments Information\n',
+                  style="on.TLabel").grid(column=0, row=0, columnspan=2, rowspan=2, sticky="w")
+
+        ttk.Label(info_lf, text='Total Number of Payments: ',
+                  style="small_info.TLabel").grid(column=0, row=2, sticky="w")
+
+        ttk.Label(info_lf, text=len(df.index), style="on.TLabel").grid(column=1, row=2, sticky="w")
+
+        ttk.Label(info_lf, text='Total Amount of Payments: ',
+                  style="small_info.TLabel").grid(column=0, row=3, sticky="w")
+
+        ttk.Label(info_lf, text=df['payment_amount'].sum(), style="on.TLabel").grid(column=1, row=3, sticky="w")
+
+        # Buttons
+        buttons_lf = tk.LabelFrame(self.info_content_lf, bg="#FFFFFF", relief="flat")
+        buttons_lf.pack(side="top", fill="x", expand=True)
+
+        tk.Button(buttons_lf, text="Generate report", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
                   image=self.report_im_resized, compound="left", relief="flat",
                   command=self.generate_sales_report_request).pack(side="left", padx=10, pady=10)
 
@@ -4432,53 +4456,6 @@ class Window:
                     self.invalid_input()
                     print(e)
 
-    def remove_tenant_account_request(self):
-        if not self.admin_access_bool:
-            self.admin_access_validation_dialog()
-        else:
-            try:
-                confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
-                                                                          "value?\nDeletion of this value might "
-                                                                          "delete values that are tethered to it.")
-                if confirmation:
-
-                    # Grab record number
-                    selected = self.info_tree.focus()
-
-                    # Grab record values
-                    values = self.info_tree.item(selected, "values")
-
-                    self.database_connect()
-
-                    if values[3] == 'None':
-
-                        self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
-
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
-
-                        messagebox.showinfo("Success", "Removed tenant account successfully")
-                    else:
-                        self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
-
-                        self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
-                                              "room_availability = 'Available' WHERE room_id = '"
-                                              + values[3] + "' AND admin_id = '" + self.admin_id_str + "';")
-
-                        self.db1.commit()
-                        self.db1.close()
-                        self.mycursor.close()
-
-                        messagebox.showinfo("Success", "Removed tenant account successfully")
-
-                # Turn off admin access if account is basic user
-                self.basic_user_status()
-
-            except Exception as e:
-                messagebox.showinfo("Error", "Unsuccessful in removing account")
-                print(e)
-
     def tenant_info_treeview_request(self):
         Content_control.clear_treeview(self.info_tree)
         # Connect to database
@@ -4492,7 +4469,7 @@ class Window:
                                   "WHERE t.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY t.tenant_id DESC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY t.tenant_id DESC;")
         elif self.order_by_cb.get() == 'Tenant Name':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
@@ -4500,7 +4477,7 @@ class Window:
                                   "WHERE t.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY t.tenant_name ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY t.tenant_name ASC;")
         elif self.order_by_cb.get() == 'Status':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
@@ -4508,7 +4485,7 @@ class Window:
                                   "WHERE t.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY t.tenant_status ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY t.tenant_status ASC;")
         elif self.order_by_cb.get() == 'Date Created':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
@@ -4516,14 +4493,15 @@ class Window:
                                   "WHERE t.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY t.date_created ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY t.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT t.tenant_id, t.tenant_name, t.tenant_status, t.room_id,"
                                   "t.tenant_balance, t.tenant_email, t.date_created, t.time_created FROM tenant t "
                                   "WHERE t.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND t.date_created <= '"
-                                  + self.dashboard_filter_to.get() + "' AND admin_id = '" + self.admin_id_str + "';")
+                                  + self.dashboard_filter_to.get() + "' AND admin_id = '"
+                                  + self.admin_id_str + "' AND deleted = False;")
 
         tenants = self.mycursor.fetchall()
 
@@ -4543,9 +4521,56 @@ class Window:
                                               record[6], record[7]), tags=("evenrow",))
             count += 1
 
-        # self.db1.commit()
         self.mycursor.close()
-        # self.db1.close()
+
+    def remove_tenant_account_request(self):
+        if not self.admin_access_bool:
+            self.admin_access_validation_dialog()
+        else:
+            try:
+                confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                          "value?")
+                if confirmation:
+
+                    # Grab record number
+                    selected = self.info_tree.focus()
+
+                    # Grab record values
+                    values = self.info_tree.item(selected, "values")
+
+                    self.database_connect()
+
+                    if values[3] == 'None':
+                        # self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
+                        self.mycursor.execute("UPDATE tenant SET deleted = True WHERE tenant_id = '"
+                                              + self.tenant_id + "';")
+
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Removed tenant account successfully")
+                    else:
+                        # self.mycursor.execute("DELETE FROM tenant WHERE tenant_id = '" + self.tenant_id + "';")
+                        self.mycursor.execute("UPDATE tenant SET deleted = True WHERE tenant_id = '"
+                                              + self.tenant_id + "';")
+
+                        self.mycursor.execute("UPDATE room SET current_occupants = current_occupants - 1, "
+                                              "room_availability = 'Available' WHERE room_id = '"
+                                              + values[3] + "' AND admin_id = '" + self.admin_id_str + "';")
+
+                        self.db1.commit()
+                        self.db1.close()
+                        self.mycursor.close()
+
+                        messagebox.showinfo("Success", "Deleted tenant account successfully")
+
+                # Turn off admin access if account is basic user
+                self.basic_user_status()
+
+            except Exception as e:
+                messagebox.showinfo("Error", "Unsuccessful in removing account")
+                print(e)
 
     def create_tenant_transaction_request(self):
         # Grab record number
