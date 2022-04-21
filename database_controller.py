@@ -44,10 +44,10 @@ class Database:
         # Creating admin table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`admin` (`admin_id` INT NOT NULL AUTO_INCREMENT, "
-                                  "`username` VARCHAR(45) NOT NULL, `password` VARCHAR(45) NOT NULL, `email` "
-                                  "VARCHAR(45) NOT NULL, `date_created` VARCHAR(45) NOT NULL, PRIMARY KEY (`admin_id`),"
-                                  "UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC) VISIBLE, UNIQUE INDEX "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`admin` (`admin_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, `username` VARCHAR(45) NOT NULL, `password` VARCHAR(45) NOT NULL, "
+                                  "`email` VARCHAR(45) NOT NULL, `date_created` VARCHAR(45) NOT NULL, PRIMARY KEY "
+                                  "(`admin_id`), UNIQUE INDEX `admin_id_UNIQUE` (`admin_id` ASC) VISIBLE, UNIQUE INDEX "
                                   "`username_UNIQUE` (`username` ASC) VISIBLE, UNIQUE INDEX `email_UNIQUE` "
                                   "(`email` ASC) VISIBLE);")
             print("'Admin' table is created successfully")
@@ -70,7 +70,7 @@ class Database:
         # Creating basic_user table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`basic_user` (`basic_user_id` INT NOT NULL "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`basic_user` (`basic_user_id` INT NOT NULL "
                                   "AUTO_INCREMENT, `admin_id` INT NOT NULL, `username` VARCHAR(45) NOT NULL, "
                                   "`password` VARCHAR(45) NOT NULL, `role` VARCHAR(45) NOT NULL, `date_created` "
                                   "VARCHAR(45) NOT NULL, PRIMARY KEY (`basic_user_id`), UNIQUE INDEX "
@@ -108,7 +108,8 @@ class Database:
         # Creating room table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`room` (`room_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`room` (`room_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`room_number` INT NOT NULL, `room_description` VARCHAR(45) NULL, `room_type` "
                                   "VARCHAR(45) NULL, `room_availability` VARCHAR(45) NOT NULL, `room_capacity` INT "
                                   "NOT NULL, `admin_id` INT NOT NULL, PRIMARY KEY (`room_id`), UNIQUE INDEX "
@@ -179,12 +180,23 @@ class Database:
             print("Alteration is not added successfully")
             print(e)
 
+        # Alter room table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`room` ADD COLUMN `deleted` VARCHAR(45) NOT NULL DEFAULT "
+                                  "'False' AFTER `amenities_price`;")
+            print("Alteration is added successfully")
+        except Exception as e:
+            print("Alteration is not added successfully")
+            print(e)
+
         # ================================================ tenant table ================================================
 
         # Creating tenant's table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`tenant` (`tenant_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`tenant` (`tenant_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`tenant_name` VARCHAR(45) NOT NULL, `tenant_balance` VARCHAR(45) NULL, "
                                   "`date_created` VARCHAR(45) NOT NULL, `admin_id` VARCHAR(45) NOT NULL, PRIMARY KEY "
                                   "(`tenant_id`), UNIQUE INDEX `tenant_id_UNIQUE` (`tenant_id` ASC) VISIBLE, "
@@ -282,7 +294,8 @@ class Database:
         # Creating payment table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`payment` (`payment_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`payment` (`payment_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`payment_amount` INT NOT NULL, `room_id` INT NOT NULL, `tenant_id` INT NOT NULL, "
                                   "`admin_id` INT NOT NULL, `basic_user_id` INT NULL, `date_created` VARCHAR(45) NOT "
                                   "NULL, PRIMARY KEY (`payment_id`), UNIQUE INDEX `payment_id_UNIQUE` (`payment_id` "
@@ -338,7 +351,8 @@ class Database:
         # Creating discount table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`discount` ( `discount_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`discount` ( `discount_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`discount_code` VARCHAR(45) NOT NULL, `discount_amount` INT NOT NULL, `admin_id` "
                                   "INT NOT NULL, `basic_user_id` INT NULL, `date_created` VARCHAR(45) NOT NULL, "
                                   "PRIMARY KEY (`discount_id`), UNIQUE INDEX `discount_code_UNIQUE` "
@@ -370,12 +384,23 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter discount table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`discount` ADD COLUMN `deleted` VARCHAR(45) NOT NULL "
+                                  "DEFAULT 'False' AFTER `time_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ action_history table ========================================
 
         # Creating action_history table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`action_history` (`action_id` INT NOT NULL, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`action_history` (`action_id` INT "
+                                  "NOT NULL, "
                                   "`action_description` VARCHAR(45) NOT NULL, `admin_id` INT NOT NULL, `current_user` "
                                   "VARCHAR(45) NOT NULL, `privilege_access` VARCHAR(45) NOT NULL, `date_created` "
                                   "VARCHAR(45) NOT NULL, PRIMARY KEY (`action_id`));")
@@ -428,7 +453,8 @@ class Database:
         # Creating booking table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`booking` (`booking_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`booking` (`booking_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`tenant_name` VARCHAR(45) NOT NULL, `tenant_email` VARCHAR(45) NOT NULL, `admin_id` "
                                   "INT NOT NULL, `date_created` VARCHAR(45) NOT NULL, PRIMARY KEY (`booking_id`));")
             print("'booking' table is created successfully")
@@ -491,7 +517,8 @@ class Database:
         # Creating notif table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`notif` (`notif_id` INT NOT NULL AUTO_INCREMENT, "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`notif` (`notif_id` INT NOT NULL "
+                                  "AUTO_INCREMENT, "
                                   "`notif_subject` VARCHAR(45) NOT NULL, `notif_description` VARCHAR(45) NOT NULL, "
                                   "`date_created` VARCHAR(45) NOT NULL, `admin_id` VARCHAR(45) NOT NULL, PRIMARY KEY "
                                   "(`notif_id`));")
@@ -511,12 +538,22 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter notif table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`notif` ADD COLUMN `deleted` VARCHAR(45) NOT NULL DEFAULT "
+                                  "'False' AFTER `time_created`;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ assessment table ============================================
 
         # Creating assessment table in database
         try:
             self.mycursor = self.db1.cursor()
-            self.mycursor.execute("CREATE TABLE `hmsdatabase`.`assessment` (`assessment_id` INT NOT NULL "
+            self.mycursor.execute("CREATE TABLE IF NOT EXISTS `hmsdatabase`.`assessment` (`assessment_id` INT NOT NULL "
                                   "AUTO_INCREMENT, `assessment_amount` INT NOT NULL, `room_id` INT NULL, `tenant_id` "
                                   "INT NOT NULL, `admin_id` INT NOT NULL, `basic_user_id` INT NULL, "
                                   "`assessment_description` VARCHAR(45) NOT NULL, `date_created` VARCHAR(45) NOT NULL, "

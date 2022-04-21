@@ -3970,37 +3970,37 @@ class Window:
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "' ORDER BY r.room_id ASC;")
+                                  + str(self.admin_id_str) + "' AND deleted = False ORDER BY r.room_id ASC;")
         elif self.order_by_cb.get() == 'Room Number':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "' ORDER BY r.room_number ASC;")
+                                  + str(self.admin_id_str) + "' AND deleted = False ORDER BY r.room_number ASC;")
         elif self.order_by_cb.get() == 'Room Type':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "' ORDER BY r.room_type ASC;")
+                                  + str(self.admin_id_str) + "' AND deleted = False ORDER BY r.room_type ASC;")
         elif self.order_by_cb.get() == 'Room Availability':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "' ORDER BY r.room_availability ASC;")
+                                  + str(self.admin_id_str) + "' AND deleted = False ORDER BY r.room_availability ASC;")
         elif self.order_by_cb.get() == 'Room Capacity':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "' ORDER BY r.room_capacity ASC;")
+                                  + str(self.admin_id_str) + "' AND deleted = False ORDER BY r.room_capacity ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT r.room_id, r.room_number, r.room_description, r.room_type, "
                                   "r.room_availability, r.room_capacity, r.room_price, r.amenities_price, "
                                   "r.current_occupants FROM room r where admin_id = '"
-                                  + str(self.admin_id_str) + "';")
+                                  + str(self.admin_id_str) + "' AND deleted = False;")
 
         rooms = self.mycursor.fetchall()
 
@@ -4263,22 +4263,28 @@ class Window:
 
     def remove_room_account_request(self):
         try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+            confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                      "value?")
+            if confirmation:
+                self.database_connect()
+                # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
 
-            # Grab record number
-            selected = self.info_tree.focus()
+                # Grab record number
+                selected = self.info_tree.focus()
 
-            # Grab record values
-            values = self.info_tree.item(selected, "values")
+                # Grab record values
+                values = self.info_tree.item(selected, "values")
 
-            self.mycursor.execute("DELETE FROM room WHERE room_id = '" + values[0] + "';")
+                self.mycursor.execute("UPDATE room SET deleted = True WHERE room_id = '"
+                                      + values[0] + "';")
 
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
 
-            messagebox.showinfo("Success", "Removed room successfully")
+                messagebox.showinfo("Success", "Removed room successfully")
+            else:
+                pass
 
         except Exception as e:
             self.invalid_input()
@@ -6169,35 +6175,35 @@ class Window:
                                   "n.date_created, n.time_created FROM notif n WHERE n.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND n.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY n.notif_id DESC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY n.notif_id DESC;")
         elif self.order_by_cb.get() == 'Notif Subject':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
                                   "n.date_created, n.time_created FROM notif n WHERE n.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND n.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY n.notif_subject ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY n.notif_subject ASC;")
         elif self.order_by_cb.get() == 'Notif Description':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
                                   "n.date_created, n.time_created FROM notif n WHERE n.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND n.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY n.notif_description ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY n.notif_description ASC;")
         elif self.order_by_cb.get() == 'Date Created':
             print(self.order_by_cb.get())
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
                                   "n.date_created, n.time_created FROM notif n WHERE n.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND n.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "' ORDER BY n.date_created ASC;")
+                                  + self.admin_id_str + "' AND deleted = False ORDER BY n.date_created ASC;")
         else:
             print('Safety condition')
             self.mycursor.execute("SELECT n.notif_id, n.notif_subject, n.notif_description, n.admin_id, "
                                   "n.date_created, n.time_created FROM notif n WHERE n.date_created >= '"
                                   + self.dashboard_filter_from.get() + "' AND n.date_created <= '"
                                   + self.dashboard_filter_to.get() + "' AND admin_id = '"
-                                  + self.admin_id_str + "';")
+                                  + self.admin_id_str + "' AND deleted = False;")
 
         notif = self.mycursor.fetchall()
         print(notif)
@@ -6222,9 +6228,9 @@ class Window:
         self.db1.close()
 
     def remove_notif_request(self):
-        try:
-            self.database_connect()
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+        confirmation = messagebox.askokcancel("Confirm deletion", "Are you sure you want to delete this "
+                                                                  "value?")
+        if confirmation:
 
             # Grab record number
             selected = self.info_tree.focus()
@@ -6232,18 +6238,20 @@ class Window:
             # Grab record values
             values = self.info_tree.item(selected, "values")
 
-            self.mycursor.execute("DELETE FROM notif WHERE notif_id = '" + values[0] +
-                                  "';")
-            # self.mycursor.execute("SET FOREIGN_KEY_CHECKS=1;")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+            try:
+                self.database_connect()
 
-            messagebox.showinfo("Success", "Removed notif successfully")
+                self.mycursor.execute("UPDATE notif SET deleted = True WHERE notif_id = '" + values[0] + "';")
 
-        except Exception as e:
-            self.invalid_request()
-            print(e)
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
+
+                messagebox.showinfo("Success", "Removed notif successfully")
+
+            except Exception as e:
+                self.invalid_request()
+                print(e)
 
     # Menu
     def bug_report(self):
