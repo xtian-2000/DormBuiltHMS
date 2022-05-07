@@ -263,7 +263,7 @@ class Window:
         self.change_password_e = ttk.Entry
 
         self.room_description_e = ttk.Entry
-        self.room_type_e = ttk.Entry
+        # self.room_type_e = ttk.Entry
         self.new_room_type_e = ttk.Entry
 
         self.tenant_name_e = ttk.Entry
@@ -290,6 +290,7 @@ class Window:
         self.discount_status_cb = ttk.Combobox
         self.payment_description_cb = ttk.Combobox
         self.order_by_cb = ttk.Combobox
+        self.room_type_cb = ttk.Combobox
 
         # Treeview
         self.info_tree = ttk.Treeview
@@ -2063,20 +2064,22 @@ class Window:
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
+        ttk.Label(forms_lf, text="optional", image=self.exclamation_im_resized, compound="left",
+                  style="small_info.TLabel", justify="left").grid(column=1, row=2, sticky="w")
+
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, padx=2.5, pady=2.5, row=2, sticky="w")
+                  justify="left").grid(column=0, padx=2.5, pady=2.5, row=3, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=60)
-        self.room_type_e.grid(column=1, row=2)
-
-        ttk.Label(forms_lf, text='ex. Large Single, Single, Double', style="small_info.TLabel",
-                  justify="left").grid(column=1, row=3, sticky="w")
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single', 'Double')
+        self.room_type_cb.grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
                   justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
 
         self.room_availability_cb = ttk.Combobox(forms_lf)
         self.room_availability_cb['values'] = ('Reserved', 'Available', 'Fully Occupied', 'Maintenance')
+        self.room_availability_cb.current(1)
         self.room_availability_cb.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms_lf, text='Room capacity', style="h2.TLabel",
@@ -3689,7 +3692,7 @@ class Window:
 
         ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
-        self.admin_access_password_e = ttk.Entry(forms_lf, width=60)
+        self.admin_access_password_e = ttk.Entry(forms_lf, width=60, show="*")
         self.admin_access_password_e.grid(column=1, row=1, sticky="w", padx=10)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
