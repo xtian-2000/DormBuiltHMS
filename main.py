@@ -263,8 +263,6 @@ class Window:
         self.change_password_e = ttk.Entry
 
         self.room_description_e = ttk.Entry
-        # self.room_type_e = ttk.Entry
-        self.new_room_type_e = ttk.Entry
 
         self.tenant_name_e = ttk.Entry
         self.tenant_email_e = ttk.Entry
@@ -291,6 +289,7 @@ class Window:
         self.payment_description_cb = ttk.Combobox
         self.order_by_cb = ttk.Combobox
         self.room_type_cb = ttk.Combobox
+        self.new_room_type_cb = ttk.Combobox
 
         # Treeview
         self.info_tree = ttk.Treeview
@@ -2071,7 +2070,7 @@ class Window:
                   justify="left").grid(column=0, padx=2.5, pady=2.5, row=3, sticky="w")
 
         self.room_type_cb = ttk.Combobox(forms_lf)
-        self.room_type_cb['values'] = ('Large Single', 'Single', 'Double')
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
         self.room_type_cb.grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
@@ -2160,8 +2159,9 @@ class Window:
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
                   justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=60)
-        self.room_type_e.grid(column=1, row=2)
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.room_type_cb.grid(column=1, row=2)
 
         ttk.Label(forms_lf, text='ex. Basic, Suite', style="small_info.TLabel",
                   justify="left").grid(column=1, row=3, sticky="w")
@@ -2207,7 +2207,7 @@ class Window:
         # Insert values to entry widgets
         self.room_number_sp.insert(0, values[1])
         self.room_description_e.insert(0, values[2])
-        self.room_type_e.insert(0, values[3])
+        self.room_type_cb.insert(0, values[3])
         self.room_availability_cb.insert(0, values[4])
         self.room_capacity_sp.insert(0, values[5])
         self.room_price_sp.insert(0, values[6])
@@ -2262,14 +2262,14 @@ class Window:
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
+        ttk.Label(forms_lf, text="optional", image=self.exclamation_im_resized, compound="left",
+                  style="small_info.TLabel", justify="left").grid(column=1, row=2, sticky="w")
+
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+                  justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=60)
-        self.room_type_e.grid(column=1, row=2)
-
-        ttk.Label(forms_lf, text='ex. Basic, Suite', style="small_info.TLabel",
-                  justify="left").grid(column=1, row=3, sticky="w")
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb.grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
                   justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
@@ -2316,7 +2316,7 @@ class Window:
 
         # Insert values to entry widgets
         self.room_description_e.insert(0, values[2])
-        self.room_type_e.insert(0, values[3])
+        self.room_type_cb.insert(0, values[3])
         self.room_availability_cb.insert(0, values[4])
         self.room_capacity_sp.insert(0, values[5])
         self.room_price_sp.insert(0, values[6])
@@ -2324,7 +2324,7 @@ class Window:
 
         # Disable widgets
         self.room_description_e.config(state="disabled")
-        self.room_type_e.config(state="disabled")
+        self.room_type_cb.config(state="disabled")
         self.room_availability_cb.config(state="disabled")
         self.room_capacity_sp.config(state="disabled")
         self.room_price_sp.config(state="disabled")
@@ -2374,8 +2374,9 @@ class Window:
         ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
                   justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=40)
-        self.room_type_e.grid(column=1, row=1, columnspan=2)
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.room_type_cb.grid(column=1, row=1)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -2427,8 +2428,9 @@ class Window:
         ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
                   justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=40)
-        self.room_type_e.grid(column=1, row=1, columnspan=2)
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.room_type_cb.grid(column=1, row=1)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -2477,8 +2479,9 @@ class Window:
         ttk.Label(forms_lf, text='Room Type', style="h2.TLabel",
                   justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=40)
-        self.room_type_e.grid(column=1, row=1, columnspan=2)
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.room_type_cb.grid(column=1, row=1)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -2521,14 +2524,16 @@ class Window:
         ttk.Label(forms_lf, text='New room type', style="h2.TLabel",
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
-        self.new_room_type_e = ttk.Entry(forms_lf, width=40)
-        self.new_room_type_e.grid(column=1, row=0, sticky="w")
+        self.new_room_type_cb = ttk.Combobox(forms_lf)
+        self.new_room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.new_room_type_cb.grid(column=1, row=0)
 
         ttk.Label(forms_lf, text='Current room type', style="h2.TLabel",
                   justify="left").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
-        self.room_type_e = ttk.Entry(forms_lf, width=40)
-        self.room_type_e.grid(column=1, row=1)
+        self.room_type_cb = ttk.Combobox(forms_lf)
+        self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
+        self.room_type_cb.grid(column=1, row=1)
 
         buttons_lf = tk.LabelFrame(main_lf, padx=20, pady=20, bg="#FFFFFF", relief="flat")
         buttons_lf.pack(side="top", fill="both", expand=True)
@@ -3715,7 +3720,7 @@ class Window:
     def admin_signin_request(self):
         if not self.signin_username_e.get():
             self.invalid_input()
-        if not self.signin_password_e.get():
+        elif not self.signin_password_e.get():
             self.invalid_input()
         else:
             self.database_connect()
@@ -3768,7 +3773,7 @@ class Window:
     def basic_user_signin_request(self):
         if not self.signin_username_e.get():
             self.invalid_input()
-        if not self.signin_password_e.get():
+        elif not self.signin_password_e.get():
             self.invalid_input()
         else:
             self.database_connect()
@@ -3876,9 +3881,9 @@ class Window:
     def admin_signup_request(self):
         if not self.signup_username_e.get():
             self.invalid_input()
-        if not self.signup_password_e.get():
+        elif not self.signup_password_e.get():
             self.invalid_input()
-        if not self.signup_email_e.get():
+        elif not self.signup_email_e.get():
             self.invalid_input()
         else:
             try:
@@ -3903,9 +3908,11 @@ class Window:
     def create_room_request(self):
         if not self.room_number_sp.get():
             self.invalid_input()
-        if not self.room_availability_cb.get():
+        elif not self.room_type_cb.get():
             self.invalid_input()
-        if not self.room_capacity_sp.get():
+        elif not self.room_availability_cb.get():
+            self.invalid_input()
+        elif not self.room_capacity_sp.get():
             self.invalid_input()
         else:
             try:
@@ -3914,7 +3921,7 @@ class Window:
                                       " room_capacity, admin_id, room_price, amenities_price) VALUES (%s,%s,%s,%s,%s,"
                                       "%s,%s,%s)",
                                       (self.room_number_sp.get(), self.room_description_e.get(),
-                                       self.room_type_e.get(),
+                                       self.room_type_cb.get(),
                                        self.room_availability_cb.get(), self.room_capacity_sp.get(), self.admin_id_str,
                                        self.room_price_sp.get(), self.amenity_price_sp.get()))
 
@@ -3933,9 +3940,9 @@ class Window:
     def modify_room_request(self):
         if not self.room_number_sp.get():
             self.invalid_input()
-        if not self.room_availability_cb.get():
+        elif not self.room_availability_cb.get():
             self.invalid_input()
-        if not self.room_capacity_sp.get():
+        elif not self.room_capacity_sp.get():
             self.invalid_input()
         else:
             try:
@@ -3944,7 +3951,7 @@ class Window:
                 self.mycursor.execute("UPDATE room SET room_number = '"
                                       + self.room_number_sp.get() + "', room_description = '"
                                       + self.room_description_e.get() + "', room_type = '"
-                                      + self.room_type_e.get() + "', room_availability = '"
+                                      + self.room_type_cb.get() + "', room_availability = '"
                                       + self.room_availability_cb.get() + "', room_capacity = '"
                                       + self.room_capacity_sp.get() + "', room_price = '"
                                       + self.room_price_sp.get() + "', amenities_price = '"
@@ -4032,13 +4039,13 @@ class Window:
     def set_room_price_to_type_request(self):
         if not self.room_price_sp.get():
             self.invalid_input()
-        if not self.room_type_e.get():
+        elif not self.room_type_cb.get():
             self.invalid_input()
         else:
             try:
                 self.database_connect()
                 self.mycursor.execute("UPDATE room SET room_price='" + self.room_price_sp.get() + "' WHERE admin_id='" +
-                                      str(self.admin_id_str) + "' and room_type='" + self.room_type_e.get() + "';")
+                                      str(self.admin_id_str) + "' and room_type='" + self.room_type_cb.get() + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -4053,14 +4060,14 @@ class Window:
     def set_amenities_price_to_type_request(self):
         if not self.amenity_price_sp.get():
             self.invalid_input()
-        if not self.room_type_e.get():
+        elif not self.room_type_cb.get():
             self.invalid_input()
         else:
             try:
                 self.database_connect()
                 self.mycursor.execute("UPDATE room SET amenities_price='" + self.amenity_price_sp.get() +
                                       "' WHERE admin_id='" +
-                                      str(self.admin_id_str) + "' and room_type='" + self.room_type_e.get() + "';")
+                                      str(self.admin_id_str) + "' and room_type='" + self.room_type_cb.get() + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -4075,14 +4082,14 @@ class Window:
     def set_room_capacity_to_type_request(self):
         if not self.room_capacity_sp.get():
             self.invalid_input()
-        if not self.room_type_e.get():
+        elif not self.room_type_cb.get():
             self.invalid_input()
         else:
             try:
                 self.database_connect()
                 self.mycursor.execute("UPDATE room SET room_capacity='" + self.room_capacity_sp.get() +
-                                      "' WHERE admin_id='" + str(self.admin_id_str) + "' and room_type='"
-                                      + self.room_type_e.get() + "';")
+                                      "' WHERE admin_id='" + self.admin_id_str + "' and room_type='"
+                                      + self.room_type_cb.get() + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -4095,16 +4102,16 @@ class Window:
                 print(e)
 
     def set_room_type_to_type_request(self):
-        if not self.new_room_type_e.get():
+        if not self.new_room_type_cb.get():
             self.invalid_input()
-        if not self.room_type_e.get():
+        elif not self.room_type_cb.get():
             self.invalid_input()
         else:
             try:
                 self.database_connect()
-                self.mycursor.execute("UPDATE room SET room_type='" + self.new_room_type_e.get() +
+                self.mycursor.execute("UPDATE room SET room_type='" + self.new_room_type_cb.get() +
                                       "' WHERE admin_id='" + str(self.admin_id_str) + "' and room_type='"
-                                      + self.room_type_e.get() + "';")
+                                      + self.room_type_cb.get() + "';")
                 self.db1.commit()
                 self.db1.close()
                 self.mycursor.close()
@@ -4119,7 +4126,7 @@ class Window:
     def create_room_transaction_request(self):
         if not self.tenant_id_sp.get():
             self.invalid_input()
-        if not self.payment_amount_sp.get():
+        elif not self.payment_amount_sp.get():
             self.invalid_input()
         else:
             # Grab record number
@@ -4395,7 +4402,7 @@ class Window:
     def modify_tenant_request(self):
         if not self.tenant_name_e.get():
             self.invalid_input()
-        if not self.tenant_status_cb.get():
+        elif not self.tenant_status_cb.get():
             self.invalid_input()
         else:
             # Grab record number
@@ -5115,7 +5122,7 @@ class Window:
     def send_assessment_email_request(self):
         if not self.tenant_email_e.get():
             self.invalid_input()
-        if self.tenant_email_e.get() == "None":
+        elif self.tenant_email_e.get() == "None":
             self.invalid_input()
         else:
             try:
@@ -5446,7 +5453,7 @@ class Window:
     def send_receipt_email_request(self):
         if not self.tenant_email_e.get():
             self.invalid_input()
-        if self.tenant_email_e.get() == "None":
+        elif self.tenant_email_e.get() == "None":
             self.invalid_input()
         else:
             try:
@@ -5637,9 +5644,9 @@ class Window:
     def create_discount_request(self):
         if not self.discount_code_e.get():
             self.invalid_input()
-        if not self.discount_amount_sp.get():
+        elif not self.discount_amount_sp.get():
             self.invalid_input()
-        if not self.discount_status_cb.get():
+        elif not self.discount_status_cb.get():
             self.invalid_input()
         else:
             try:
@@ -5667,9 +5674,9 @@ class Window:
     def modify_discount_request(self):
         if not self.discount_code_e.get():
             self.invalid_input()
-        if not self.discount_amount_sp.get():
+        elif not self.discount_amount_sp.get():
             self.invalid_input()
-        if not self.discount_status_cb.get():
+        elif not self.discount_status_cb.get():
             self.invalid_input()
         else:
             try:
@@ -5833,13 +5840,12 @@ class Window:
                 print(e)
 
     # Accounts
-
     def change_username_password_request(self):
         if not self.change_username_e.get():
             self.invalid_input()
-        if not self.change_password_e.get():
+        elif not self.change_password_e.get():
             self.invalid_input()
-        if not self.admin_access_bool:
+        elif not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             self.database_connect()
@@ -5863,11 +5869,11 @@ class Window:
     def create_employee_request(self):
         if not self.employee_username_e.get():
             self.invalid_input()
-        if not self.employee_password_e.get():
+        elif not self.employee_password_e.get():
             self.invalid_input()
-        if not self.employee_role_e.get():
+        elif not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access_bool:
+        elif not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -5897,11 +5903,11 @@ class Window:
     def modify_employee_request(self):
         if not self.employee_username_e.get():
             self.invalid_input()
-        if not self.employee_password_e.get():
+        elif not self.employee_password_e.get():
             self.invalid_input()
-        if not self.employee_role_e.get():
+        elif not self.employee_role_e.get():
             self.invalid_input()
-        if not self.admin_access_bool:
+        elif not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
             try:
@@ -6314,7 +6320,7 @@ class Window:
     def admin_access_request(self):
         if not self.admin_access_username_e.get():
             self.invalid_input()
-        if not self.admin_access_password_e.get():
+        elif not self.admin_access_password_e.get():
             self.invalid_input()
         else:
             self.database_connect()
