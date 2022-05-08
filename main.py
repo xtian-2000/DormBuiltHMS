@@ -79,6 +79,18 @@ class Window:
         hms_logo_im = PhotoImage(file=r"pongodev_hms_small_logo.png")
         self.hms_logo_im_resized = hms_logo_im.subsample(8, 8)
 
+        signin_b_im = PhotoImage(file=r"signin_b.png")
+        self.signin_b_im_resized = signin_b_im.subsample(1, 1)
+
+        signup_b_im = PhotoImage(file=r"signup_b.png")
+        self.signup_b_im_resized = signup_b_im.subsample(1, 1)
+
+        signup_b_2_im = PhotoImage(file=r"signup_b_2.png")
+        self.signup_b_2_im_resized = signup_b_2_im.subsample(1, 1)
+
+        cancel_b_im = PhotoImage(file=r"cancel_b.png")
+        self.cancel_b_im_resized = cancel_b_im.subsample(1, 1)
+
         download_im = PhotoImage(file=r"download_b.png")
         self.download_im_resized = download_im.subsample(1, 1)
 
@@ -404,16 +416,15 @@ class Window:
         buttons_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both")
 
-        tk.Button(buttons_f, text="Sign in as Administrator", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
-                  relief="flat", command=self.admin_signin_request).pack(side="top", pady=5, padx=10, fill="x")
-
-        tk.Button(buttons_f, text="Sign in as Basic User", font="OpenSans, 12", fg="#FFFFFF", bg="#89CFF0",
-                  relief="flat", command=self.basic_user_signin_request).pack(side="top", pady=5, padx=10, fill="x")
+        tk.Button(buttons_f, text=" Sign in", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
+                  relief="flat", image=self.signin_b_im_resized,
+                  compound="left", command=self.admin_signin_request).pack(side="top", pady=5, padx=10, fill="x")
 
         signup_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
         signup_b_lf.pack(side="top", pady=5, padx=10, fill="x")
 
-        tk.Button(signup_b_lf, text="Sign up", font="OpenSans, 12", fg="#585456", bg="#FFFFFF", relief="flat",
+        tk.Button(signup_b_lf, text=" Sign up", font="OpenSans, 12", fg="#585456", bg="#FFFFFF", relief="flat",
+                  image=self.signup_b_im_resized, compound="left",
                   command=self.signup_interface).pack(side="top", fill="x")
 
         self.signin_username_e.focus()
@@ -522,14 +533,13 @@ class Window:
         buttons_f = ttk.Frame(self.login_register_lf, style="Basic.TFrame")
         buttons_f.pack(side="top", fill="both", ipady=20)
 
-        tk.Button(buttons_f, text="Sign up as Administrator", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
-                  relief="flat", command=self.admin_signup_request).pack(side="top", pady=5, padx=10, fill="x")
+        tk.Button(buttons_f, text=" Sign up ", font="OpenSans, 12", fg="#FFFFFF", bg="#4C8404",
+                  relief="flat", image=self.signup_b_2_im_resized,
+                  compound="left", command=self.admin_signup_request).pack(side="top", pady=5, padx=10, fill="x")
 
-        cancel_b_lf = tk.LabelFrame(buttons_f, bd=1, bg="#585456", relief="flat")
-        cancel_b_lf.pack(side="top", pady=5, padx=10, fill="x")
-
-        tk.Button(cancel_b_lf, text="Go back", font="OpenSans, 12", fg="#585456", bg="#FFFFFF", relief="flat",
-                  command=self.signin_interface).pack(fill="x")
+        tk.Button(buttons_f, text=" Cancel", font="OpenSans, 12", fg="#FFFFFF", bg="#BD1E51", relief="flat",
+                  image=self.cancel_b_im_resized, compound="left",
+                  command=self.signin_interface).pack(side="top", pady=5, padx=10, fill="x")
 
     def main_interface(self):
         # Clean widgets in the master window
@@ -3730,7 +3740,7 @@ class Window:
                 self.signin_password_e.get() + "';")
             myresult = self.mycursor.fetchone()
             if myresult is None:
-                tk.messagebox.showerror("Error", "Invalid User Name And Password")
+                self.basic_user_signin_request()
             else:
                 self.mycursor.execute(
                     "SELECT DISTINCT admin_id FROM admin where username = '" + self.signin_username_e.get() + "';")
@@ -3771,41 +3781,36 @@ class Window:
         self.mycursor.close()
 
     def basic_user_signin_request(self):
-        if not self.signin_username_e.get():
-            self.invalid_input()
-        elif not self.signin_password_e.get():
-            self.invalid_input()
+        self.database_connect()
+        self.mycursor.execute(
+            "SELECT * FROM basic_user where username = '" + self.signin_username_e.get() + "' and password = '" +
+            self.signin_password_e.get() + "';")
+        myresult = self.mycursor.fetchone()
+        if myresult is None:
+            tk.messagebox.showerror("Error", "Invalid User Name And Password")
         else:
-            self.database_connect()
             self.mycursor.execute(
-                "SELECT * FROM basic_user where username = '" + self.signin_username_e.get() + "' and password = '" +
-                self.signin_password_e.get() + "';")
-            myresult = self.mycursor.fetchone()
-            if myresult is None:
-                tk.messagebox.showerror("Error", "Invalid User Name And Password")
-            else:
-                self.mycursor.execute(
-                    "SELECT DISTINCT admin_id FROM basic_user where username = '" + self.signin_username_e.get() + "';")
+                "SELECT DISTINCT admin_id FROM basic_user where username = '" + self.signin_username_e.get() + "';")
 
-                # Converts the tuple into integer
-                admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
-                self.admin_id_str = str(admin_id)
+            # Converts the tuple into integer
+            admin_id = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+            self.admin_id_str = str(admin_id)
 
-                self.admin_access_bool = False
-                self.basic_user_access_bool = True
+            self.admin_access_bool = False
+            self.basic_user_access_bool = True
 
-                # Instantiate create_widgets method
-                self.basic_user_get_id_request()
-                self.basic_user_get_current_user()
+            # Instantiate create_widgets method
+            self.basic_user_get_id_request()
+            self.basic_user_get_current_user()
 
-                # Record action history
-                self.action_description = "Basic User Sign in"
-                self.action_history_request()
+            # Record action history
+            self.action_description = "Basic User Sign in"
+            self.action_history_request()
 
-                self.main_interface()
+            self.main_interface()
 
-            self.db1.close()
-            self.mycursor.close()
+        self.db1.close()
+        self.mycursor.close()
 
     def basic_user_get_id_request(self):
         self.database_connect()
