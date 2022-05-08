@@ -2156,15 +2156,15 @@ class Window:
         self.room_description_e = ttk.Entry(forms_lf, width=60)
         self.room_description_e.grid(column=1, row=1)
 
+        ttk.Label(forms_lf, text="optional", image=self.exclamation_im_resized, compound="left",
+                  style="small_info.TLabel", justify="left").grid(column=1, row=2, sticky="w")
+
         ttk.Label(forms_lf, text='Room type', style="h2.TLabel",
-                  justify="left").grid(column=0, row=2, padx=2.5, pady=2.5, sticky="w")
+                  justify="left").grid(column=0, row=3, padx=2.5, pady=2.5, sticky="w")
 
         self.room_type_cb = ttk.Combobox(forms_lf)
         self.room_type_cb['values'] = ('Large Single', 'Single Type', 'Shared Type')
-        self.room_type_cb.grid(column=1, row=2)
-
-        ttk.Label(forms_lf, text='ex. Basic, Suite', style="small_info.TLabel",
-                  justify="left").grid(column=1, row=3, sticky="w")
+        self.room_type_cb.grid(column=1, row=3, sticky="w")
 
         ttk.Label(forms_lf, text='Room availability', style="h2.TLabel",
                   justify="left").grid(column=0, row=4, padx=2.5, pady=2.5, sticky="w")
@@ -4989,8 +4989,7 @@ class Window:
                 count += 1
 
             if count <= 0:
-                messagebox.showerror("Error", "Database request unsuccessful! \n Please check your internet connection"
-                                              "\nor check for invalid input.")
+                messagebox.showinfo("Info", "No data detected! \n Try configuring the date filter above.")
             else:
                 pass
 
@@ -5335,8 +5334,7 @@ class Window:
                 count += 1
 
             if count <= 0:
-                messagebox.showerror("Error", "Database request unsuccessful! \n Please check your internet connection"
-                                              "\nor check for invalid input.")
+                messagebox.showinfo("Info", "No data detected! \n Try configuring the date filter above.")
             else:
                 pass
 
