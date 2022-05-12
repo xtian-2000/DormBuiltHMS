@@ -2691,7 +2691,7 @@ class Window:
         # Grab record values
         values = self.info_tree.item(selected, "values")
 
-        amount_to_be_paid = int(values[6]) + int(values[7])
+        amount_to_be_paid = int(values[6]) + int(values[7]) + 500
 
         # ================================================ Widgets for resetting password ==========================
         main_lf = tk.LabelFrame(self.dialog_box_top, bg="#FFFFFF")
@@ -2712,7 +2712,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Confirmation fee',)
+        self.payment_description_cb['values'] = ('Initial payment',)
         self.payment_description_cb['state'] = 'readonly'
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
@@ -2726,24 +2726,33 @@ class Window:
         ttk.Label(forms1_lf, text='Payment Information',
                   style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
 
-        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
+        ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
                   justify="left").grid(column=0, row=4, padx=2.5, sticky="w")
 
-        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
-        self.room_cost_l.grid(column=1, row=4, sticky="w")
+        ttk.Label(forms1_lf, text='500', style="small_info.TLabel",
+                  justify="left").grid(column=1, row=4, sticky="w")
 
-        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
+        ttk.Label(forms1_lf, text='Confirmation fee', style="small_info.TLabel",
                   justify="left").grid(column=0, row=5, padx=2.5, sticky="w")
 
+        ttk.Label(forms1_lf, text='Room price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+
+        self.room_cost_l = ttk.Label(forms1_lf, text=values[6], style="small_info.TLabel", justify="left")
+        self.room_cost_l.grid(column=1, row=6, sticky="w")
+
+        ttk.Label(forms1_lf, text='Amenities price: ', style="small_info.TLabel",
+                  justify="left").grid(column=0, row=7, padx=2.5, sticky="w")
+
         self.room_cost_l = ttk.Label(forms1_lf, text=values[7], style="small_info.TLabel", justify="left")
-        self.room_cost_l.grid(column=1, row=5, sticky="w")
+        self.room_cost_l.grid(column=1, row=7, sticky="w")
 
         ttk.Label(forms1_lf, text='Total amount  to be paid: ', style="small_info.TLabel",
-                  justify="left").grid(column=0, row=6, padx=2.5, sticky="w")
+                  justify="left").grid(column=0, row=8, padx=2.5, sticky="w")
 
         self.amount_to_be_paid_l = ttk.Label(forms1_lf, text=amount_to_be_paid,
                                              style="small_info.TLabel", justify="left")
-        self.amount_to_be_paid_l.grid(column=1, row=6, sticky="w")
+        self.amount_to_be_paid_l.grid(column=1, row=8, sticky="w")
 
         forms2_lf = tk.LabelFrame(main_lf, bg="#FFFFFF", relief="flat")
         forms2_lf.pack(side="top", fill="both", expand=True)
@@ -3066,7 +3075,7 @@ class Window:
                   justify="left").grid(column=0, row=0, padx=2.5, pady=2.5, sticky="w")
 
         self.payment_description_cb = ttk.Combobox(forms1_lf, width=30)
-        self.payment_description_cb['values'] = ('Application fee', 'Processing fee', 'Monthly rental fee')
+        self.payment_description_cb['values'] = ('Processing fee', 'Monthly rental fee')
         self.payment_description_cb.current(0)
         self.payment_description_cb.grid(column=1, row=0, sticky="w")
         self.payment_description_cb.bind("<<ComboboxSelected>>", self.change_payment_information)
@@ -3075,11 +3084,11 @@ class Window:
         ttk.Label(forms1_lf, text='Assessment Information',
                   style="on.TLabel").grid(column=0, row=3, padx=2.5, sticky="w")
 
-        self.payment_description_l = ttk.Label(forms1_lf, text='Application fee: ', style="small_info.TLabel",
+        self.payment_description_l = ttk.Label(forms1_lf, text='None', style="small_info.TLabel",
                                                justify="left")
         self.payment_description_l.grid(column=0, row=4, padx=2.5, sticky="w")
 
-        self.application_fee_l = ttk.Label(forms1_lf, text=500, style="small_info.TLabel", justify="left")
+        self.application_fee_l = ttk.Label(forms1_lf, text="", style="small_info.TLabel", justify="left")
         self.application_fee_l.grid(column=1, row=4, sticky="w")
 
         ttk.Label(forms1_lf, text='-------------------------',
@@ -3129,6 +3138,8 @@ class Window:
 
         ttk.Label(buttons_lf, text="Click here to create assessment!",
                   style="small_info.TLabel").pack(side="left", padx=10)
+
+        self.initialize_payment_information()
 
         # Disables underlying window
         self.dialog_box_top.grab_set()
@@ -6361,7 +6372,7 @@ class Window:
         # Grab record values
         values = self.info_tree.item(selected, "values")
 
-        if self.payment_description_cb.get() == "Application fee":
+        if self.payment_description_cb.get() == "Initial payment":
             amount_to_be_paid = 500
             self.payment_description_l.config(text="Application fee: ")
             self.application_fee_l.config(text=amount_to_be_paid)
@@ -6432,6 +6443,84 @@ class Window:
         self.payment_amount_sp.insert(0, amount_to_be_paid)
 
         print(event)
+
+    def initialize_payment_information(self):
+        amount_to_be_paid = 500
+        # Grab record number
+        selected = self.info_tree.focus()
+
+        # Grab record values
+        values = self.info_tree.item(selected, "values")
+
+        if self.payment_description_cb.get() == "Initial payment":
+            amount_to_be_paid = 500
+            self.payment_description_l.config(text="Application fee: ")
+            self.application_fee_l.config(text=amount_to_be_paid)
+            self.room_cost_l.config(text=0)
+            self.amenities_cost_l.config(text=0)
+        elif self.payment_description_cb.get() == "Confirmation fee":
+            amount_to_be_paid = int(values[6]) + int(values[7])
+        elif self.payment_description_cb.get() == "Processing fee":
+            try:
+                # Get the value room and amenities price
+                self.database_connect()
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.room_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                room_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.amenities_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                amount_to_be_paid = (((room_price + amenities_price) * 2) + 1500)
+
+                self.payment_description_l.config(text="Processing fee: ")
+                self.application_fee_l.config(text=amount_to_be_paid)
+                self.room_cost_l.config(text=room_price)
+                self.amenities_cost_l.config(text=amenities_price)
+            except Exception as e:
+                messagebox.showerror("Error", "Cannot proceed with the payment. Please connect to the internet or \n"
+                                              "if there is no Room ID available, please pay Confirmation fee first.")
+                print(e)
+
+        elif self.payment_description_cb.get() == "Monthly rental fee":
+            try:
+                # Get the value room and amenities price
+                self.database_connect()
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.room_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                room_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+
+                self.mycursor.execute(
+                    "SELECT DISTINCT r.amenities_price FROM room r WHERE r.room_id = '"
+                    + values[3] + "' AND admin_id = '" + str(self.admin_id_str) + "';")
+
+                # Converts the tuple into integer
+                amenities_price = functools.reduce(lambda sub, ele: sub * 10 + ele, self.mycursor.fetchone())
+                amount_to_be_paid = room_price + amenities_price
+
+                self.payment_description_l.config(text="Monthly rental fee: ")
+                self.application_fee_l.config(text=amount_to_be_paid)
+                self.room_cost_l.config(text=room_price)
+                self.amenities_cost_l.config(text=amenities_price)
+            except Exception as e:
+                messagebox.showerror("Error", "Cannot proceed with the payment. Please connect to the internet or \n"
+                                              "if there is no Room ID available, please pay Confirmation fee first.")
+                print(e)
+        else:
+            amount_to_be_paid = 0
+
+        self.amount_to_be_paid_l.config(text=amount_to_be_paid)
+        self.payment_amount_sp.delete(0, "end")
+        self.payment_amount_sp.insert(0, amount_to_be_paid)
 
     def basic_user_status(self):
         if self.basic_user_access_bool:
@@ -6518,30 +6607,32 @@ class Window:
         content_lf.pack(side="top", fill="both", pady=15, expand=True)
 
         # Payment transaction information section
-        ttk.Label(content_lf, text='Application fee - ', style="on.TLabel").grid(column=0, row=0, sticky="nw")
+        ttk.Label(content_lf, text='Initial payments', style="on.TLabel").grid(column=0, row=0, sticky="nw")
+
+        ttk.Label(content_lf, text='Application fee - ', style="h2_small.TLabel").grid(column=0, row=1, sticky="nw")
 
         ttk.Label(content_lf, text='DormBuilt, Inc. requires a fee for tenants that are interested in booking rooms. \n'
                                    'Application fee amounts to 500 pesos only.',
-                  style="h2_small.TLabel").grid(column=1, row=0, rowspan=3, sticky="w")
+                  style="h2_small.TLabel").grid(column=1, row=1, rowspan=3, sticky="w")
 
-        ttk.Label(content_lf, text='Confirmation fee - ', style="on.TLabel").grid(column=0, row=3, sticky="nw")
+        ttk.Label(content_lf, text='Confirmation fee - ', style="h2_small.TLabel").grid(column=0, row=4, sticky="nw")
 
         ttk.Label(content_lf, text='After payment of the application fee. A confirmation fee is required - 1 month \n'
                                    'cost of room and amenities. Application and Confirmation Fee are both part of the\n'
                                    'initial payment required by DormBuilt, Inc.',
-                  style="h2_small.TLabel").grid(column=1, row=3, rowspan=4, sticky="w")
+                  style="h2_small.TLabel").grid(column=1, row=4, rowspan=4, sticky="w")
 
-        ttk.Label(content_lf, text='Processing fee - ', style="on.TLabel").grid(column=0, row=7, sticky="nw")
+        ttk.Label(content_lf, text='Processing fee - ', style="on.TLabel").grid(column=0, row=8, sticky="nw")
 
         ttk.Label(content_lf, text='After the initial payment, tenants are then required of payment for Processing \n'
                                    'fee - One thousand and five hundred pesos plus 2 month security deposit on both\n'
                                    'the cost of room and amenities.',
-                  style="h2_small.TLabel").grid(column=1, row=7, rowspan=4, sticky="w")
+                  style="h2_small.TLabel").grid(column=1, row=8, rowspan=4, sticky="w")
 
-        ttk.Label(content_lf, text='Monthly rental - ', style="on.TLabel").grid(column=0, row=11, sticky="nw")
+        ttk.Label(content_lf, text='Monthly rental - ', style="on.TLabel").grid(column=0, row=12, sticky="nw")
 
         ttk.Label(content_lf, text='A monthly fee of equal to the cost of room and amenities are required from the\n '
-                                   'tenant.', style="h2_small.TLabel").grid(column=1, row=11, rowspan=4, sticky="w")
+                                   'tenant.', style="h2_small.TLabel").grid(column=1, row=12, rowspan=4, sticky="w")
 
         # Disables underlying window
         self.dialog_box_top.grab_set()
