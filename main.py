@@ -22,6 +22,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import DateEntry
 import webbrowser
+from hashlib import sha256
 
 # Import needed for compilation
 import babel.numbers
@@ -3746,9 +3747,13 @@ class Window:
         else:
             self.database_connect()
 
+            # Encodes plaintext to hash
+            password_hash = sha256(self.signin_password_e.get().encode('utf-8')).hexdigest()
+            print(password_hash)
+
             self.mycursor.execute(
                 "SELECT * FROM admin where username = '" + self.signin_username_e.get() + "' and password = '" +
-                self.signin_password_e.get() + "';")
+                password_hash + "';")
             myresult = self.mycursor.fetchone()
             if myresult is None:
                 self.basic_user_signin_request()
@@ -3855,22 +3860,24 @@ class Window:
         if not self.forgot_password_email_e.get():
             self.invalid_input()
         else:
-            otp = randint(10000, 99999)
+            otp = str(randint(10000, 99999))
+            # Encodes plaintext to hash
+            password_hash = sha256(otp.encode('utf-8')).hexdigest()
 
             self.database_connect()
-            self.mycursor.execute("UPDATE admin SET password='" + str(otp) + "' WHERE email='"
+            self.mycursor.execute("UPDATE admin SET password='" + password_hash + "' WHERE email='"
                                   + self.forgot_password_email_e.get() + "';")
-            print(str(otp), self.forgot_password_email_e.get())
+            print(otp, self.forgot_password_email_e.get())
 
             self.db1.commit()
             self.db1.close()
             self.mycursor.close()
 
-            email = 'pongodev0914@gmail.com'
-            email_password = 'Bin@1110010010'
+            email = 'pongodev0914@yahoo.com'
+            email_password = 'lwtphsgmanlhaimu'
             send_to_email = self.forgot_password_email_e.get()
             subject = 'Password reset for Administrative account in Hotel Management System of DormBuilt Inc.'
-            message = ("Your new password is\n\n" + str(otp))
+            message = ("Your new password is\n\n" + otp)
 
             msg = MIMEMultipart()
             msg['From'] = email
@@ -3880,7 +3887,7 @@ class Window:
             # Attach the message to the MIMEMultipart object
             msg.attach(MIMEText(message, 'plain'))
 
-            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server = smtplib.SMTP('smtp.mail.yahoo.com', 587)
             server.starttls()
             server.login(email, email_password)
             text = msg.as_string()
@@ -3903,10 +3910,13 @@ class Window:
             self.invalid_input()
         else:
             try:
+                # Encodes plaintext to hash
+                password_hash = sha256(self.signup_password_e.get().encode('utf-8')).hexdigest()
+
                 self.database_connect()
                 self.mycursor.execute("INSERT INTO admin (username, password, email, date_created, time_created)"
                                       "VALUES (%s,%s,%s,%s,%s)", (self.signup_username_e.get(),
-                                                                  self.signup_password_e.get(),
+                                                                  password_hash,
                                                                   self.signup_email_e.get(), date_str, time_str))
 
                 self.db1.commit()

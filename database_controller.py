@@ -65,6 +65,16 @@ class Database:
             print("alteration failed")
             print(e)
 
+        # Alter admin table
+        try:
+            self.mycursor = self.db1.cursor()
+            self.mycursor.execute("ALTER TABLE `hmsdatabase`.`admin`CHANGE COLUMN `password` `password` VARCHAR(64) "
+                                  "NOT NULL ;")
+            print("alteration is added successfully")
+        except Exception as e:
+            print("alteration failed")
+            print(e)
+
         # ================================================ basic_user table ============================================
 
         # Creating basic_user table in database
