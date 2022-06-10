@@ -23,12 +23,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import DateEntry
 import webbrowser
 from hashlib import sha256
-from update_check import checkForUpdates
+# from update_check import checkForUpdates
 # Import needed for compilation
 import babel.numbers
 
 # Check for updates
-checkForUpdates(__file__, 'https://github.com/xtian-2000/DormBuiltHMS.git')
+# checkForUpdates(__file__, 'https://github.com/xtian-2000/DormBuiltHMS.git')
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
@@ -3489,7 +3489,7 @@ class Window:
 
         self.change_username_e = ttk.Entry(forms_lf, width=60)
         self.change_username_e.grid(column=1, row=0, sticky="w", padx=10)
-        self.change_username_e.focus()
+        self.change_username_e.insert(0, self.current_user)
 
         ttk.Label(forms_lf, text='Password', style="h2.TLabel").grid(column=0, row=1, padx=2.5, pady=2.5, sticky="w")
 
@@ -5161,8 +5161,8 @@ class Window:
                 This email is an automated message, please don't reply.
                 '''
 
-                sender = 'pongodev0914@gmail.com'
-                pwd = 'Bin@1110010010'
+                sender = 'pongodev0914@yahoo.com'
+                pwd = 'lwtphsgmanlhaimu'
                 # put the email of the receiver here
                 receiver = self.tenant_email_e.get()
 
@@ -5191,7 +5191,7 @@ class Window:
                 message.attach(payload)
 
                 # use gmail with port
-                session = smtplib.SMTP('smtp.gmail.com', 587)
+                session = smtplib.SMTP('smtp.mail.yahoo.com', 587)
 
                 # enable security
                 session.starttls()
@@ -5491,8 +5491,8 @@ class Window:
                 This email is an automated message, please don't reply.
                 '''
 
-                sender = 'pongodev0914@gmail.com'
-                pwd = 'Bin@1110010010'
+                sender = 'pongodev0914@yahoo.com'
+                pwd = 'lwtphsgmanlhaimu'
                 # put the email of the receiver here
                 receiver = self.tenant_email_e.get()
 
@@ -5521,7 +5521,7 @@ class Window:
                 message.attach(payload)
 
                 # use gmail with port
-                session = smtplib.SMTP('smtp.gmail.com', 587)
+                session = smtplib.SMTP('smtp.mail.yahoo.com', 587)
 
                 # enable security
                 session.starttls()
@@ -5874,23 +5874,31 @@ class Window:
         elif not self.admin_access_bool:
             self.admin_access_validation_dialog()
         else:
-            self.database_connect()
-            self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
-                                  + self.change_password_e.get() + "' WHERE admin_id='"
-                                  + str(self.admin_id_str) + "';")
-            self.db1.commit()
-            self.db1.close()
-            self.mycursor.close()
+            # Encodes plaintext to hash
+            password_hash = sha256(self.change_password_e.get().encode('utf-8')).hexdigest()
+            try:
+                self.database_connect()
+                self.mycursor.execute("UPDATE admin SET username='" + self.change_username_e.get() + "', password='"
+                                      + password_hash + "' WHERE admin_id='"
+                                      + self.admin_id_str + "';")
+                self.db1.commit()
+                self.db1.close()
+                self.mycursor.close()
 
-            self.dialog_box_top.destroy()
+                self.dialog_box_top.destroy()
 
-            self.basic_user_status()
+                self.basic_user_status()
 
-            # Turn off admin access
-            if self.basic_user_access_bool:
-                self.admin_access_bool = False
-            else:
-                "Basic User Sign in is = False"
+                # Turn off admin access
+                if self.basic_user_access_bool:
+                    self.admin_access_bool = False
+                else:
+                    "Basic User Sign in is = False"
+
+                messagebox.showinfo("Success", "Change username or password successfully")
+            except Exception as e:
+                self.invalid_input()
+                print(e)
 
     def create_employee_request(self):
         if not self.employee_username_e.get():
@@ -6140,7 +6148,7 @@ class Window:
             self.mycursor.close()
             print("Action history is recorded successfully")
         except Exception as e:
-            self.invalid_input()
+            self.invalid_request()
             print(e)
 
     def remove_action_request(self):
@@ -6304,9 +6312,9 @@ class Window:
             self.db1.close()
             self.mycursor.close()
 
-            email = 'pongodev0914@gmail.com'
-            email_password = 'Bin@1110010010'
-            send_to_email = 'pongodev0914@gmail.com'
+            email = 'pongodev0914@yahoo.com'
+            email_password = 'lwtphsgmanlhaimu'
+            send_to_email = 'pongodev0914@yahoo.com'
             subject = ('Bug report from ' + admin_email)
             message = self.bug_description_e.get()
 
@@ -6318,7 +6326,7 @@ class Window:
             # Attach the message to the MIMEMultipart object
             msg.attach(MIMEText(message, 'plain'))
 
-            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server = smtplib.SMTP('smtp.mail.yahoo.com', 587)
             server.starttls()
             server.login(email, email_password)
             text = msg.as_string()
