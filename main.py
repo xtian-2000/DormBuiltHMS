@@ -23,9 +23,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkcalendar import DateEntry
 import webbrowser
 from hashlib import sha256
-
+from update_check import checkForUpdates
 # Import needed for compilation
 import babel.numbers
+
+# Check for updates
+checkForUpdates(__file__, 'https://github.com/xtian-2000/DormBuiltHMS.git')
 
 host = "hms.cm10enqi961k.us-east-2.rds.amazonaws.com"
 user = "admin"
@@ -34,7 +37,6 @@ password = "44966874"
 date = datetime.now()
 date_str = date.strftime('%x')
 
-print(date_str)
 time = datetime.now()
 time_str = time.strftime('%X')
 
@@ -5075,7 +5077,7 @@ class Window:
                 self.invalid_input()
                 print(e)
 
-    # def download_receipt_request(self):
+        # def download_receipt_request(self):
         # Grab record number
         selected = self.info_tree.focus()
 
@@ -5848,7 +5850,7 @@ class Window:
                     discounted_price = (int(self.amount_to_be_paid_l.cget("text")) -
                                         (int(self.amount_to_be_paid_l.cget("text")) * discount_amount / 100))
 
-                    self.discount_reduction = (int(self.amount_to_be_paid_l.cget("text")) * discount_amount/100)
+                    self.discount_reduction = (int(self.amount_to_be_paid_l.cget("text")) * discount_amount / 100)
 
                     self.amount_to_be_paid_l.config(text=discounted_price)
                     self.discount_l.config(text=discount_amount)
